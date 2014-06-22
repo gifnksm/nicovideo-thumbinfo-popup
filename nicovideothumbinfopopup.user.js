@@ -9,7 +9,7 @@
 // @exclude        http://ext.nicovideo.jp/thumb_mylist/*
 // @exclude        http://ext.nicovideo.jp/thumb_community/*
 // @exclude        http://ichiba.nicovideo.jp/parts/*
-// @resource       style    style.css
+// @resource       style    https://raw.githubusercontent.com/gifnksm/nicovideo-thumbinfo-popup/master/style.css
 // @grant          GM_getResourceText
 // @grant          GM_addStyle
 // @grant          GM_xmlhttpRequest

@@ -7,7 +7,7 @@
 // @exclude        http://ext.nicovideo.jp/thumb_mylist/*
 // @exclude        http://ext.nicovideo.jp/thumb_community/*
 // @exclude        http://ichiba.nicovideo.jp/parts/*
-// @resource       style    http://mfp.xrea.jp/misc/greasemonkey/nicovideoThumbinfoPopup/style.css
+// @resource       style    style.css
 // @grant          GM_getResourceText
 // @grant          GM_addStyle
 // @grant          GM_xmlhttpRequest

@@ -1,7 +1,9 @@
 // ==UserScript==
 // @name           nicovideo Thumbinfo popup
-// @namespace      http://d.hatena.ne.jp/gifnksm/
 // @description    Get information about nicovideo movies before going to watch page.
+// @version        1.0.0
+// @updateURL      https://raw.githubusercontent.com/gifnksm/nicovideo-thumbinfo-popup/master/nicovideothumbinfopopup.user.js
+// @namespace      http://d.hatena.ne.jp/gifnksm/
 // @include        *
 // @exclude        http://ext.nicovideo.jp/thumb/*
 // @exclude        http://ext.nicovideo.jp/thumb_mylist/*

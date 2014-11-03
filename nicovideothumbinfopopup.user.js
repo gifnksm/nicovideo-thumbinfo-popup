@@ -1741,8 +1741,8 @@ var NicovideoContentGenerator = function() {
         'a@'+POPUP_PARENT_ATTRIBUTE+'='+this.popup.uniqueID,
         {href: href, title: title},
         $N('img',
-           {src: 'http://res.nicovideo.jp/img/common/icon/dic_'
-            + (exist? 'on': 'off') + '.gif',
+           {src: 'http://res.nimg.jp/img/common/icon/dic_'
+            + (exist? 'on': 'off') + '.png',
             alt: (exist? '百': '？'),
             'class': ClassNames.get('dic_icon')}));
     },

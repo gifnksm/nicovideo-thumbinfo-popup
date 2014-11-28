@@ -2335,6 +2335,7 @@ function getPosition(elem) {
       function(target) {
         // target は Element で，elem は target.offsetParent の子孫でなければならない
         if(target.nodeType != 1 ||
+           target.offsetParent === null ||
            (elem.compareDocumentPosition(target.offsetParent) & 8) == 0)
           return;
 

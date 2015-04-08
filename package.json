@@ -1,0 +1,40 @@
+{
+  "name": "nicovideo-thumbinfo-popup",
+  "version": "2.0.0-alpha",
+  "description": "UserScript to get nicovideo movie information before going to watch page.",
+  "scripts": {
+    "build": "gulp build",
+    "test": "gulp test",
+    "clean": "gulp clean"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gifnksm/nicovideo-thumbinfo-popup.git"
+  },
+  "author": "NAKASHIMA, Makoto <makoto.nksm+github@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/gifnksm/nicovideo-thumbinfo-popup/issues"
+  },
+  "homepage": "https://github.com/gifnksm/nicovideo-thumbinfo-popup",
+  "devDependencies": {
+    "browserify": "^9.0.7",
+    "del": "^1.1.1",
+    "gulp": "^3.8.11",
+    "gulp-espower": "^0.10.1",
+    "gulp-karma": "0.0.4",
+    "gulp-sourcemaps": "^1.5.1",
+    "gulp-tsd": "0.0.4",
+    "gulp-typescript": "^2.6.0",
+    "karma": "^0.12.31",
+    "karma-browserify": "^4.1.2",
+    "karma-firefox-launcher": "^0.1.4",
+    "karma-mocha": "^0.1.10",
+    "karma-mocha-debug": "^0.1.2",
+    "karma-mocha-reporter": "^1.0.2",
+    "mocha": "^2.2.3",
+    "power-assert": "^0.10.2",
+    "typescript": "^1.5.0-alpha",
+    "vinyl-source-stream": "^1.1.0"
+  }
+}

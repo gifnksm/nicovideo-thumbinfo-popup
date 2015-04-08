@@ -1,11 +1,31 @@
 nicovideo-thumbinfo-popup
 =========================
 
-Get information about nicovideo movies before going to watch page.
+UserScript to get nicovideo movie information before going to watch page.
 
-## Distribution sites
+This branch is in a very early stage of development.
 
-* [userscripts.org](http://userscripts.org/scripts/show/28910)
-* [userscripts-mirror.org](http://userscripts-mirror.org/scripts/show/28910)
-* [Greasy Fork](https://greasyfork.org/scripts/2721-nicovideo-thumbinfo-popup)
+## Setup
 
+```
+$ cd ./<path to cloned directory>
+$ npm install
+```
+
+## Build
+
+```
+$ gulp build
+```
+
+## Test
+
+```
+$ gulp test
+```
+
+To start test watcher:
+
+```
+$ gulp watch
+```

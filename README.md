@@ -1,5 +1,4 @@
-nicovideo-thumbinfo-popup
-=========================
+# nicovideo-thumbinfo-popup.user.js [![Build Status](https://travis-ci.org/gifnksm/nicovideo-thumbinfo-popup.svg?branch=new)](https://travis-ci.org/gifnksm/nicovideo-thumbinfo-popup)
 
 UserScript to get nicovideo movie information before going to watch page.
 

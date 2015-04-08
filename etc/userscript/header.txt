@@ -1,0 +1,17 @@
+// ==UserScript==
+// @name        nicovideo Thumbinfo popup
+// @namespace   http://d.hatena.ne.jp/gifnksm/
+// @version     <%= pkg.version %>
+// @description <%= pkg.description %>
+// @copyright   2008+ <%= pkg.author %>
+// @license     MIT
+// @author      <%= pkg.author %>
+// @homepageURL <%= pkg.homepage %>
+// @supportURL  <%= pkg.bugs.url %>
+// @updateURL   https://raw.githubusercontent.com/gifnksm/nicovideo-thumbinfo-popup/master/nicovideothumbinfopopup.user.js
+// @include     *
+// @exclude     http://ext.nicovideo.jp/thumb/*
+// @exclude     http://ext.nicovideo.jp/thumb_mylist/*
+// @exclude     http://ext.nicovideo.jp/thumb_community/*
+// @exclude     http://ichiba.nicovideo.jp/parts/*
+// ==/UserScript==

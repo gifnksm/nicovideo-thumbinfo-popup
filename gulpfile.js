@@ -8,6 +8,10 @@ var sourcemaps = require("gulp-sourcemaps");
 var tsd = require("gulp-tsd");
 var espower = require("gulp-espower");
 var karma = require("gulp-karma");
+var concat = require("gulp-concat");
+var merge = require("gulp-merge");
+var buffer = require("gulp-buffer");
+var template = require("gulp-template");
 
 var tsProject = typescript.createProject({
   typescript: require("typescript"),
@@ -30,10 +34,16 @@ gulp.task("build:typescript", ["prepare:tsd"], function() {
     .pipe(gulp.dest("./target/src"));
 });
 
-gulp.task("build:browserify", ["build:typescript"], function() {
-  return browserify("./target/src/main.js")
-    .bundle()
-    .pipe(source("nicovideo-thumbinfo-popup.user.js"))
+gulp.task("build:concat", ["build:typescript"], function() {
+  return merge(
+    gulp.src("etc/userscript/header.txt")
+      .pipe(template({ pkg: require("./package.json") })),
+    browserify("./target/src/main.js")
+      .bundle()
+      .pipe(source("main.js"))
+      .pipe(buffer())
+  )
+    .pipe(concat("nicovideo-thumbinfo-popup.user.js"))
     .pipe(gulp.dest("./target/"));
 });
 
@@ -63,7 +73,7 @@ gulp.task("watch:karma", ["test:typescript"], function() {
 });
 
 gulp.task("prepare", ["prepare:tsd"]);
-gulp.task("build", ["build:browserify"]);
+gulp.task("build", ["build:concat"]);
 gulp.task("test", ["test:karma"]);
 gulp.task("clean", function(cb) {
   var del = require("del");
@@ -72,7 +82,7 @@ gulp.task("clean", function(cb) {
 
 gulp.task("default", ["build"]);
 gulp.task("watch:build", ["build"], function() {
-  gulp.watch("src/**/*.ts", ["build:browserify"]);
+  gulp.watch("src/**/*.ts", ["build:concat"]);
 });
 gulp.task("watch:test", ["watch:karma"], function() {
   gulp.watch("src/**/*.ts", ["test:typescript"]);

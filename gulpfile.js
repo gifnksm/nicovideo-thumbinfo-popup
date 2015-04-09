@@ -51,6 +51,7 @@ gulp.task("test:typescript", ["build:typescript"], function() {
   return gulp.src(["./test/**/*.ts"])
     .pipe(sourcemaps.init())
     .pipe(typescript(tsProject))
+    .pipe(sourcemaps.write())
     .pipe(espower())
     .pipe(sourcemaps.write())
     .pipe(gulp.dest("./target/test"));

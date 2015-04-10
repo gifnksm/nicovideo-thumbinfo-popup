@@ -12,6 +12,7 @@ var concat = require("gulp-concat");
 var merge = require("gulp-merge");
 var buffer = require("gulp-buffer");
 var template = require("gulp-template");
+var bower = require("gulp-bower");
 
 var tsProject = typescript.createProject({
   typescript: require("typescript"),
@@ -20,10 +21,14 @@ var tsProject = typescript.createProject({
 });
 
 gulp.task("prepare:tsd", function(cb) {
-  tsd({
+  return tsd({
     command: "reinstall",
     config: "./tsd.json"
   }, cb);
+});
+
+gulp.task("prepare:bower", function() {
+  return bower();
 });
 
 gulp.task("build:typescript", ["prepare:tsd"], function() {
@@ -57,16 +62,16 @@ gulp.task("test:typescript", ["build:typescript"], function() {
     .pipe(gulp.dest("./target/test"));
 });
 
-gulp.task("test:karma", ["test:typescript"], function() {
-  return gulp.src("target/test/**/*.js")
+gulp.task("test:karma", ["test:typescript", "prepare:bower"], function() {
+  return gulp.src("./idontexist") // https://github.com/lazd/gulp-karma/issues/9
     .pipe(karma({
       configFile: "karma.conf.js",
       action: "run"
     }));
 });
 
-gulp.task("watch:karma", ["test:typescript"], function() {
-  gulp.src("target/test/**/*.js")
+gulp.task("watch:karma", ["test:typescript", "prepare:bower"], function() {
+  gulp.src("./idontexist") // https://github.com/lazd/gulp-karma/issues/9
     .pipe(karma({
       configFile: "karma.conf.js",
       action: "watch"

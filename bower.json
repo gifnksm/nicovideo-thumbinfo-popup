@@ -1,0 +1,22 @@
+{
+  "name": "nicovideo-thumbinfo-popup",
+  "version": "2.0.0-alpha",
+  "homepage": "https://github.com/gifnksm/nicovideo-thumbinfo-popup",
+  "authors": [
+    "gifnksm <makoto.nksm+github@gmail.com>"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "react": "~0.13.1"
+  },
+  "devDependencies": {
+    "power-assert": "~0.10.2"
+  }
+}

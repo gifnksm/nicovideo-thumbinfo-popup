@@ -15,6 +15,8 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
+      'bower_components/react/react.js',
+      'bower_components/power-assert/build/power-assert.js',
       'target/test/**/*.js'
     ],
 

@@ -17,10 +17,22 @@
     "url": "https://github.com/gifnksm/nicovideo-thumbinfo-popup/issues"
   },
   "homepage": "https://github.com/gifnksm/nicovideo-thumbinfo-popup",
+  "browserify": {
+    "transform": [
+      "browserify-shim"
+    ]
+  },
+  "browserify-shim": {
+    "react": "global:React",
+    "power-assert": "global:assert"
+  },
   "devDependencies": {
+    "bower": "^1.4.1",
     "browserify": "^9.0.7",
+    "browserify-shim": "^3.8.3",
     "del": "^1.1.1",
     "gulp": "^3.8.11",
+    "gulp-bower": "0.0.10",
     "gulp-buffer": "0.0.2",
     "gulp-concat": "^2.5.2",
     "gulp-espower": "^0.10.1",
@@ -37,11 +49,8 @@
     "karma-mocha-debug": "^0.1.2",
     "karma-mocha-reporter": "^1.0.2",
     "mocha": "^2.2.4",
-    "power-assert": "^0.10.2",
     "typescript": "^1.5.0-alpha",
     "vinyl-source-stream": "^1.1.0"
   },
-  "dependencies": {
-    "react": "^0.13.1"
-  }
+  "dependencies": {}
 }

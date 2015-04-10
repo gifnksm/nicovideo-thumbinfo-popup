@@ -40,5 +40,8 @@
     "power-assert": "^0.10.2",
     "typescript": "^1.5.0-alpha",
     "vinyl-source-stream": "^1.1.0"
+  },
+  "dependencies": {
+    "react": "^0.13.1"
   }
 }

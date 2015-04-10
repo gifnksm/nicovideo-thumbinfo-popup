@@ -1,12 +1,16 @@
-/// <reference path="../..//target/typings/tsd.d.ts" />
+/// <reference path="../../target/typings/tsd.d.ts" />
 
 import * as React from "react";
 
-interface Props {}
-interface State {}
+module Component {
+    export interface Props {}
+    export interface State {}
+}
 
-export class Component extends React.Component<Props, State> {
+class Component extends React.Component<Component.Props, Component.State> {
     public render() {
         return React.DOM.div(null, "Hello, This is thumbinfo!");
     }
 }
+
+export default Component;

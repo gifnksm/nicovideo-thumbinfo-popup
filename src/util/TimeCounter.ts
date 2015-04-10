@@ -1,4 +1,4 @@
-class TimeCounter {
+export default class TimeCounter {
     private startTime: number = NaN;
     private timeout: number;
 
@@ -11,5 +11,3 @@ class TimeCounter {
     isTimeout(now: number): boolean { return this.getTimeLeft(now) <= 0; }
     getTimeLeft(now: number): number { return this.timeout + this.startTime - now; }
 }
-
-export default TimeCounter;

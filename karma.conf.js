@@ -2,6 +2,8 @@
 // Generated on Wed Apr 08 2015 01:01:34 GMT+0900 (JST)
 
 module.exports = function(config) {
+  var bowerFiles = require('main-bower-files');
+
   config.set({
 
     // base path that will be used to resolve all patterns (eg. files, exclude)
@@ -14,11 +16,9 @@ module.exports = function(config) {
 
 
     // list of files / patterns to load in the browser
-    files: [
-      'bower_components/react/react.js',
-      'bower_components/power-assert/build/power-assert.js',
+    files: bowerFiles({includeDev: true}).concat([
       'target/test/**/*.js'
-    ],
+    ]),
 
 
     // list of files to exclude

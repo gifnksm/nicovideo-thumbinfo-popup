@@ -13,11 +13,13 @@ var merge = require("gulp-merge");
 var buffer = require("gulp-buffer");
 var template = require("gulp-template");
 var bower = require("gulp-bower");
+var through = require("through2");
 
 var tsProject = typescript.createProject({
   typescript: require("typescript"),
   target: "ES5", sortOutput: true, module: "commonjs",
-  noImplicitAny: true
+  noImplicitAny: true,
+  noEmitOnError: true
 });
 
 gulp.task("prepare:tsd", function(cb) {
@@ -36,14 +38,14 @@ gulp.task("build:typescript", ["prepare:tsd"], function() {
     .pipe(sourcemaps.init())
     .pipe(typescript(tsProject))
     .pipe(sourcemaps.write())
-    .pipe(gulp.dest("./target/src"));
+    .pipe(gulp.dest("./target/compiled/src/"));
 });
 
 gulp.task("build:concat", ["build:typescript"], function() {
   return merge(
     gulp.src("etc/userscript/header.txt")
       .pipe(template({ pkg: require("./package.json") })),
-    browserify("./target/src/main.js")
+    browserify("./target/compiled/src/main.js")
       .bundle()
       .pipe(source("main.js"))
       .pipe(buffer())
@@ -59,10 +61,30 @@ gulp.task("test:typescript", ["build:typescript"], function() {
     .pipe(sourcemaps.write())
     .pipe(espower())
     .pipe(sourcemaps.write())
-    .pipe(gulp.dest("./target/test"));
+    .pipe(gulp.dest("./target/compiled/test/"));
 });
 
-gulp.task("test:karma", ["test:typescript", "prepare:bower"], function() {
+gulp.task("test:concat", ["test:typescript"], function() {
+  var browserified = function() {
+    return through.obj(function(chunk, enc, callback) {
+      if (chunk.isBuffer()) {
+        var b = browserify({
+          entries: [chunk.path],
+          debug: true
+        });
+        chunk.contents = b.bundle();
+        this.push(chunk);
+      }
+      callback();
+    });
+  };
+
+  return gulp.src(["./target/compiled/test/**/*.js"])
+    .pipe(browserified())
+    .pipe(gulp.dest("./target/test/"));
+});
+
+gulp.task("test:karma", ["test:concat", "prepare:bower"], function() {
   return gulp.src("./idontexist") // https://github.com/lazd/gulp-karma/issues/9
     .pipe(karma({
       configFile: "karma.conf.js",
@@ -70,7 +92,7 @@ gulp.task("test:karma", ["test:typescript", "prepare:bower"], function() {
     }));
 });
 
-gulp.task("watch:karma", ["test:typescript", "prepare:bower"], function() {
+gulp.task("watch:karma", ["test:concat", "prepare:bower"], function() {
   gulp.src("./idontexist") // https://github.com/lazd/gulp-karma/issues/9
     .pipe(karma({
       configFile: "karma.conf.js",
@@ -91,7 +113,7 @@ gulp.task("watch:build", ["build"], function() {
   gulp.watch("src/**/*.ts", ["build:concat"]);
 });
 gulp.task("watch:test", ["watch:karma"], function() {
-  gulp.watch("src/**/*.ts", ["test:typescript"]);
-  gulp.watch("test/**/*.ts", ["test:typescript"]);
+  gulp.watch("src/**/*.ts", ["test:concat"]);
+  gulp.watch("test/**/*.ts", ["test:concat"]);
 });
 gulp.task("watch", ["watch:build", "watch:test"]);

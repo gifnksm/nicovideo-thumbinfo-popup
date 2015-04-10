@@ -1,6 +1,6 @@
-/// <reference path="../../target/typings/tsd.d.ts" />
+/// <reference path="../../../target/typings/tsd.d.ts" />
 
-import * as NicoThumbinfo from "../../src/component/NicoThumbinfo";
+import * as NicoThumbinfo from "../../../src/component/NicoThumbinfo";
 import * as assert from "power-assert";
 import * as React from "react";
 

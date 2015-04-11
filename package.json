@@ -28,7 +28,7 @@
   },
   "devDependencies": {
     "bower": "^1.4.1",
-    "browserify": "^9.0.7",
+    "browserify": "^9.0.8",
     "browserify-shim": "^3.8.3",
     "del": "^1.1.1",
     "gulp": "^3.8.11",
@@ -42,7 +42,7 @@
     "gulp-template": "^3.0.0",
     "gulp-tsd": "0.0.4",
     "gulp-typescript": "^2.6.0",
-    "karma": "^0.12.31",
+    "karma": "^0.12.32",
     "karma-firefox-launcher": "^0.1.4",
     "karma-mocha": "^0.1.10",
     "karma-mocha-debug": "^0.1.2",

@@ -3,6 +3,7 @@
   "version": "2.0.0-alpha",
   "description": "UserScript to get nicovideo movie information before going to watch page.",
   "scripts": {
+    "start": "gulp start",
     "build": "gulp build",
     "test": "gulp test",
     "clean": "gulp clean",
@@ -32,15 +33,15 @@
     "browserify": "^9.0.8",
     "browserify-shim": "^3.8.3",
     "del": "^1.1.1",
+    "espowerify": "^0.10.0",
     "gulp": "^3.8.11",
     "gulp-buffer": "0.0.2",
     "gulp-concat": "^2.5.2",
-    "gulp-espower": "^0.10.1",
-    "gulp-karma": "0.0.4",
     "gulp-merge": "^0.1.0",
     "gulp-sourcemaps": "^1.5.1",
     "gulp-template": "^3.0.0",
     "gulp-typescript": "^2.6.0",
+    "gulp-uglify": "^1.2.0",
     "karma": "^0.12.32",
     "karma-firefox-launcher": "^0.1.4",
     "karma-mocha": "^0.1.10",
@@ -50,7 +51,8 @@
     "through2": "^0.6.5",
     "tsd": "^0.5.7",
     "typescript": "^1.5.0-alpha",
-    "vinyl-source-stream": "^1.1.0"
+    "vinyl-source-stream": "^1.1.0",
+    "watchify": "^3.1.0"
   },
   "dependencies": {}
 }

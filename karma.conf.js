@@ -17,7 +17,7 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: bowerFiles({includeDev: true}).concat([
-      'target/test/**/*.js'
+      'target/bundle/test/**/*.js'
     ]),
 
 

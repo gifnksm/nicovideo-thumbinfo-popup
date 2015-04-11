@@ -2,6 +2,11 @@ language: node_js
 node_js:
   - "0.12"
 sudo: false
+cache:
+  directories:
+    - node_modules
+    - bower_components
+    - target/typings
 
 before_script:
   - export DISPLAY=:99.0

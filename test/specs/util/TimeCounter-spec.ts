@@ -1,4 +1,4 @@
-/// <reference path="../../../typings/tsd.d.ts" />
+/// <reference path="../../../typings/common.d.ts" />
 
 import TimeCounter from "../../../src/util/TimeCounter";
 import * as assert from "power-assert";

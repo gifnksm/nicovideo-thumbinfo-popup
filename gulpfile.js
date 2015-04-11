@@ -18,8 +18,7 @@ var tsProject = typescript.createProject({
   typescript: require("typescript"),
   target: "ES5", sortOutput: true, module: "commonjs",
   noImplicitAny: true,
-  noEmitOnError: true,
-  noExternalResolve: true
+  noEmitOnError: true
 });
 
 function typescript_build(src, option) {

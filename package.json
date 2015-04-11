@@ -5,7 +5,8 @@
   "scripts": {
     "build": "gulp build",
     "test": "gulp test",
-    "clean": "gulp clean"
+    "clean": "gulp clean",
+    "postinstall": "bower cache clean && bower install && tsd reinstall -so"
   },
   "repository": {
     "type": "git",
@@ -32,7 +33,6 @@
     "browserify-shim": "^3.8.3",
     "del": "^1.1.1",
     "gulp": "^3.8.11",
-    "gulp-bower": "0.0.10",
     "gulp-buffer": "0.0.2",
     "gulp-concat": "^2.5.2",
     "gulp-espower": "^0.10.1",
@@ -40,7 +40,6 @@
     "gulp-merge": "^0.1.0",
     "gulp-sourcemaps": "^1.5.1",
     "gulp-template": "^3.0.0",
-    "gulp-tsd": "0.0.4",
     "gulp-typescript": "^2.6.0",
     "karma": "^0.12.32",
     "karma-firefox-launcher": "^0.1.4",
@@ -50,6 +49,7 @@
     "main-bower-files": "^2.6.2",
     "mocha": "^2.2.4",
     "through2": "^0.6.5",
+    "tsd": "^0.5.7",
     "typescript": "^1.5.0-alpha",
     "vinyl-source-stream": "^1.1.0"
   },

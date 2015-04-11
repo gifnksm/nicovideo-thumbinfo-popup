@@ -5,14 +5,12 @@ var typescript = require("gulp-typescript");
 var browserify = require("browserify");
 var source = require("vinyl-source-stream");
 var sourcemaps = require("gulp-sourcemaps");
-var tsd = require("gulp-tsd");
 var espower = require("gulp-espower");
 var karma = require("gulp-karma");
 var concat = require("gulp-concat");
 var merge = require("gulp-merge");
 var buffer = require("gulp-buffer");
 var template = require("gulp-template");
-var bower = require("gulp-bower");
 var through = require("through2");
 
 var tsProject = typescript.createProject({
@@ -22,18 +20,7 @@ var tsProject = typescript.createProject({
   noEmitOnError: true
 });
 
-gulp.task("prepare:tsd", function(cb) {
-  return tsd({
-    command: "reinstall",
-    config: "./tsd.json"
-  }, cb);
-});
-
-gulp.task("prepare:bower", function() {
-  return bower();
-});
-
-gulp.task("build:typescript", ["prepare:tsd"], function() {
+gulp.task("build:typescript", function() {
   return gulp.src(["./src/**/*.ts"])
     .pipe(sourcemaps.init())
     .pipe(typescript(tsProject))
@@ -84,7 +71,7 @@ gulp.task("test:concat", ["test:typescript"], function() {
     .pipe(gulp.dest("./target/test/"));
 });
 
-gulp.task("test:karma", ["test:concat", "prepare:bower"], function() {
+gulp.task("test:karma", ["test:concat"], function() {
   return gulp.src("./idontexist") // https://github.com/lazd/gulp-karma/issues/9
     .pipe(karma({
       configFile: "karma.conf.js",
@@ -92,7 +79,7 @@ gulp.task("test:karma", ["test:concat", "prepare:bower"], function() {
     }));
 });
 
-gulp.task("watch:karma", ["test:concat", "prepare:bower"], function() {
+gulp.task("watch:karma", ["test:concat"], function() {
   gulp.src("./idontexist") // https://github.com/lazd/gulp-karma/issues/9
     .pipe(karma({
       configFile: "karma.conf.js",
@@ -100,7 +87,6 @@ gulp.task("watch:karma", ["test:concat", "prepare:bower"], function() {
     }));
 });
 
-gulp.task("prepare", ["prepare:tsd"]);
 gulp.task("build", ["build:concat"]);
 gulp.task("test", ["test:karma"]);
 gulp.task("clean", function(cb) {

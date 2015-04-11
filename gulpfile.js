@@ -116,4 +116,4 @@ gulp.task("watch:test", ["watch:karma"], function() {
   gulp.watch("src/**/*.ts", ["test:concat"]);
   gulp.watch("test/**/*.ts", ["test:concat"]);
 });
-gulp.task("watch", ["watch:build", "watch:test"]);
+gulp.task("watch", ["watch:test"]);

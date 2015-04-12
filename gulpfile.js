@@ -7,7 +7,6 @@ var source = require("vinyl-source-stream");
 var sourcemaps = require("gulp-sourcemaps");
 var concat = require("gulp-concat");
 var merge = require("gulp-merge");
-var buffer = require("gulp-buffer");
 var template = require("gulp-template");
 var through = require("through2");
 var uglify = require("gulp-uglify");
@@ -92,34 +91,50 @@ gulp.task("test:bundle", ["test:typescript"], test_bundle(false));
 gulp.task("watch:bundle", ["test:typescript"], test_bundle(true));
 
 
-function userscript_header(filename) {
-  return gulp.src("./etc/userscript/header.txt")
-    .pipe(template({ pkg: require("./package.json"), filename: filename}));
+function userscript_meta(baseName) {
+  return function () {
+    var baseUrl = "https://raw.githubusercontent.com/gifnksm/nicovideo-thumbinfo-popup/master/";
+    return gulp.src("./etc/userscript/header.txt")
+      .pipe(template({
+        pkg: require("./package.json"),
+        updateUrl: baseUrl + baseName + ".meta.js",
+        downloadUrl: baseUrl + baseName + ".user.js"
+      }))
+      .pipe(concat(baseName + ".meta.js"))
+      .pipe(gulp.dest("./target/"));
+  };
 }
 
-gulp.task("build:normal", ["build:bundle"], function() {
-  var filename = "nicovideo-thumbinfo-popup.user.js";
-  return merge(
-    userscript_header(filename),
-    gulp.src("./target/bundle/src/index.js")
-      .pipe(buffer()))
-    .pipe(concat(filename))
-    .pipe(gulp.dest("./target/"));
-});
+var userscript_normal_baseName = "nicovideothumbinfopopup";
+var userscript_min_baseName = "nicovideothumbinfopopup.min";
 
-gulp.task("build:uglify", ["build:bundle"], function() {
-  var filename = "nicovideo-thumbinfo-popup.min.user.js";
-  return merge(
-    userscript_header(filename),
-    gulp.src("./target/bundle/src/index.js")
-      .pipe(uglify())
-      .pipe(buffer()))
-    .pipe(concat(filename))
-    .pipe(gulp.dest("./target/"));
-});
+gulp.task("build:meta:normal", userscript_meta(userscript_normal_baseName));
+gulp.task("build:meta:min", userscript_meta(userscript_min_baseName));
+
+function userscript_body(baseName, body) {
+  return function() {
+    return merge(
+      gulp.src("./target/" + baseName + ".meta.js"),
+      body()
+    )
+      .pipe(concat(baseName + ".user.js"))
+      .pipe(gulp.dest("./target/"));
+  };
+}
+
+gulp.task("build:normal", ["build:meta:normal", "build:bundle"],
+          userscript_body(userscript_normal_baseName, function() {
+            return gulp.src("./target/bundle/src/index.js");
+          }));
+gulp.task("build:min", ["build:meta:min", "build:bundle"],
+          userscript_body(userscript_min_baseName, function() {
+            return gulp.src("./target/bundle/src/index.js")
+              .pipe(uglify());
+          }));
 
 
-gulp.task("build", ["build:normal", "build:uglify"]);
+
+gulp.task("build", ["build:normal", "build:min"]);
 
 gulp.task("test", ["test:bundle"], function(done) {
   karma.start({

@@ -31,11 +31,10 @@
   "devDependencies": {
     "bower": "^1.4.1",
     "browserify": "^9.0.8",
-    "browserify-shim": "^3.8.3",
+    "browserify-shim": "^3.8.5",
     "del": "^1.1.1",
     "espowerify": "^0.10.0",
     "gulp": "^3.8.11",
-    "gulp-buffer": "0.0.2",
     "gulp-concat": "^2.5.2",
     "gulp-merge": "^0.1.0",
     "gulp-sourcemaps": "^1.5.1",

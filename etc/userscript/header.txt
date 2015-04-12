@@ -8,7 +8,8 @@
 // @author      <%= pkg.author %>
 // @homepageURL <%= pkg.homepage %>
 // @supportURL  <%= pkg.bugs.url %>
-// @updateURL   https://raw.githubusercontent.com/gifnksm/nicovideo-thumbinfo-popup/master/<%= filename %>
+// @updateURL   <%= updateUrl %>
+// @downloadURL <%= downloadUrl %>
 // @include     *
 // @exclude     http://ext.nicovideo.jp/thumb/*
 // @exclude     http://ext.nicovideo.jp/thumb_mylist/*

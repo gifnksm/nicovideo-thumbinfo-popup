@@ -92,7 +92,6 @@ module NicoThumbinfoKey {
      */
     export function fromUrl(url: string): Option<string> {
         let m = UrlRegExp.exec(url);
-        console.log(UrlRegExp, url, m);
         if (m !== null) {
             let id: string;
             // 動画ID

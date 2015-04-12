@@ -6,19 +6,19 @@
   "bundle": "typings/tsd.d.ts",
   "installed": {
     "mocha/mocha.d.ts": {
-      "commit": "d5f92f93bdb49f332fa662ff1d0cc8700f02e4dc"
+      "commit": "b0056383b51495b373a32b791de8112fcafe2ace"
     },
     "power-assert/power-assert.d.ts": {
-      "commit": "d5f92f93bdb49f332fa662ff1d0cc8700f02e4dc"
+      "commit": "b0056383b51495b373a32b791de8112fcafe2ace"
     },
     "empower/empower.d.ts": {
-      "commit": "d5f92f93bdb49f332fa662ff1d0cc8700f02e4dc"
+      "commit": "b0056383b51495b373a32b791de8112fcafe2ace"
     },
     "power-assert-formatter/power-assert-formatter.d.ts": {
-      "commit": "d5f92f93bdb49f332fa662ff1d0cc8700f02e4dc"
+      "commit": "b0056383b51495b373a32b791de8112fcafe2ace"
     },
     "react/react.d.ts": {
-      "commit": "d5f92f93bdb49f332fa662ff1d0cc8700f02e4dc"
+      "commit": "b0056383b51495b373a32b791de8112fcafe2ace"
     }
   }
 }

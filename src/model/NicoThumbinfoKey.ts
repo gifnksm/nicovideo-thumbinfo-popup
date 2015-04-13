@@ -3,7 +3,9 @@
 import {Option, Some, None} from "option-t";
 
 /**
- * URLよりサムネイル情報取得用キーを抽出するための関数群。
+ * サムネイル情報取得用キー
+ *
+ * キー同士の等価性を比較するためには、 {@link valueOf} メソッドの戻り値同士を比較すること。
  *
  * サムネイル情報取得用キーには以下の2種類が存在する。
  *
@@ -23,7 +25,36 @@ import {Option, Some, None} from "option-t";
  *
  * 参考: http://d.hatena.ne.jp/kotas/20070926/watchurl
  */
-module NicoThumbinfoKey {
+class Key {
+    private _type: Key.Type;
+    private _id: string;
+
+    private static _typeValue: {[index: number]: string} = {
+        [Key.Type.VideoId]: "video",
+        [Key.Type.ThreadId]: "thread"
+    };
+
+    /**
+     * @param type キーの種別
+     * @param id   動画ID/スレッドID
+     */
+    constructor(type: Key.Type, id: string) {
+        this._type = type;
+        this._id = id;
+    }
+
+    get type(): Key.Type { return this._type; }
+    get id(): string { return this._id; }
+
+    valueOf(): string {
+        return `${Key._typeValue[this._type]}:${this._id}`;
+    }
+}
+
+module Key {
+    export const enum Type {
+        VideoId, ThreadId
+    }
 
     /**
      * 動画IDのプレフィックス (先頭2文字) 部分の定義。
@@ -43,7 +74,7 @@ module NicoThumbinfoKey {
 
     module RegExpStr {
         const NicovideoDomain = "(?:ext|www|tw|es|de|de|nine)\\.nicovideo\\.jp";
-        const NicoMsDomain = "nico\\.ms";
+        const ShorUrlDomain = "nico\\.(?:ms|sc)";
         module VideoId {
             export const Strict = `(?:${Prefix.AutoLink})\\d+`;
             export const Loose = `[a-z]{2}\\d+`;
@@ -54,7 +85,7 @@ module NicoThumbinfoKey {
         }
 
         /**
-         * URLから動画IDを抽出するための正規表現。
+         * URLからサムネイル情報取得用キーを抽出するための正規表現。
          *
          * 動画IDしか出現しないような箇所とのマッチングについては、
          * 未知のIDが追加された場合にもそれらしく動作するよう、
@@ -75,12 +106,12 @@ module NicoThumbinfoKey {
             `^http://${NicovideoDomain}/thumb/(?:(${VideoId.Loose})|(${ThreadId.Loose}))`,
 
             // 公式短縮URL中の 動画ID (m[7])
-            `^http://${NicoMsDomain}/(${VideoId.Strict})`
+            `^http://${ShorUrlDomain}/(${VideoId.Strict})`
         ].join('|');
     }
 
     /**
-     * URLから動画IDを抽出するための正規表現。
+     * URLからサムネイル情報取得用キーを抽出するための正規表現。
      */
     const UrlRegExp = new RegExp(RegExpStr.Url);
 
@@ -90,22 +121,42 @@ module NicoThumbinfoKey {
      * @param   url 変換元のURL
      * @returns サムネイル情報取得用キー
      */
-    export function fromUrl(url: string): Option<string> {
+    export function fromUrl(url: string): Option<Key> {
         let m = UrlRegExp.exec(url);
         if (m !== null) {
             let id: string;
             // 動画ID
             if (id = (m[1] || m[3] || m[5] || m[7])) {
-                return new Some(`video:${id}`);
+                return new Some(Key.fromVideoId(id));
             }
             // スレッドID
             if (id = (m[2] || m[4] || m[6])) {
-                return new Some(`thread:${id}`);
+                return new Some(Key.fromThreadId(id));
             }
             console.error("Unkown match result.", m, url, UrlRegExp);
         }
-        return new None<string>();
+        return new None<Key>();
+    }
+
+    /**
+     * 動画IDからサムネイル情報取得用キーを生成する
+     *
+     * @param   id 動画ID
+     * @returns サムネイル情報取得用キー
+     */
+    export function fromVideoId(id: string): Key {
+        return  new Key(Key.Type.VideoId, id);
+    }
+
+    /**
+     * スレッドIDからサムネイル情報取得用キーを生成する
+     *
+     * @param   id スレッドID
+     * @returns サムネイル情報取得用キー
+     */
+    export function fromThreadId(id: string): Key {
+        return new Key(Key.Type.ThreadId, id);
     }
 }
 
-export default NicoThumbinfoKey;
+export default Key;

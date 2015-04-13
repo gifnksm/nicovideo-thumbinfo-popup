@@ -4,7 +4,7 @@ import NicoThumbinfo from "../../../src/component/NicoThumbinfo";
 import * as assert from "power-assert";
 import * as React from "react";
 
-describe("NicoThumbinfo", () => {
+describe("component/NicoThumbinfo", () => {
     it("should be able to render with epmty props.", () => {
         let div = document.createElement('div');
         React.render(React.createElement(NicoThumbinfo), div);

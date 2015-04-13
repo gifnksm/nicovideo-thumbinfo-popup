@@ -169,7 +169,8 @@ gulp.task("watch", ["watch:bundle"], function() {
 
   return gulp.watch([Path.input("test/**/*.ts"),
                      Path.input("src/**/*.ts"),
-                     "typings/**/*.d.ts"],
+                     "typings/**/*.d.ts",
+                     "!**/.#*"],
                     ["test:typescript"]);
 });
 

@@ -3,7 +3,7 @@
 import TimeCounter from "../../../src/util/TimeCounter";
 import * as assert from "power-assert";
 
-describe("TimeCounter", () => {
+describe("util/TimeCounter", () => {
     context("when timeout is finite positive number", () => {
         const Timeout = 100;
         const Now = [ -Infinity, -100, 0, 100, 109, 110, Infinity, NaN];

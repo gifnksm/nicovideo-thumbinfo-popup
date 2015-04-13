@@ -6,11 +6,16 @@ import {Option, Some, None} from "option-t";
 
 const NicoDomain = "www.nicovideo.jp";
 
-describe("NicoThumbinfoKey", () => {
-
+describe("model/NicoThumbinfoKey", () => {
     let getKey = NicoThumbinfoKey.fromUrl;
-    function some(url: string, id: string) {
-        assert(getKey(url).unwrap() === id);
+    function some(url: string, key: NicoThumbinfoKey) {
+        assert(getKey(url).unwrap().valueOf() === key.valueOf());
+    }
+    function video(url: string, id:string) {
+        some(url, NicoThumbinfoKey.fromVideoId(id));
+    }
+    function thread(url: string, id:string) {
+        some(url, NicoThumbinfoKey.fromThreadId(id));
     }
     function none(url: string) {
         assert(!getKey(url).isSome);
@@ -18,15 +23,15 @@ describe("NicoThumbinfoKey", () => {
 
     context("when watch page's URL is given", () => {
         it("should be able to get an ID from valid URL.", () => {
-            some("http://www.nicovideo.jp/watch/sm9", "video:sm9");
-            some("http://www.nicovideo.jp/watch/sm12345", "video:sm12345")
-            some("http://www.nicovideo.jp/watch/1234567890", "thread:1234567890");
-            some("http://www.nicovideo.jp/watch/12345678901", "thread:12345678901");
+            video("http://www.nicovideo.jp/watch/sm9", "sm9");
+            video("http://www.nicovideo.jp/watch/sm12345", "sm12345")
+            thread("http://www.nicovideo.jp/watch/1234567890", "1234567890");
+            thread("http://www.nicovideo.jp/watch/12345678901", "12345678901");
         });
 
         it("should be able to get an ID from loosely formed URL.", () => {
-            some("http://www.nicovideo.jp/watch/zz1", "video:zz1");
-            some("http://www.nicovideo.jp/watch/123", "thread:123");
+            video("http://www.nicovideo.jp/watch/zz1", "zz1");
+            thread("http://www.nicovideo.jp/watch/123", "123");
         });
 
         it("should not be able to get an ID from invalid URL.", () => {
@@ -36,15 +41,15 @@ describe("NicoThumbinfoKey", () => {
         })
 
         it("should be able to get an ID if watch page's URL is contained by other URL", () => {
-            some("http://b.hatena.ne.jp/entry/http://www.nicovideo.jp/watch/sm9", "video:sm9");
-            some("http://b.hatena.ne.jp/entry/www.nicovideo.jp/watch/sm9", "video:sm9");
+            video("http://b.hatena.ne.jp/entry/http://www.nicovideo.jp/watch/sm9", "sm9");
+            video("http://b.hatena.ne.jp/entry/www.nicovideo.jp/watch/sm9", "sm9");
         });
     });
 
     context("when tag search page's URL is given", () => {
         it("should be able to get an ID from valid URL.", () => {
-            some("http://www.nicovideo.jp/tag/%E6%9C%AC%E5%AE%B6%E2%87%92sm9", "video:sm9");
-            some("http://www.nicovideo.jp/tag/%E6%9C%AC%E5%AE%B6%E2%87%92watch%df1234567890", "thread:1234567890");
+            video("http://www.nicovideo.jp/tag/%E6%9C%AC%E5%AE%B6%E2%87%92sm9", "sm9");
+            thread("http://www.nicovideo.jp/tag/%E6%9C%AC%E5%AE%B6%E2%87%92watch%df1234567890", "1234567890");
         });
 
         it("should not be able to get an ID from loosely formed URL.", () => {
@@ -55,15 +60,15 @@ describe("NicoThumbinfoKey", () => {
 
     context("when thumbnail's URL is given", () => {
         it("should be able to get an ID from valid URL.", () => {
-            some("http://ext.nicovideo.jp/thumb/sm9", "video:sm9");
-            some("http://ext.nicovideo.jp/thumb/sm12345", "video:sm12345")
-            some("http://ext.nicovideo.jp/thumb/1234567890", "thread:1234567890");
-            some("http://ext.nicovideo.jp/thumb/12345678901", "thread:12345678901");
+            video("http://ext.nicovideo.jp/thumb/sm9", "sm9");
+            video("http://ext.nicovideo.jp/thumb/sm12345", "sm12345");
+            thread("http://ext.nicovideo.jp/thumb/1234567890", "1234567890");
+            thread("http://ext.nicovideo.jp/thumb/12345678901", "12345678901");
         });
 
         it("should be able to get an ID from loosely formed URL.", () => {
-            some("http://ext.nicovideo.jp/thumb/zz1", "video:zz1");
-            some("http://ext.nicovideo.jp/thumb/123", "thread:123");
+            video("http://ext.nicovideo.jp/thumb/zz1", "zz1");
+            thread("http://ext.nicovideo.jp/thumb/123", "123");
         });
 
         it("should not be able to get an ID from invalid URL.", () => {
@@ -73,15 +78,19 @@ describe("NicoThumbinfoKey", () => {
         })
     });
 
-    context("when tag nico.ms's URL is given", () => {
+    context("when short URL is given", () => {
         it("should be able to get an ID from valid URL.", () => {
-            some("http://nico.ms/sm9", "video:sm9");
-            some("http://nico.ms/sm12345", "video:sm12345");
+            video("http://nico.ms/sm9", "sm9");
+            video("http://nico.ms/sm12345", "sm12345");
+            video("http://nico.sc/sm9", "sm9");
+            video("http://nico.sc/sm12345", "sm12345");
         });
 
         it("should not be able to get an ID from loosely formed URL.", () => {
             none("http://nico.ms/zz9");
             none("http://nico.ms/12345");
+            none("http://nico.sc/zz9");
+            none("http://nico.sc/12345");
         });
     });
 });

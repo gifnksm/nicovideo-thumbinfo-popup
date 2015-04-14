@@ -56,6 +56,6 @@
     "watchify": "^3.1.0"
   },
   "dependencies": {
-    "option-t": "^0.6.0"
+    "option-t": "^0.7.1"
   }
 }

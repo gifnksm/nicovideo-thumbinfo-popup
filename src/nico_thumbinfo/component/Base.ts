@@ -1,4 +1,4 @@
-/// <reference path="../../typings/common.d.ts" />
+/// <reference path="../../../typings/common.d.ts" />
 
 import * as React from "react";
 

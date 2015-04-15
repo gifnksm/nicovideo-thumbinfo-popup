@@ -1,8 +1,8 @@
 /// <reference path="../typings/common.d.ts" />
 
 import * as React from "react";
-import NicoThumbinfo from "./component/NicoThumbinfo";
-import NicoThumbinfoKey from "./model/NicoThumbinfoKey";
+import NicoThumbinfo from "./nico_thumbinfo/component/Base";
+import VideoKey from "./nico_thumbinfo/model/VideoKey";
 
-console.log(NicoThumbinfoKey.fromUrl("http://www.nicovideo.jp/watch/sm9"));
+console.log(VideoKey.fromUrl("http://www.nicovideo.jp/watch/sm9"));
 React.render(React.createElement(NicoThumbinfo,{}), document.body);

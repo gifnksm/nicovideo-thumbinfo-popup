@@ -1,12 +1,7 @@
-/// <reference path="../../typings/common.d.ts" />
+/// <reference path="../../../typings/common.d.ts" />
 
 import {Option, Some, None} from "option-t";
-import Key from "NicoThumbinfoKey";
-
-class Thread {
-    id: string;
-    numRes: string;
-}
+import Key from "VideoKey";
 
 class Tag {
     isCategory: boolean;
@@ -44,7 +39,7 @@ enum Source {
     GetThumbinfo = 2
 }
 
-export class RawThumbData {
+export class RawData {
     key: Key;
     source: Source;
 
@@ -65,7 +60,7 @@ export class RawThumbData {
     tags: {[index: string]: Tag};
     uploader: Uploader;
 
-    merge(rawData: RawThumbData) {
+    merge(rawData: RawData) {
         // key と source はマージしない
         if (this.thumbType === undefined) { this.thumbType = rawData.thumbType; }
         if (this.videoId === undefined) { this.videoId = rawData.videoId; }
@@ -85,11 +80,11 @@ export class RawThumbData {
     }
 }
 
-class ThumbData {
+class Data {
     private _key: Key;
-    private _primaryData: Option<RawThumbData>;
+    private _primaryData: Option<RawData>;
 
-    private _rawData: RawThumbData[] = [];
+    private _rawData: RawData[] = [];
 
     constructor(key: Key) {
         this._key = key;
@@ -100,7 +95,7 @@ class ThumbData {
             return;
         }
 
-        let data = new RawThumbData();
+        let data = new RawData();
         for (let rawData of this._rawData) {
             data.merge(rawData);
         }
@@ -114,10 +109,10 @@ class ThumbData {
         return this._primaryData.unwrap();
     }
 
-    pushRawData(raw: RawThumbData) {
+    pushRawData(raw: RawData) {
         this._rawData.push(raw);
         this._rawData.sort((a, b) => a.source - b.source);
-        this._primaryData = new None<RawThumbData>();
+        this._primaryData = new None<RawData>();
     }
 
     get key(): Key { return this._key; }
@@ -136,4 +131,4 @@ class ThumbData {
     }
 }
 
-export default ThumbData;
+export default Data;

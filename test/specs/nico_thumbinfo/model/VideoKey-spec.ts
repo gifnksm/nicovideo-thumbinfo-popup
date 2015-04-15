@@ -1,21 +1,21 @@
-/// <reference path="../../../typings/common.d.ts" />
+/// <reference path="../../../../typings/common.d.ts" />
 
-import NicoThumbinfoKey from "../../../src/model/NicoThumbinfoKey";
+import VideoKey from "../../../../src/nico_thumbinfo/model/VideoKey";
 import * as assert from "power-assert";
 import {Option, Some, None} from "option-t";
 
 const NicoDomain = "www.nicovideo.jp";
 
-describe("model/NicoThumbinfoKey", () => {
-    let getKey = NicoThumbinfoKey.fromUrl;
-    function some(url: string, key: NicoThumbinfoKey) {
+describe("model/VideoKey", () => {
+    let getKey = VideoKey.fromUrl;
+    function some(url: string, key: VideoKey) {
         assert(getKey(url).unwrap().valueOf() === key.valueOf());
     }
     function video(url: string, id:string) {
-        some(url, NicoThumbinfoKey.fromVideoId(id));
+        some(url, VideoKey.fromVideoId(id));
     }
     function thread(url: string, id:string) {
-        some(url, NicoThumbinfoKey.fromThreadId(id));
+        some(url, VideoKey.fromThreadId(id));
     }
     function none(url: string) {
         assert(!getKey(url).isSome);

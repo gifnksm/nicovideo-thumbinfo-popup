@@ -1,4 +1,4 @@
-/// <reference path="../../typings/common.d.ts" />
+/// <reference path="../../../typings/common.d.ts" />
 
 import {Option, Some, None} from "option-t";
 

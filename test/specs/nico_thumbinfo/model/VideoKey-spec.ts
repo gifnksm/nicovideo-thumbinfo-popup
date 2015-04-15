@@ -6,7 +6,7 @@ import {Option, Some, None} from "option-t";
 
 const NicoDomain = "www.nicovideo.jp";
 
-describe("model/VideoKey", () => {
+describe("nico_thumbinfo/model/VideoKey", () => {
     let getKey = VideoKey.fromUrl;
     function some(url: string, key: VideoKey) {
         assert(getKey(url).unwrap().valueOf() === key.valueOf());

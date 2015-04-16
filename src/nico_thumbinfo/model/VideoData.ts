@@ -10,7 +10,7 @@ enum Source {
     GetThumbinfo = 3
 }
 
-class Tag {
+export class Tag {
     isCategory: boolean;
     isLocked: boolean;
     name: string;
@@ -23,7 +23,7 @@ interface Uploader {
     url: string;
 }
 
-class User implements Uploader {
+export class User implements Uploader {
     id: string;
     name: string;
     iconUrl: string;
@@ -32,7 +32,7 @@ class User implements Uploader {
     }
 }
 
-class Channel implements Uploader {
+export class Channel implements Uploader {
     id: string;
     name: string;
     iconUrl: string;

@@ -31,7 +31,8 @@ class Key {
 
     private static _typeValue: {[index: number]: string} = {
         [Key.Type.VideoId]: "video",
-        [Key.Type.ThreadId]: "thread"
+        [Key.Type.ThreadId]: "thread",
+        [Key.Type.OptionalThreadId]: "optional_thread"
     };
 
     /**
@@ -53,7 +54,7 @@ class Key {
 
 module Key {
     export const enum Type {
-        VideoId, ThreadId
+        VideoId, ThreadId, OptionalThreadId
     }
 
     /**
@@ -156,6 +157,16 @@ module Key {
      */
     export function fromThreadId(id: string): Key {
         return new Key(Key.Type.ThreadId, id);
+    }
+
+    /**
+     * オプショナルスレッドIDからサムネイル情報取得用キーを生成する
+     *
+     * @param   id オプショナルスレッドID
+     * @returns サムネイル情報取得用キー
+     */
+    export function fromOptionalThreadId(id: string): Key {
+        return new Key(Key.Type.OptionalThreadId, id);
     }
 }
 

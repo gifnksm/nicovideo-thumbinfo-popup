@@ -67,11 +67,11 @@ gulp.task("build:bundle", ["build:typescript"], function() {
 
 
 function test_bundle(isWatch) {
-  function bundle(src, bundler) {
+  function bundle(chunk, bundler) {
     return function() {
       return bundler
         .bundle()
-        .pipe(source(src.replace(/.*\/target\/compiled\//, '')))
+        .pipe(source(chunk.relative))
         .pipe(gulp.dest(Path.bundle()));
     };
   }
@@ -79,7 +79,7 @@ function test_bundle(isWatch) {
   function transform(fun) {
     return through.obj(function(chunk, end, cb) {
       if (chunk.isBuffer()) {
-        chunk.contents = fun(chunk.path);
+        chunk.contents = fun(chunk);
         this.push(chunk);
       }
       cb();
@@ -87,19 +87,19 @@ function test_bundle(isWatch) {
   }
 
   function browserified() {
-    return transform(function(path) {
+    return transform(function(chunk) {
       var option = {debug: true};
       if (isWatch) {
         option.cache = {};
         option.packageCache = {};
       }
 
-      var bundler = browserify(path, option);
+      var bundler = browserify(chunk.path, option);
       bundler.transform('espowerify');
 
       if (isWatch) {
         bundler = watchify(bundler);
-        bundler.on('update', bundle(path, bundler));
+        bundler.on('update', bundle(chunk, bundler));
       }
       return bundler.bundle();
     });

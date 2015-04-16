@@ -36,7 +36,7 @@ describe("nico_thumbinfo/model/VideoData", () => {
         check(watchPage, watchPage.description);
     });
 
-    it("should be overwritten by higher priority rawData when merge is called.", () => {
+    it("should overwrite the property with higher priority rawData's value.", () => {
         let data = new Data(key);
         data.pushRawData(getThumbInfo);
         data.pushRawData(videoArray);
@@ -51,7 +51,7 @@ describe("nico_thumbinfo/model/VideoData", () => {
         assert(data.description === watchPage.description);
     });
 
-    it("should not overwrite the property when higher priority rawData's value is undefine.", () => {
+    it("should not overwrite the property when higher priority rawData's value is undefined.", () => {
         let data = new Data(key);
         data.pushRawData(getThumbInfo);
         data.pushRawData(videoArray);

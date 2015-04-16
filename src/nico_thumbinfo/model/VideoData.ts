@@ -13,6 +13,7 @@ enum Source {
 class Tag {
     isCategory: boolean;
     isLocked: boolean;
+    name: string;
 }
 
 interface Uploader {

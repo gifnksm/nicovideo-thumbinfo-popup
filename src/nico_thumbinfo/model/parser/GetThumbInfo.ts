@@ -16,39 +16,65 @@ class GetThumbinfoError {
     }
 }
 
-export class Parser {
+export default class Parser {
     private static parser: DOMParser = new DOMParser();
 
-    parse(key: Key, input: string): Promise<RawData|GetThumbinfoError> {
+    static parse(key: Key, input: string): Promise<RawData|GetThumbinfoError> {
         return new Promise((resolve, reject) => {
             let xml = Parser.parser.parseFromString(input, "application/xml");
-            if (xml.documentElement.nodeName === "parseerror") {
-                reject(new Error(xml.documentElement.firstChild.textContent));
-                return;
+
+            // パースに失敗した場合、以下のXMLが返される。
+            // Firefox の場合、下記要素のみからなる XML 文書が返るが、
+            // Google Chrome の場合、下記要素を含む HTML 文書が返されるので注意。
+            //
+            //     <parsererror xmlns="http://www.mozilla.org/newlayout/xml/parsererror.xml">
+            //       (error description)
+            //       <sourcetext>(a snippet of the source XML)</sourcetext>
+            //     </parsererror>
+            let error = xml.getElementsByTagName("parsererror");
+            if (error.length > 0) {
+                throw new Error("XML Parse Error: " + error[0].textContent);
+            }
+
+            // レスポンスを簡単にバリデーションする
+            let docElem = xml.documentElement;
+            if (docElem.nodeName !== "nicovideo_thumb_response") {
+                throw new Error(`XML Format Error: Root element name is "${docElem.nodeName}".`);
+            }
+            if (!docElem.hasAttribute("status")) {
+                throw new Error(`XML Format Error: Root element does not have "status" attribute.`);
             }
 
             let status = xml.documentElement.getAttribute("status");
-            if (status !== "ok") {
-                resolve(this._parseError(key, xml));
-            } else {
+            switch (status) {
+            case "ok":
                 resolve(this._parseOk(key, xml));
+                break;
+
+            case "fail":
+                resolve(this._parseFail(key, xml));
+                break;
+
+            default:
+                throw new Error(`XML Format Error: Unknown status "${status}".`);
             }
         });
     }
 
-    private _parseOk(key: Key, xml: XMLDocument): RawData {
+    private static _parseOk(key: Key, xml: XMLDocument): RawData {
         let data = RawData.createGetThumbinfo(key);
         data.tags = {};
-
-        if (key.type === Key.Type.ThreadId) {
-            data.threadId = key.id;
-        }
 
         let user: User = new User();
         let channel: Channel = new Channel();
 
-        // for (let node of xml.getElementsByTagName("thumb")[0].childNodes) {
-        for (let node of Array.prototype.slice.call(xml.getElementsByTagName("thumb")[0].childNodes)) {
+        let thums = xml.getElementsByTagName("thumb");
+        if (thums.length === 0) {
+            throw new Error(`XML Format Error: There is no "thumb" element.`);
+        }
+
+        // for (let node of thums[0].childNodes) {
+        for (let node of Array.prototype.slice.call(thums[0].childNodes)) {
             if (node.nodeType !== Node.ELEMENT_NODE) {
                 continue;
             }
@@ -68,7 +94,7 @@ export class Parser {
             case "title": data.title = text; break;
             case "description": data.description = text; break;
             case "thumbnail_url": data.thumbnailUrl = text; break;
-            case "first_retrieve": data.postedAt = text; break;
+            case "first_retrieve": data.postedAt = new Date(text); break;
             case "length": data.length = text; break;
 
             case "view_counter": data.viewCounter = text; break;
@@ -127,7 +153,7 @@ export class Parser {
         return data;
     }
 
-    private _parseError(key: Key, xml: XMLDocument): GetThumbinfoError {
+    private static _parseFail(key: Key, xml: XMLDocument): GetThumbinfoError {
         let code: ErrorCode;
 
         switch (xml.getElementsByTagName("code")[0].textContent) {

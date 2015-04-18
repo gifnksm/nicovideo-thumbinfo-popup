@@ -45,23 +45,22 @@ export class RawData {
     _key: Key;
     _source: Source;
 
-    thumbType: string;
-    videoId: string;
-    threadId: string;
+    thumbType: string = undefined;
+    videoId: string = undefined;
 
-    title: string;
-    description: string;
-    thumbnailUrl: string;
-    postedAt: string;
-    length: string;
+    title: string = undefined;
+    description: string = undefined;
+    thumbnailUrl: string = undefined;
+    postedAt: Date = undefined;
+    length: string = undefined;
 
-    viewCounter: string;
-    commentCounter: string;
-    mylistCounter: string;
-    lastResBody: string;
+    viewCounter: string = undefined;
+    commentCounter: string = undefined;
+    mylistCounter: string = undefined;
+    lastResBody: string = undefined;
 
-    tags: {[index: string]: Tag};
-    uploader: Uploader;
+    tags: {[index: string]: Tag} = undefined;
+    uploader: Uploader = undefined;
 
     constructor(key: Key, source: Source) {
         this._key = key;
@@ -87,7 +86,6 @@ export class RawData {
         // key と source はマージしない
         if (this.thumbType === undefined) { this.thumbType = rawData.thumbType; }
         if (this.videoId === undefined) { this.videoId = rawData.videoId; }
-        if (this.threadId === undefined) { this.threadId = rawData.threadId; }
 
         if (this.title === undefined) { this.title = rawData.title; }
         if (this.description === undefined) { this.description = rawData.description; }

@@ -66,6 +66,8 @@ module.exports = function(config) {
     singleRun: false,
 
     client: {
+      // Workaround: https://github.com/karma-runner/karma-mocha/issues/47
+      captureConsole: true,
       mocha: {
         reporter: 'html',
         ui: 'bdd'

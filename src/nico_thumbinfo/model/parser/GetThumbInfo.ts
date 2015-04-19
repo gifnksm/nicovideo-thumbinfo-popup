@@ -3,11 +3,11 @@
 import Key from "../VideoKey";
 import {RawData, User, Channel, Tag} from "../VideoData";
 
-enum ErrorCode {
+export enum ErrorCode {
     Deleted, Community, NotFound
 }
 
-class GetThumbinfoError {
+export class GetThumbinfoError {
     code: ErrorCode;
     description: string;
     constructor(code: ErrorCode, description: string) {
@@ -99,7 +99,7 @@ export default class Parser {
 
             case "view_counter": data.viewCounter = text; break;
             case "comment_num": data.commentCounter = text; break;
-            case "mylist_countenr": data.mylistCounter = text; break;
+            case "mylist_counter": data.mylistCounter = text; break;
             case "last_res_body": data.lastResBody = text; break;
 
             case "tags":
@@ -148,6 +148,10 @@ export default class Parser {
             case "embeddable":
             case "no_live_play":
                 break;
+
+            default:
+                console.warn("Unknown element:", node);
+                break;
             }
         }
         return data;
@@ -155,20 +159,48 @@ export default class Parser {
 
     private static _parseFail(key: Key, xml: XMLDocument): GetThumbinfoError {
         let code: ErrorCode;
+        let desc: string;
 
-        switch (xml.getElementsByTagName("code")[0].textContent) {
-        case "DELETED":
-            code = ErrorCode.Deleted;
-            break;
-        case "COMMUNITY":
-            code = ErrorCode.Community;
-            break;
-        case "NOT_FOUND":
-            code = ErrorCode.NotFound;
-            break;
+        let errors = xml.getElementsByTagName("error");
+        if (errors.length === 0) {
+            throw new Error(`XML Format Error: There is no "error" element.`);
         }
 
-        let desc = xml.getElementsByTagName("description")[0].textContent;
+        // for (let node of errors[0].childNodes) {
+        for (let node of Array.prototype.slice.call(errors[0].childNodes)) {
+            if (node.nodeType !== Node.ELEMENT_NODE) {
+                continue;
+            }
+
+            let text = node.textContent;
+            switch (node.nodeName) {
+            case "code":
+                switch (text) {
+                case "DELETED":
+                    code = ErrorCode.Deleted;
+                    break;
+                case "COMMUNITY":
+                    code = ErrorCode.Community;
+                    break;
+                case "NOT_FOUND":
+                    code = ErrorCode.NotFound;
+                    break;
+                default:
+                    console.warn("Unknown code: ", node);
+                    break;
+                }
+                break;
+
+            case "description":
+                desc = text;
+                break;
+
+            default:
+                console.warn("Unknown element:", node);
+                break;
+            }
+        }
+
         return new GetThumbinfoError(code, desc);
     }
 }

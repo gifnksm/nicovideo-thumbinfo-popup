@@ -1,6 +1,7 @@
 /// <reference path="../../../../../typings/common.d.ts" />
 
-import GetThumbInfo from "../../../../../src/nico_thumbinfo/model/parser/GetThumbInfo";
+import GetThumbInfo, {ErrorCode, GetThumbinfoError} from "../../../../../src/nico_thumbinfo/model/parser/GetThumbInfo";
+import {RawData} from "../../../../../src/nico_thumbinfo/model/VideoData";
 import VideoKey from "../../../../../src/nico_thumbinfo/model/VideoKey";
 import * as assert from "power-assert";
 
@@ -46,8 +47,72 @@ describe("nico_thumbinfo/model/parser/GetThumbInfo", () => {
     });
 
     it("should return parse result if valid input is given.", () => {
-        return getUrl("/base/etc/resource/sm9.xml").then((input) => {
-            return GetThumbInfo.parse(key, input);
-        }).then((a) => {console.log(a)});
+        return getUrl("/base/etc/resource/getthumbinfo/sm9")
+            .then(input => GetThumbInfo.parse(key, input))
+            .then(data => {
+                if (data instanceof RawData) {
+                    assert(data.thumbType !== undefined);
+                    assert(data.videoId === "sm9");
+                    assert(data.title !== undefined);
+                    assert(data.description !== undefined);
+                    assert(data.thumbnailUrl !== undefined);
+                    assert(data.postedAt !== undefined);
+                    assert(data.length !== undefined);
+                    assert(data.viewCounter !== undefined);
+                    assert(data.commentCounter !== undefined);
+                    assert(data.mylistCounter !== undefined);
+                    assert(data.lastResBody !== undefined);
+                    assert(data.tags !== undefined);
+                    assert(data.uploader !== undefined);
+                } else {
+                    console.error("data is not instanceof RawData: ", data);
+                    throw new Error("data is not instanceof RawData");
+                }
+            });
+    });
+
+    it("should return error if deleted video is given.", () => {
+        let key = VideoKey.fromVideoId("sm22532786");
+        return getUrl("/base/etc/resource/getthumbinfo/sm22532786")
+            .then(input => GetThumbInfo.parse(key, input))
+            .then(data => {
+                if (data instanceof GetThumbinfoError) {
+                    assert(data.code === ErrorCode.Deleted);
+                    assert(data.description === "deleted");
+                } else {
+                    console.error("data is not instance of GetThumbinfoError: ", data);
+                    throw new Error("data is not instance of GetThumbinfoError");
+                }
+            });
+    });
+
+    it("should return error if community only video is given.", () => {
+        let key = VideoKey.fromThreadId("1340979099");
+        return getUrl("/base/etc/resource/getthumbinfo/1340979099")
+            .then(input => GetThumbInfo.parse(key, input))
+            .then(data => {
+                if (data instanceof GetThumbinfoError) {
+                    assert(data.code === ErrorCode.Community);
+                    assert(data.description === "community");
+                } else {
+                    console.error("data is not instance of GetThumbinfoError: ", data);
+                    throw new Error("data is not instance of GetThumbinfoError");
+                }
+            });
+    });
+
+    it("should return error if outdated video is given.", () => {
+        let key = VideoKey.fromThreadId("so19903664");
+        return getUrl("/base/etc/resource/getthumbinfo/so19903664")
+            .then(input => GetThumbInfo.parse(key, input))
+            .then(data => {
+                if (data instanceof GetThumbinfoError) {
+                    assert(data.code === ErrorCode.NotFound);
+                    assert(data.description === "not found or invalid");
+                } else {
+                    console.error("data is not instance of GetThumbinfoError: ", data);
+                    throw new Error("data is not instance of GetThumbinfoError");
+                }
+            });
     });
 });

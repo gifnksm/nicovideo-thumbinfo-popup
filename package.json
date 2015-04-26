@@ -47,13 +47,13 @@
     "karma-firefox-launcher": "^0.1.4",
     "karma-mocha": "^0.1.10",
     "karma-mocha-reporter": "^1.0.2",
-    "main-bower-files": "^2.6.2",
+    "main-bower-files": "^2.7.0",
     "mocha": "^2.2.4",
     "through2": "^0.6.5",
     "tsd": "^0.6.0-beta.5",
     "typescript": "^1.5.0-alpha",
     "vinyl-source-stream": "^1.1.0",
-    "watchify": "^3.1.1"
+    "watchify": "^3.2.0"
   },
   "dependencies": {
     "option-t": "^0.7.1"

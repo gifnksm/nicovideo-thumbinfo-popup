@@ -1,6 +1,5 @@
 /// <reference path="../../../typings/common.d.ts" />
 
-import {Option, Some, None} from "option-t";
 import Key from "VideoKey";
 
 enum Source {
@@ -13,6 +12,7 @@ enum Source {
 export class Tag {
     isCategory: boolean;
     isLocked: boolean;
+    nicopediaRegistered: boolean;
     name: string;
 }
 
@@ -52,11 +52,11 @@ export class RawData {
     description: string = undefined;
     thumbnailUrl: string = undefined;
     postedAt: Date = undefined;
-    length: string = undefined;
+    lengthInSeconds: number = undefined;
 
-    viewCounter: string = undefined;
-    commentCounter: string = undefined;
-    mylistCounter: string = undefined;
+    viewCounter: number = undefined;
+    commentCounter: number = undefined;
+    mylistCounter: number = undefined;
     lastResBody: string = undefined;
 
     tags: {[index: string]: Tag} = undefined;
@@ -91,7 +91,7 @@ export class RawData {
         if (this.description === undefined) { this.description = rawData.description; }
         if (this.thumbnailUrl === undefined) { this.thumbnailUrl = rawData.thumbnailUrl; }
         if (this.postedAt === undefined) { this.postedAt = rawData.postedAt; }
-        if (this.length === undefined) { this.length = rawData.length; }
+        if (this.lengthInSeconds === undefined) { this.lengthInSeconds = rawData.lengthInSeconds; }
 
         if (this.viewCounter === undefined) { this.viewCounter = rawData.viewCounter; }
         if (this.commentCounter === undefined) { this.commentCounter = rawData.commentCounter; }
@@ -104,7 +104,7 @@ export class RawData {
 
 export class Data {
     private _key: Key;
-    private _primaryData: Option<RawData>;
+    private _mergedData: RawData = null;
 
     private _rawData: RawData[] = [];
 
@@ -112,8 +112,8 @@ export class Data {
         this._key = key;
     }
 
-    private _updatePrimaryData() {
-        if (this._primaryData.isSome) {
+    private _mergeData() {
+        if (this._mergedData !== null) {
             return;
         }
 
@@ -121,36 +121,36 @@ export class Data {
         for (let rawData of this._rawData) {
             data.merge(rawData);
         }
-        this._primaryData = new Some(data);
+        this._mergedData = data;
     }
 
-    private _getPrimaryData() {
-        if (!this._primaryData.isSome) {
-            this._updatePrimaryData();
+    private _getMergedData() {
+        if (this._mergedData === null) {
+            this._mergeData();
         }
-        return this._primaryData.unwrap();
+        return this._mergedData;
     }
 
     pushRawData(raw: RawData) {
         this._rawData.push(raw);
         this._rawData.sort((a, b) => a.source - b.source);
-        this._primaryData = new None<RawData>();
+        this._mergedData = null;
     }
 
     get key(): Key { return this._key; }
-    get thumbType() { return this._getPrimaryData().thumbType; }
-    get videoId() { return this._getPrimaryData().videoId; }
-    get title() { return this._getPrimaryData().title; }
-    get description() { return this._getPrimaryData().description; }
-    get thumbnailUrl() { return this._getPrimaryData().thumbnailUrl; }
-    get postedAt() { return this._getPrimaryData().postedAt; }
-    get length() { return this._getPrimaryData().length; }
-    get viewCounter() { return this._getPrimaryData().viewCounter; }
-    get commentCounter() { return this._getPrimaryData().commentCounter; }
-    get mylistCounter() { return this._getPrimaryData().mylistCounter; }
-    get lastResBody() { return this._getPrimaryData().lastResBody; }
-    get tags() { return this._getPrimaryData().tags; }
-    get uploader() { return this._getPrimaryData().uploader; }
+    get thumbType() { return this._getMergedData().thumbType; }
+    get videoId() { return this._getMergedData().videoId; }
+    get title() { return this._getMergedData().title; }
+    get description() { return this._getMergedData().description; }
+    get thumbnailUrl() { return this._getMergedData().thumbnailUrl; }
+    get postedAt() { return this._getMergedData().postedAt; }
+    get lengthInSeconds() { return this._getMergedData().lengthInSeconds; }
+    get viewCounter() { return this._getMergedData().viewCounter; }
+    get commentCounter() { return this._getMergedData().commentCounter; }
+    get mylistCounter() { return this._getMergedData().mylistCounter; }
+    get lastResBody() { return this._getMergedData().lastResBody; }
+    get tags() { return this._getMergedData().tags; }
+    get uploader() { return this._getMergedData().uploader; }
 
     get watchUrl(): string {
         return `http://www.nicovideo.jp/watch/${this._key.id}`;

@@ -79,7 +79,7 @@ export default class Parser {
                 continue;
             }
 
-            let text = node.textContent;
+            let text: string = node.textContent;
             switch (node.nodeName) {
             case "thumb_type":
                 if (key.type === Key.Type.OptionalThreadId) {
@@ -95,11 +95,15 @@ export default class Parser {
             case "description": data.description = text; break;
             case "thumbnail_url": data.thumbnailUrl = text; break;
             case "first_retrieve": data.postedAt = new Date(text); break;
-            case "length": data.length = text; break;
+            case "length":
+                data.lengthInSeconds = text
+                    .split(":")
+                    .reduce((i: number, x: string) => i * 60 + parseInt(x, 10), 0);
+                break;
 
-            case "view_counter": data.viewCounter = text; break;
-            case "comment_num": data.commentCounter = text; break;
-            case "mylist_counter": data.mylistCounter = text; break;
+            case "view_counter": data.viewCounter = parseInt(text, 10); break;
+            case "comment_num": data.commentCounter = parseInt(text, 10); break;
+            case "mylist_counter": data.mylistCounter = parseInt(text, 10); break;
             case "last_res_body": data.lastResBody = text; break;
 
             case "tags":
@@ -110,6 +114,7 @@ export default class Parser {
                         tag.name = elem.textContent;
                         tag.isLocked = elem.hasAttribute("lock");
                         tag.isCategory = elem.hasAttribute("category");
+                        tag.nicopediaRegistered = undefined;
                         return tag;
                     }
                 );

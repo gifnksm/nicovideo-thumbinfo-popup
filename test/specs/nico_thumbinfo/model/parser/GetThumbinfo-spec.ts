@@ -57,7 +57,7 @@ describe("nico_thumbinfo/model/parser/GetThumbInfo", () => {
                     assert(data.description !== undefined);
                     assert(data.thumbnailUrl !== undefined);
                     assert(data.postedAt !== undefined);
-                    assert(data.length !== undefined);
+                    assert(data.lengthInSeconds !== undefined);
                     assert(data.viewCounter !== undefined);
                     assert(data.commentCounter !== undefined);
                     assert(data.mylistCounter !== undefined);

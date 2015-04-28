@@ -59,7 +59,7 @@ export class RawData {
     mylistCounter: number = undefined;
     lastResBody: string = undefined;
 
-    tags: {[index: string]: Tag} = undefined;
+    tags: {[index: string]: Tag[]} = undefined;
     uploader: Uploader = undefined;
 
     constructor(key: Key, source: Source) {

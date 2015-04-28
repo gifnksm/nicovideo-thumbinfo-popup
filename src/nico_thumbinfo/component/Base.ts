@@ -4,6 +4,7 @@ import * as React from "react";
 import VideoKey from "../model/VideoKey";
 import {Data as VideoData} from "../model/VideoData";
 import VideoDataStore, {VideoDataStoreInterface} from "../store/VideoDataStore";
+import TagList from "./TagList";
 
 module Component {
     export interface Props {
@@ -11,7 +12,7 @@ module Component {
         store?: VideoDataStoreInterface
     }
     export interface State {
-        videoData: VideoData
+        videoData?: VideoData
     }
 }
 
@@ -20,10 +21,18 @@ class Component extends React.Component<Component.Props, Component.State> {
         videoKey: null,
         store: VideoDataStore
     };
+    static propTypes = <React.ValidationMap<Component.Props>> {
+        videoKey: React.PropTypes.instanceOf(VideoKey).isRequired,
+        store: React.PropTypes.shape({
+            addChangeListener: React.PropTypes.func.isRequired,
+            removeChangeListener: React.PropTypes.func.isRequired,
+            getVideoDataByKey: React.PropTypes.func.isRequired
+        })
+    };
+
     state = <Component.State> {
         videoData: this.props.store.getVideoDataByKey(this.props.videoKey)
     };
-
 
     private _onChange(key: VideoKey) {
         if (key.valueOf() !== this.props.videoKey.valueOf()) {
@@ -40,38 +49,52 @@ class Component extends React.Component<Component.Props, Component.State> {
         this.props.store.removeChangeListener(this._onChange.bind(this));
     }
 
-    public render() {
-        let children: React.ReactNode[] = [];
+    render() {
+        const RD = React.DOM;
         let data = this.state.videoData;
 
-        if (!data.isEmpty) {
-            children.push(React.DOM.img({src: data.thumbnailUrl}));
-            children.push(React.DOM.div(
-                null,
-                React.DOM.span(null, `${date2str(data.postedAt)}投稿 `),
-                React.DOM.span(null, "[up:"),
-                React.DOM.a({href: data.uploader.url}, data.uploader.name),
-                React.DOM.span(null, "]")));
-            children.push(React.DOM.h1(
-                null,
-                React.DOM.a({href: data.watchUrl},
-                            data.title)
-            ));
-            let mylist_url = `http://www.nicovideo.jp/openlist/${data.key.id}`;
-            children.push(React.DOM.div(
-                null,
-                React.DOM.span(null, `再生時間: `),
-                React.DOM.strong(null, length2str(data.lengthInSeconds)),
-                React.DOM.span(null, ` 再生: `),
-                React.DOM.strong(null, data.viewCounter.toLocaleString()),
-                React.DOM.span(null, ` コメント: `),
-                React.DOM.strong(null, data.commentCounter.toLocaleString()),
-                React.DOM.span(null, ` マイリスト: `),
-                React.DOM.strong(null, React.DOM.a({href: mylist_url},
-                                                   data.mylistCounter.toLocaleString()))
-            ));
+        if (data.isEmpty) {
+            return RD.div(null);
         }
-        return React.DOM.div(null, ...children);
+
+        let mylist_url = `http://www.nicovideo.jp/openlist/${data.key.id}`;
+
+        return RD.div(
+            null,
+            RD.img({ src: data.thumbnailUrl }),
+
+            RD.div(
+                null,
+                RD.span(null, `${date2str(data.postedAt)}投稿 `),
+                RD.span(null, "[up:"),
+                RD.a({href: data.uploader.url}, data.uploader.name),
+                RD.span(null, "]")
+            ),
+
+            RD.h1(
+                null,
+                RD.a({href: data.watchUrl}, data.title)
+            ),
+
+            RD.div(
+                null,
+                RD.span(null, `再生時間: `),
+                RD.strong(null, length2str(data.lengthInSeconds)),
+                RD.span(null, ` 再生: `),
+                RD.strong(null, data.viewCounter.toLocaleString()),
+                RD.span(null, ` コメント: `),
+                RD.strong(null, data.commentCounter.toLocaleString()),
+                RD.span(null, ` マイリスト: `),
+                RD.strong(null, RD.a({href: mylist_url},
+                                     data.mylistCounter.toLocaleString()))
+            ),
+
+            React.createElement(TagList, {tags: data.tags})
+            // RD.div(
+            //     null,
+            //     RD.strong(null, `タグ(${data.tags}): `)
+            // )
+        );
     }
 }
 

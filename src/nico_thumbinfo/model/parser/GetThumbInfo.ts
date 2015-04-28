@@ -63,8 +63,7 @@ export default class Parser {
 
     private static _parseOk(key: Key, xml: XMLDocument): RawData {
         let data = RawData.createGetThumbinfo(key);
-        data.tags = {};
-
+        data.tags = [];
         let user: User = new User();
         let channel: Channel = new Channel();
 
@@ -107,7 +106,7 @@ export default class Parser {
             case "last_res_body": data.lastResBody = text; break;
 
             case "tags":
-                data.tags[node.getAttribute("domain")] = Array.prototype.map.call(
+                Array.prototype.forEach.call(
                     node.getElementsByTagName("tag"),
                     (elem: Element) => {
                         let tag = new Tag();
@@ -115,7 +114,7 @@ export default class Parser {
                         tag.isLocked = elem.hasAttribute("lock");
                         tag.isCategory = elem.hasAttribute("category");
                         tag.nicopediaRegistered = undefined;
-                        return tag;
+                        data.tags.push(tag);
                     }
                 );
                 break;

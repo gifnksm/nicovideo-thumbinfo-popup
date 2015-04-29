@@ -6,7 +6,7 @@ import {Data as VideoData} from "../model/VideoData";
 import VideoDataStore, {VideoDataStoreInterface} from "../store/VideoDataStore";
 import TagList from "./TagList";
 
-module Component {
+module Base {
     export interface Props {
         videoKey: VideoKey
         store?: VideoDataStoreInterface
@@ -16,12 +16,12 @@ module Component {
     }
 }
 
-class Component extends React.Component<Component.Props, Component.State> {
-    static defaultProps = <Component.Props> {
+class Base extends React.Component<Base.Props, Base.State> {
+    static defaultProps = <Base.Props> {
         videoKey: null,
         store: VideoDataStore
     };
-    static propTypes = <React.ValidationMap<Component.Props>> {
+    static propTypes = <React.ValidationMap<Base.Props>> {
         videoKey: React.PropTypes.instanceOf(VideoKey).isRequired,
         store: React.PropTypes.shape({
             addChangeListener: React.PropTypes.func.isRequired,
@@ -30,7 +30,7 @@ class Component extends React.Component<Component.Props, Component.State> {
         })
     };
 
-    state = <Component.State> {
+    state = <Base.State> {
         videoData: this.props.store.getVideoDataByKey(this.props.videoKey)
     };
 
@@ -122,4 +122,4 @@ function length2str(len: number): string {
     return `${min}分${sec}秒`;
 }
 
-export default Component;
+export default Base;

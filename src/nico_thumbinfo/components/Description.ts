@@ -2,7 +2,7 @@
 
 import * as React from "react";
 
-import {DescriptionElement as DescElem} from "../model/VideoData";
+import {DescriptionElement as DescElem} from "../stores/VideoData";
 
 
 module Description {

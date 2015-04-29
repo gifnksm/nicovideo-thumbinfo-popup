@@ -1,8 +1,8 @@
 /// <reference path="../../../typings/common.d.ts" />
 
 import {EventEmitter} from "events";
-import VideoKey from "../model/VideoKey"
-import {Data as VideoData} from "../model/VideoData"
+import VideoKey from "./VideoKey"
+import {Data as VideoData} from "./VideoData"
 
 const CHANGE_EVENT = "change";
 

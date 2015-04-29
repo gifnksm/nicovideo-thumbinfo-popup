@@ -1,8 +1,8 @@
 /// <reference path="../../../../../typings/common.d.ts" />
 
-import GetThumbInfo, {ErrorCode, GetThumbinfoError} from "../../../../../src/nico_thumbinfo/model/parser/GetThumbInfo";
-import {RawData} from "../../../../../src/nico_thumbinfo/model/VideoData";
-import VideoKey from "../../../../../src/nico_thumbinfo/model/VideoKey";
+import GetThumbInfo, {ErrorCode, GetThumbinfoError} from "../../../../../src/nico_thumbinfo/stores/parser/GetThumbInfo";
+import {RawData} from "../../../../../src/nico_thumbinfo/stores/VideoData";
+import VideoKey from "../../../../../src/nico_thumbinfo/stores/VideoKey";
 import * as assert from "power-assert";
 
 function getUrl(url: string): Promise<string> {
@@ -29,7 +29,7 @@ function failTest() {
     throw new Error("Expected promise to be rejected but it was fulfilled");
 }
 
-describe("nico_thumbinfo/model/parser/GetThumbInfo", () => {
+describe("nico_thumbinfo/stores/parser/GetThumbInfo", () => {
     let key = VideoKey.fromVideoId("sm9");
 
     it("should fails if input is empty", () => {

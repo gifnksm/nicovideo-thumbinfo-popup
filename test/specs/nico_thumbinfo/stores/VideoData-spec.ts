@@ -1,11 +1,11 @@
 /// <reference path="../../../../typings/common.d.ts" />
 
-import VideoKey from "../../../../src/nico_thumbinfo/model/VideoKey";
-import {Data, RawData} from "../../../../src/nico_thumbinfo/model/VideoData";
+import VideoKey from "../../../../src/nico_thumbinfo/stores/VideoKey";
+import {Data, RawData} from "../../../../src/nico_thumbinfo/stores/VideoData";
 import * as assert from "power-assert";
 import {Option, Some, None} from "option-t";
 
-describe("nico_thumbinfo/model/VideoData", () => {
+describe("nico_thumbinfo/stores/VideoData", () => {
     let key = VideoKey.fromVideoId("sm9");
 
     let getThumbInfo = RawData.createGetThumbinfo(key);

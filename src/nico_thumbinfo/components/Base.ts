@@ -1,9 +1,9 @@
 /// <reference path="../../../typings/common.d.ts" />
 
 import * as React from "react";
-import VideoKey from "../model/VideoKey";
-import {Data as VideoData, ThumbType} from "../model/VideoData";
-import VideoDataStore, {VideoDataStoreInterface} from "../store/VideoDataStore";
+import VideoKey from "../stores/VideoKey";
+import {Data as VideoData, ThumbType} from "../stores/VideoData";
+import VideoDataStore, {VideoDataStoreInterface} from "../stores/VideoDataStore";
 import TagList from "./TagList";
 import Description from "./Description";
 

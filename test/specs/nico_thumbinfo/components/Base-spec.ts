@@ -1,10 +1,10 @@
 /// <reference path="../../../../typings/common.d.ts" />
 
-import NicoThumbinfo from "../../../../src/nico_thumbinfo/component/Base";
-import GetThumbInfo from "../../../../src/nico_thumbinfo/model/parser/GetThumbInfo";
-import VideoKey from "../../../../src/nico_thumbinfo/model/VideoKey";
-import {Data, RawData} from "../../../../src/nico_thumbinfo/model/VideoData";
-import {VideoDataStoreInterface} from "../../../../src/nico_thumbinfo/store/VideoDataStore";
+import NicoThumbinfo from "../../../../src/nico_thumbinfo/components/Base";
+import GetThumbInfo from "../../../../src/nico_thumbinfo/stores/parser/GetThumbInfo";
+import VideoKey from "../../../../src/nico_thumbinfo/stores/VideoKey";
+import {Data, RawData} from "../../../../src/nico_thumbinfo/stores/VideoData";
+import {VideoDataStoreInterface} from "../../../../src/nico_thumbinfo/stores/VideoDataStore";
 import * as assert from "power-assert";
 import * as React from "react";
 
@@ -48,7 +48,7 @@ class VideoDataStoreDummy implements VideoDataStoreInterface {
     }
 }
 
-describe("nico_thumbinfo/component/Base", () => {
+describe("nico_thumbinfo/components/Base", () => {
     it("should renser loading message without any data loaded");
 
     it("should render sm9 video.", () => {

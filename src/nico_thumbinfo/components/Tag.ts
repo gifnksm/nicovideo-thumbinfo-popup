@@ -1,7 +1,7 @@
 /// <reference path="../../../typings/common.d.ts" />
 
 import * as React from "react";
-import {Tag as TagData} from "../model/VideoData";
+import {Tag as TagData} from "../stores/VideoData";
 
 module Tag {
     export interface Props {

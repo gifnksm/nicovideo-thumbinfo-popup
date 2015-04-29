@@ -57,7 +57,31 @@ class Base extends React.Component<Base.Props, Base.State> {
             return RD.div(null);
         }
 
-        let mylist_url = `http://www.nicovideo.jp/openlist/${data.key.id}`;
+        let mylistURL = `http://www.nicovideo.jp/openlist/${data.key.id}`;
+        let thumbType: React.ReactNode = null;
+        switch (data.thumbType) {
+        case "video":
+            break;
+        case "mymemory":
+        case "community":
+            thumbType = [RD.strong(null,
+                                   data.thumbType === "mymemory"
+                                   ? "マイメモリー"
+                                   : "コミュニティー" ),
+                         " ",
+                         RD.a({href: "http://www.nicovideo.jp/watch/" + data.watchUrl},
+                             "\u00bb元動画")];
+            break;
+        case "communityOnly":
+            thumbType = RD.strong(null, "コミュニティー限定動画");
+            break;
+        case "deleted":
+            thumbType = RD.strong({style: {color: "red"}}, "削除済み");
+            break;
+        default:
+            console.warn("Unknown thumbType: ", data.thumbType);
+            break;
+        }
 
         return RD.div(
             null,
@@ -66,6 +90,9 @@ class Base extends React.Component<Base.Props, Base.State> {
             RD.div(
                 null,
                 RD.span(null, `${date2str(data.postedAt)}投稿 `),
+                " ",
+                thumbType,
+                " ",
                 RD.span(null, "[up:"),
                 RD.a({href: data.uploader.url}, data.uploader.name),
                 RD.span(null, "]")
@@ -80,20 +107,19 @@ class Base extends React.Component<Base.Props, Base.State> {
                 null,
                 RD.span(null, `再生時間: `),
                 RD.strong(null, length2str(data.lengthInSeconds)),
-                RD.span(null, ` 再生: `),
+                " ",
+                RD.span(null, `再生: `),
                 RD.strong(null, data.viewCounter.toLocaleString()),
-                RD.span(null, ` コメント: `),
+                " ",
+                RD.span(null, `コメント: `),
                 RD.strong(null, data.commentCounter.toLocaleString()),
-                RD.span(null, ` マイリスト: `),
-                RD.strong(null, RD.a({href: mylist_url},
+                " ",
+                RD.span(null, `マイリスト: `),
+                RD.strong(null, RD.a({href: mylistURL},
                                      data.mylistCounter.toLocaleString()))
             ),
 
             React.createElement(TagList, {tags: data.tags})
-            // RD.div(
-            //     null,
-            //     RD.strong(null, `タグ(${data.tags}): `)
-            // )
         );
     }
 }

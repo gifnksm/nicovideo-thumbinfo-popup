@@ -1,11 +1,12 @@
 /// <reference path="../../../typings/common.d.ts" />
 
 import * as React from "react";
-import {Tag} from "../model/VideoData";
+import {Tag as TagData} from "../model/VideoData";
+import Tag from "./Tag"
 
 module TagList {
     export interface Props {
-        tags: Tag[];
+        tags: TagData[];
     }
     export interface State {}
 }
@@ -22,8 +23,11 @@ class TagList extends React.Component<TagList.Props, TagList.State> {
         const RD = React.DOM;
         return RD.div(
             null,
-            RD.strong(null, `タグ(${this.props.tags.length}): `)
-        );
+            RD.strong(null, `タグ(${this.props.tags.length}): `),
+            this.props.tags.map((tag) => {
+                return [" ", React.createElement(Tag, {tag: tag, key: tag.name})];
+            })
+       );
     }
 }
 

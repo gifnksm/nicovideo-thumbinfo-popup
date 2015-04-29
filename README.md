@@ -14,17 +14,17 @@ $ npm install
 ## Build
 
 ```
-$ gulp build
+$ npm run build
 ```
 
 ## Test
 
 ```
-$ gulp test
+$ npm test
 ```
 
 To start test watcher:
 
 ```
-$ gulp watch
+$ npm start
 ```

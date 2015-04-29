@@ -2240,12 +2240,9 @@ function log() {
     return;
   if(console && console.log)
     try {
-      unsafeWindow.console.log.apply(console, arguments);
+      console.log.apply(console, arguments);
     } catch(e) {
-      GM_log('Error on console.log\n' + Array.map(
-               arguments,
-               function(obj) { return obj.toString(); }
-             ).join('\n'));
+      GM_log('Error on console.log:\n' + Array.slice(arguments).join(',\n'));
     }
   else
     Array.forEach(arguments, GM_log);
@@ -2255,12 +2252,9 @@ function group() {
     return;
   if(console && console.group)
     try {
-      unsafeWindow.console.group.apply(console, arguments);
+      console.group.apply(console, arguments);
     } catch(e) {
-      GM_log('Error on console.group\n' + Array.map(
-               arguments,
-               function(obj) { return obj.toString(); }
-             ).join('\n'));
+      GM_log('Error on console.group:\n' + Array.slice(arguments).join(',\n'));
     }
 }
 function groupEnd() {
@@ -2268,12 +2262,9 @@ function groupEnd() {
     return;
   if(console && console.groupEnd)
     try {
-      unsafeWindow.console.groupEnd();
+      console.groupEnd();
     } catch(e) {
-      GM_log('Error on console.groupEnd\n' + Array.map(
-               arguments,
-               function(obj) { return obj.toString(); }
-             ).join('\n'));
+      GM_log('Error on console.groupEnd:\n' + Array.slice(arguments).join(',\n'));
     }
 }
 function getPosition(elem) {

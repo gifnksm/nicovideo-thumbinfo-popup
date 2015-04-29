@@ -1,7 +1,7 @@
 /// <reference path="../../../../typings/common.d.ts" />
 
 import Key from "../VideoKey";
-import {RawData, User, Channel, Tag} from "../VideoData";
+import {RawData, User, Channel, Tag, ThumbType} from "../VideoData";
 
 export enum ErrorCode {
     Deleted, Community, NotFound
@@ -82,16 +82,26 @@ export default class Parser {
             switch (node.nodeName) {
             case "thumb_type":
                 if (key.type === Key.Type.OptionalThreadId) {
-                    data.thumbType = "community";
+                    data.thumbType = ThumbType.Community;
                 } else {
-                    data.thumbType = text;
+                    switch (text) {
+                    case "video":
+                        data.thumbType = ThumbType.Video;
+                        break;
+                    case "mymemory":
+                        data.thumbType = ThumbType.MyMemory;
+                        break;
+                    default:
+                        console.warn("Unknown thumb_type: ", text);
+                        break;
+                    }
                 }
                 break;
 
             case "video_id": data.videoId = text; break;
 
             case "title": data.title = text; break;
-            case "description": data.description = text; break;
+            case "description": data.description = [text]; break;
             case "thumbnail_url": data.thumbnailUrl = text; break;
             case "first_retrieve": data.postedAt = new Date(text); break;
             case "length":

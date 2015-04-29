@@ -3,10 +3,19 @@
 import Key from "VideoKey";
 
 enum Source {
-    Merge = 0,
-    WatchPage = 1,
-    V3VideoArray = 2,
-    GetThumbinfo = 3
+    Merge,
+    WatchPage,
+    V3VideoArray,
+    GetThumbinfo
+}
+
+export enum ThumbType {
+    Unknown,
+    Video,
+    MyMemory,
+    Community,
+    CommunityOnly,
+    Deleted
 }
 
 export class Tag {
@@ -41,15 +50,17 @@ export class Channel implements Uploader {
     }
 }
 
+export type DescriptionElement = string | { name: string, attr: any, children: DescriptionElement[] };
+
 export class RawData {
     _key: Key;
     _source: Source;
 
-    thumbType: string = undefined;
+    thumbType: ThumbType = undefined;
     videoId: string = undefined;
 
     title: string = undefined;
-    description: string = undefined;
+    description: DescriptionElement[] = undefined;
     thumbnailUrl: string = undefined;
     postedAt: Date = undefined;
     lengthInSeconds: number = undefined;

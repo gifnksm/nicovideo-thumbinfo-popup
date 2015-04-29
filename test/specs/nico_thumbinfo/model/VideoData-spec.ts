@@ -9,16 +9,16 @@ describe("nico_thumbinfo/model/VideoData", () => {
     let key = VideoKey.fromVideoId("sm9");
 
     let getThumbInfo = RawData.createGetThumbinfo(key);
-    getThumbInfo.description = "getthumbinfo description";
+    getThumbInfo.description = ["getthumbinfo description"];
     getThumbInfo.title = "getthumbinfo title";
     getThumbInfo.lastResBody = "getthumbinfo lastResBody";
 
     let videoArray = RawData.createV3VideoArray(key);
-    videoArray.description = "videoarray description";
+    videoArray.description = ["videoarray description"];
     videoArray.title = "videoarray title";
 
     let watchPage = RawData.createWatchPage(key);
-    watchPage.description = "watchpage description";
+    watchPage.description = ["watchpage description"];
 
     it("should empty when no raw data is pushed.", () => {
         let data = new Data(key);
@@ -26,14 +26,15 @@ describe("nico_thumbinfo/model/VideoData", () => {
     });
 
     it("should returns pushed data.", () => {
-        function check(raw: RawData, value: string) {
+        function check(raw: RawData, value: string[]) {
             let data = new Data(key);
             data.pushRawData(raw);
-            assert(data.description === value);
+            assert(data.description.length === 1)
+            assert(data.description[0] === value[0]);
         }
-        check(getThumbInfo, getThumbInfo.description);
-        check(videoArray, videoArray.description);
-        check(watchPage, watchPage.description);
+        check(getThumbInfo, <string[]>getThumbInfo.description);
+        check(videoArray, <string[]>videoArray.description);
+        check(watchPage, <string[]>watchPage.description);
     });
 
     it("should overwrite the property with higher priority rawData's value.", () => {

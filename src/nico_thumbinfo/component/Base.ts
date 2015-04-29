@@ -2,9 +2,10 @@
 
 import * as React from "react";
 import VideoKey from "../model/VideoKey";
-import {Data as VideoData} from "../model/VideoData";
+import {Data as VideoData, ThumbType} from "../model/VideoData";
 import VideoDataStore, {VideoDataStoreInterface} from "../store/VideoDataStore";
 import TagList from "./TagList";
+import Description from "./Description";
 
 module Base {
     export interface Props {
@@ -60,22 +61,22 @@ class Base extends React.Component<Base.Props, Base.State> {
         let mylistURL = `http://www.nicovideo.jp/openlist/${data.key.id}`;
         let thumbType: React.ReactNode = null;
         switch (data.thumbType) {
-        case "video":
+        case ThumbType.Video:
             break;
-        case "mymemory":
-        case "community":
+        case ThumbType.MyMemory:
+        case ThumbType.Community:
             thumbType = [RD.strong(null,
-                                   data.thumbType === "mymemory"
+                                   data.thumbType === ThumbType.MyMemory
                                    ? "マイメモリー"
                                    : "コミュニティー" ),
                          " ",
                          RD.a({href: "http://www.nicovideo.jp/watch/" + data.watchUrl},
                              "\u00bb元動画")];
             break;
-        case "communityOnly":
+        case ThumbType.CommunityOnly:
             thumbType = RD.strong(null, "コミュニティー限定動画");
             break;
-        case "deleted":
+        case ThumbType.Deleted:
             thumbType = RD.strong({style: {color: "red"}}, "削除済み");
             break;
         default:
@@ -119,7 +120,9 @@ class Base extends React.Component<Base.Props, Base.State> {
                                      data.mylistCounter.toLocaleString()))
             ),
 
-            React.createElement(TagList, {tags: data.tags})
+            React.createElement(TagList, {tags: data.tags}),
+            React.createElement(Description, {description: data.description}),
+            RD.div(null, data.lastResBody)
         );
     }
 }

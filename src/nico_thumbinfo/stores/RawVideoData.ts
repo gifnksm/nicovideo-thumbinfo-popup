@@ -72,48 +72,4 @@ export default class RawVideoData {
 
         if (this.uploader === undefined) { this.uploader = rawData.uploader; }
     }
-
-    // private _mergeTags(tags: TagData[]) {
-    //     if (this.tags === undefined) {
-    //         this.tags = tags;
-    //         return;
-    //     }
-
-    //     // A, B, C + A, B, C => A, B, C
-    //     // A, B, C + A, D, B => A, D, B, C
-    //     // A, B, C + A, C, B => A, B, C
-    //     // A, B, C + A, D, C, B => A, B, D, C
-
-    //     // TODO: replace with ES6's Array.prototype.find
-    //     function search(needle: TagData, heystack: TagData[]) {
-    //         for (let t of heystack) {
-    //             if (t.name === needle.name) {
-    //                 return t;
-    //             }
-    //         }
-    //         return null;
-    //     }
-
-    //     let newTags: TagData[] = [];
-    //     let notFound: TagData[] = [];
-
-    //     for (let t of tags) {
-    //         let base = search(t, this.tags);
-    //         if (base === null) {
-    //             notFound.push(t);
-    //         } else {
-    //             if (notFound.length > 0) {
-    //                 newTags.push(...notFound);
-    //                 notFound = [];
-    //             }
-    //             newTags.push(TagData.merged(base, t));
-    //         }
-    //     }
-    //     if (notFound.length > 0) {
-    //         newTags.push(...notFound);
-    //         notFound = [];
-    //     }
-
-    //     this.tags = newTags;
-    // }
 }

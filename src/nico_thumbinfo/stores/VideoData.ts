@@ -1,4 +1,5 @@
 /// <reference path="../../../typings/common.d.ts" />
+"use strict";
 
 import Key from "VideoKey";
 

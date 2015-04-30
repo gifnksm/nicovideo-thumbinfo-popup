@@ -1,4 +1,5 @@
 /// <reference path="../../../../typings/common.d.ts" />
+"use strict";
 
 import NicoThumbinfo from "../../../../src/nico_thumbinfo/components/Base";
 import GetThumbInfo from "../../../../src/nico_thumbinfo/stores/parser/GetThumbInfo";

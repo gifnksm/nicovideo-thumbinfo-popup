@@ -1,4 +1,5 @@
 /// <reference path="../../../typings/common.d.ts" />
+"use strict";
 
 import * as React from "react";
 import VideoKey from "../stores/VideoKey";

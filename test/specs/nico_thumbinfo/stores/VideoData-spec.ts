@@ -1,4 +1,5 @@
 /// <reference path="../../../../typings/common.d.ts" />
+"use strict";
 
 import VideoKey from "../../../../src/nico_thumbinfo/stores/VideoKey";
 import {Data, RawData} from "../../../../src/nico_thumbinfo/stores/VideoData";

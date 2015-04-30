@@ -1,4 +1,5 @@
 /// <reference path="../../../typings/common.d.ts" />
+"use strict";
 
 import {EventEmitter} from "events";
 import VideoKey from "./VideoKey"

@@ -1,4 +1,5 @@
 /// <reference path="../../../typings/common.d.ts" />
+"use strict";
 
 import TimeCounter from "../../../src/util/TimeCounter";
 import * as assert from "power-assert";

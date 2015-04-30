@@ -1,4 +1,5 @@
 /// <reference path="../../../typings/common.d.ts" />
+"use strict";
 
 import * as React from "react";
 import {Tag as TagData} from "../stores/VideoData";

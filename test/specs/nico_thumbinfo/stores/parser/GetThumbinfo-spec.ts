@@ -1,4 +1,5 @@
 /// <reference path="../../../../../typings/common.d.ts" />
+"use strict";
 
 import GetThumbInfo, {ErrorCode, GetThumbinfoError} from "../../../../../src/nico_thumbinfo/stores/parser/GetThumbInfo";
 import {RawData} from "../../../../../src/nico_thumbinfo/stores/VideoData";

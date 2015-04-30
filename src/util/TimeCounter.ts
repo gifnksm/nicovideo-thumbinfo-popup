@@ -1,3 +1,6 @@
+/// <reference path="../../typings/common.d.ts" />
+"use strict";
+
 export default class TimeCounter {
     private _startTime: number = NaN;
     private _timeout: number;

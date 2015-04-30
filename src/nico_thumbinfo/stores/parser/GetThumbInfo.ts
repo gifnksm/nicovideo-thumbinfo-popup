@@ -1,8 +1,11 @@
 /// <reference path="../../../../typings/common.d.ts" />
 "use strict";
 
-import Key from "../VideoKey";
-import {RawData, User, Channel, Tag, ThumbType} from "../VideoData";
+import {ThumbType} from "../constants";
+import TagData from "../TagData";
+import {User, Channel} from "../Uploader";
+import VideoKey from "../VideoKey";
+import RawVideoData from "../RawVideoData";
 
 export enum ErrorCode {
     Deleted, Community, NotFound
@@ -20,7 +23,7 @@ export class GetThumbinfoError {
 export default class Parser {
     private static parser: DOMParser = new DOMParser();
 
-    static parse(key: Key, input: string): Promise<RawData|GetThumbinfoError> {
+    static parse(key: VideoKey, input: string): Promise<RawVideoData|GetThumbinfoError> {
         return new Promise((resolve, reject) => {
             let xml = Parser.parser.parseFromString(input, "application/xml");
 
@@ -62,9 +65,8 @@ export default class Parser {
         });
     }
 
-    private static _parseOk(key: Key, xml: XMLDocument): RawData {
-        let data = RawData.createGetThumbinfo(key);
-        data.tags = [];
+    private static _parseOk(key: VideoKey, xml: XMLDocument): RawVideoData {
+        let data = RawVideoData.createGetThumbinfo(key);
         let user: User = new User();
         let channel: Channel = new Channel();
 
@@ -82,7 +84,7 @@ export default class Parser {
             let text: string = node.textContent;
             switch (node.nodeName) {
             case "thumb_type":
-                if (key.type === Key.Type.OptionalThreadId) {
+                if (key.type === VideoKey.Type.OptionalThreadId) {
                     data.thumbType = ThumbType.Community;
                 } else {
                     switch (text) {
@@ -120,7 +122,7 @@ export default class Parser {
                 Array.prototype.forEach.call(
                     node.getElementsByTagName("tag"),
                     (elem: Element) => {
-                        let tag = new Tag();
+                        let tag = new TagData();
                         tag.name = elem.textContent;
                         tag.isLocked = elem.hasAttribute("lock");
                         tag.isCategory = elem.hasAttribute("category");
@@ -172,7 +174,7 @@ export default class Parser {
         return data;
     }
 
-    private static _parseFail(key: Key, xml: XMLDocument): GetThumbinfoError {
+    private static _parseFail(key: VideoKey, xml: XMLDocument): GetThumbinfoError {
         let code: ErrorCode;
         let desc: string;
 

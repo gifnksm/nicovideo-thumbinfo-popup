@@ -2,7 +2,7 @@
 "use strict";
 
 import GetThumbInfo, {ErrorCode, GetThumbinfoError} from "../../../../../src/nico_thumbinfo/stores/parser/GetThumbInfo";
-import {RawData} from "../../../../../src/nico_thumbinfo/stores/VideoData";
+import RawVideoData from "../../../../../src/nico_thumbinfo/stores/RawVideoData";
 import VideoKey from "../../../../../src/nico_thumbinfo/stores/VideoKey";
 import * as assert from "power-assert";
 
@@ -51,7 +51,7 @@ describe("nico_thumbinfo/stores/parser/GetThumbInfo", () => {
         return getUrl("/base/etc/resource/getthumbinfo/sm9")
             .then(input => GetThumbInfo.parse(key, input))
             .then(data => {
-                if (data instanceof RawData) {
+                if (data instanceof RawVideoData) {
                     assert(data.thumbType !== undefined);
                     assert(data.videoId === "sm9");
                     assert(data.title !== undefined);
@@ -66,8 +66,8 @@ describe("nico_thumbinfo/stores/parser/GetThumbInfo", () => {
                     assert(data.tags !== undefined);
                     assert(data.uploader !== undefined);
                 } else {
-                    console.error("data is not instanceof RawData: ", data);
-                    throw new Error("data is not instanceof RawData");
+                    console.error("data is not instanceof RawVideoData: ", data);
+                    throw new Error("data is not instanceof RawVideoData");
                 }
             });
     });

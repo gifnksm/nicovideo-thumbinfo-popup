@@ -4,7 +4,8 @@
 import NicoThumbinfo from "../../../../src/nico_thumbinfo/components/Base";
 import GetThumbInfo from "../../../../src/nico_thumbinfo/stores/parser/GetThumbInfo";
 import VideoKey from "../../../../src/nico_thumbinfo/stores/VideoKey";
-import {Data, RawData} from "../../../../src/nico_thumbinfo/stores/VideoData";
+import RawVideoData from "../../../../src/nico_thumbinfo/stores/RawVideoData";
+import VideoData from "../../../../src/nico_thumbinfo/stores/VideoData";
 import {VideoDataStoreInterface} from "../../../../src/nico_thumbinfo/stores/VideoDataStore";
 import * as assert from "power-assert";
 import * as React from "react";
@@ -31,7 +32,7 @@ function getUrl(url: string): Promise<string> {
 
 class VideoDataStoreDummy implements VideoDataStoreInterface {
     callback: (key: VideoKey) => void = null;
-    data: Data = new Data(this.key);
+    data: VideoData = new VideoData(this.key);
 
     constructor(public key: VideoKey) {}
 
@@ -64,9 +65,9 @@ describe("nico_thumbinfo/components/Base", () => {
         return getUrl("/base/etc/resource/getthumbinfo/sm9")
             .then(input => GetThumbInfo.parse(key, input))
             .then(rawData => {
-                assert(rawData instanceof RawData);
-                if (rawData instanceof RawData) {
-                    store.data.pushRawData(rawData);
+                assert(rawData instanceof RawVideoData);
+                if (rawData instanceof RawVideoData) {
+                    store.data.pushRawVideoData(rawData);
                 }
                 store.callback(key);
             });

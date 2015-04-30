@@ -2,8 +2,9 @@
 "use strict";
 
 import * as React from "react";
+import {ThumbType} from "../stores/constants";
 import VideoKey from "../stores/VideoKey";
-import {Data as VideoData, ThumbType} from "../stores/VideoData";
+import VideoData from "../stores/VideoData";
 import VideoDataStore, {VideoDataStoreInterface} from "../stores/VideoDataStore";
 import TagList from "./TagList";
 import Description from "./Description";

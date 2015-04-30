@@ -3,7 +3,7 @@
 
 import {EventEmitter} from "events";
 import VideoKey from "./VideoKey"
-import {Data as VideoData} from "./VideoData"
+import VideoData from "./VideoData"
 
 const CHANGE_EVENT = "change";
 

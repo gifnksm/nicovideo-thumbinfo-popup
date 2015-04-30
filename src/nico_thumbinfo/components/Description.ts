@@ -2,8 +2,7 @@
 "use strict";
 
 import * as React from "react";
-
-import {DescriptionElement as DescElem} from "../stores/VideoData";
+import {DescriptionElement as DescElem} from "../stores/RawVideoData";
 
 
 module Description {

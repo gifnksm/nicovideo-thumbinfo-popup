@@ -2,7 +2,7 @@
 "use strict";
 
 import * as React from "react";
-import {Tag as TagData} from "../stores/VideoData";
+import TagData from "../stores/TagData";
 import Tag from "./Tag"
 
 module TagList {

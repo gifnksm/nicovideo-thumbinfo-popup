@@ -122,8 +122,7 @@ export default class Parser {
                 Array.prototype.forEach.call(
                     node.getElementsByTagName("tag"),
                     (elem: Element) => {
-                        let tag = new TagData();
-                        tag.name = elem.textContent;
+                        let tag = new TagData(elem.textContent);
                         tag.isLocked = elem.hasAttribute("lock");
                         tag.isCategory = elem.hasAttribute("category");
                         tag.nicopediaRegistered = undefined;

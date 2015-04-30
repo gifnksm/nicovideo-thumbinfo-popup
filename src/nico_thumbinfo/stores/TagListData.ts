@@ -14,29 +14,29 @@ export default class TagListData {
         // A, B, C + A, C, B => A, B, C
         // A, B, C + A, D, C, B => A, B, D, C
 
-        // TODO: replace with ES6's Array.prototype.find
-        function search(needle: TagData, heystack: TagData[]) {
-            for (let t of heystack) {
-                if (t.name === needle.name) {
-                    return t;
+        // TODO: replace with ES6's Array.prototype.findIndex
+        function searchIndex(needle: TagData, heystack: TagData[]) {
+            for (let i = 0; i < heystack.length; i++) {
+                if (heystack[i].name === needle.name) {
+                    return i;
                 }
             }
-            return null;
+            return -1;
         }
 
-        let newTags: TagData[] = [];
+        let newTags = this.tags.slice();
         let notFound: TagData[] = [];
 
         for (let t of tags.tags) {
-            let base = search(t, this._tags);
-            if (base === null) {
+            let i = searchIndex(t, newTags);
+            if (i === -1) {
                 notFound.push(t);
             } else {
+                newTags[i] = TagData.merged(newTags[i], t);
                 if (notFound.length > 0) {
-                    newTags.push(...notFound);
+                    newTags.splice(i, 0, ...notFound);
                     notFound = [];
                 }
-                newTags.push(TagData.merged(base, t));
             }
         }
         if (notFound.length > 0) {

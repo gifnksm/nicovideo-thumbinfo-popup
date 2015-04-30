@@ -15,9 +15,9 @@ export default class TagListData {
         // A, B, C + A, D, C, B => A, B, D, C
 
         // TODO: replace with ES6's Array.prototype.findIndex
-        function searchIndex(needle: TagData, heystack: TagData[]) {
-            for (let i = 0; i < heystack.length; i++) {
-                if (heystack[i].name === needle.name) {
+        function searchIndex(needle: TagData, haystack: TagData[]) {
+            for (let i = 0; i < haystack.length; i++) {
+                if (haystack[i].name === needle.name) {
                     return i;
                 }
             }

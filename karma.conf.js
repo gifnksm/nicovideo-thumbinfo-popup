@@ -36,7 +36,7 @@ module.exports = function(config) {
     // test results reporter to use
     // possible values: 'dots', 'progress'
     // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-    reporters: ['mocha'],
+    reporters: ['mocha', 'coverage'],
 
 
     // web server port
@@ -72,6 +72,17 @@ module.exports = function(config) {
         reporter: 'html',
         ui: 'bdd'
       }
+    },
+
+    coverageReporter: {
+      reporters: [{
+        type: 'lcovonly',
+        dir: 'target/coverage'
+      }, {
+        type: 'text'
+      }, {
+        type: 'text-summary'
+      }]
     }
   });
 };

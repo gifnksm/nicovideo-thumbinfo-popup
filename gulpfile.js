@@ -14,6 +14,8 @@ var karma = require("karma").server;
 var watchify = require("watchify");
 var rename = require("gulp-rename");
 var buffer = require("gulp-buffer");
+var istanbul = require("browserify-istanbul");
+var coveralls = require("gulp-coveralls");
 
 function pathConverter(base) {
   return function(path) {
@@ -96,6 +98,7 @@ function test_bundle(isWatch) {
 
       var bundler = browserify(chunk.path, option);
       bundler.transform('espowerify');
+      bundler.transform(istanbul({ defaultIgnore: false }));
 
       if (isWatch) {
         bundler = watchify(bundler);
@@ -177,6 +180,11 @@ gulp.task("watch", ["watch:bundle"], function() {
 gulp.task("clean", function(done) {
   var del = require("del");
   del(["./target/"], done);
+});
+
+gulp.task("coveralls", function() {
+  return gulp.src("./target/coverage/**/lcov.info")
+    .pipe(coveralls());
 });
 
 gulp.task("default", ["build"]);

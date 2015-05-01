@@ -14,7 +14,22 @@ module DescriptionParser {
     }
 
     function _nodeList2Description(input: NodeList): DescriptionElement[] {
-        return Array.prototype.slice.call(input).map((node: Node) => node.textContent);
+        return Array.prototype.slice.call(input).map((node: Node) => {
+            switch (node.nodeType) {
+            case Node.ELEMENT_NODE:
+                let attrs: any = {};
+                for (let attr of Array.prototype.slice.call(node.attributes)) {
+                    attrs[attr.name] = attr.value;
+                }
+                return <DescriptionElement> {
+                    name: node.nodeName.toLowerCase(),
+                    attr: attrs, children: _nodeList2Description(node.childNodes)
+                };
+
+            default:
+                return node.textContent;
+            }
+        });
     }
 
     function _convertTexts(conv: (input: string) => DescriptionElement[], input: DescriptionElement[]): DescriptionElement[] {
@@ -163,7 +178,7 @@ module DescriptionParser {
 
             let linkGen = Prefix.LinkMap[prefix];
             if (linkGen === undefined) {
-                console.warn("Unknown prefix: ", prefix);
+                console.error("Unknown prefix: ", prefix);
                 return [id];
             }
             let url: string;

@@ -10,7 +10,7 @@ import {Option, Some, None} from "option-t";
 describe("nico_thumbinfo/stores/VideoData", () => {
     let key = VideoKey.fromVideoId("sm9");
 
-    let getThumbInfo = RawVideoData.createGetThumbinfo(key);
+    let getThumbInfo = RawVideoData.createGetThumbInfo(key);
     getThumbInfo.description = ["getthumbinfo description"];
     getThumbInfo.title = "getthumbinfo title";
     getThumbInfo.lastResBody = "getthumbinfo lastResBody";

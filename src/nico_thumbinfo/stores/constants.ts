@@ -5,7 +5,7 @@ export enum DataSource {
     Merge,
     WatchPage,
     V3VideoArray,
-    GetThumbinfo
+    GetThumbInfo
 }
 
 export enum ThumbType {

@@ -11,7 +11,7 @@ export enum ErrorCode {
     Deleted, Community, NotFound
 }
 
-export class GetThumbinfoError {
+export class GetThumbInfoError {
     code: ErrorCode;
     description: string;
     constructor(code: ErrorCode, description: string) {
@@ -20,12 +20,12 @@ export class GetThumbinfoError {
     }
 }
 
-export default class Parser {
+export default class GetThumbInfoParser {
     private static parser: DOMParser = new DOMParser();
 
-    static parse(key: VideoKey, input: string): Promise<RawVideoData|GetThumbinfoError> {
+    static parse(key: VideoKey, input: string): Promise<RawVideoData|GetThumbInfoError> {
         return new Promise((resolve, reject) => {
-            let xml = Parser.parser.parseFromString(input, "application/xml");
+            let xml = this.parser.parseFromString(input, "application/xml");
 
             // パースに失敗した場合、以下のXMLが返される。
             // Firefox の場合、下記要素のみからなる XML 文書が返るが、
@@ -66,7 +66,7 @@ export default class Parser {
     }
 
     private static _parseOk(key: VideoKey, xml: XMLDocument): RawVideoData {
-        let data = RawVideoData.createGetThumbinfo(key);
+        let data = RawVideoData.createGetThumbInfo(key);
         let user: User = new User();
         let channel: Channel = new Channel();
 
@@ -173,7 +173,7 @@ export default class Parser {
         return data;
     }
 
-    private static _parseFail(key: VideoKey, xml: XMLDocument): GetThumbinfoError {
+    private static _parseFail(key: VideoKey, xml: XMLDocument): GetThumbInfoError {
         let code: ErrorCode;
         let desc: string;
 
@@ -217,6 +217,6 @@ export default class Parser {
             }
         }
 
-        return new GetThumbinfoError(code, desc);
+        return new GetThumbInfoError(code, desc);
     }
 }

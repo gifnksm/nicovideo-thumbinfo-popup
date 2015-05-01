@@ -7,7 +7,7 @@ import TagData from "./TagData";
 import TagListData from "./TagListData";
 import Uploader from "./Uploader";
 
-export type DescriptionElement = string | { name: string, attr: any, children: DescriptionElement[] };
+export type DescriptionElement = string | { name: string, attr?: any, children?: DescriptionElement[] };
 
 export default class RawVideoData {
     _key: VideoKey;

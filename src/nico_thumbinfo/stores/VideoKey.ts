@@ -65,7 +65,7 @@ module Key {
      *
      * 参考: http://dic.nicovideo.jp/a/id
      */
-    module Prefix {
+    export module Prefix {
         const User = "sm|nm";
         const OldUser = "am|fz|ut";
         const Official = "ax|ca|cd|cw|fx|ig|na|om|sd|sk|yk|yo|za|zb|zc|zd|ze|so|nl";

@@ -6,6 +6,7 @@ import TagData from "../TagData";
 import {User, Channel} from "../Uploader";
 import VideoKey from "../VideoKey";
 import RawVideoData from "../RawVideoData";
+import DescriptionParser from "./DescriptionParser";
 
 export enum ErrorCode {
     Deleted, Community, NotFound
@@ -104,7 +105,9 @@ export default class GetThumbInfoParser {
             case "video_id": data.videoId = text; break;
 
             case "title": data.title = text; break;
-            case "description": data.description = [text]; break;
+            case "description":
+                data.description = DescriptionParser.parse(node.childNodes);
+                break;
             case "thumbnail_url": data.thumbnailUrl = text; break;
             case "first_retrieve": data.postedAt = new Date(text); break;
             case "length":

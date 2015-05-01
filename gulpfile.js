@@ -1,10 +1,8 @@
 "use strict";
 
 var gulp = require("gulp");
-var typescript = require("gulp-typescript");
 var browserify = require("browserify");
 var source = require("vinyl-source-stream");
-var sourcemaps = require("gulp-sourcemaps");
 var concat = require("gulp-concat");
 var merge = require("gulp-merge");
 var template = require("gulp-template");
@@ -16,6 +14,7 @@ var rename = require("gulp-rename");
 var buffer = require("gulp-buffer");
 var istanbul = require("browserify-istanbul");
 var coveralls = require("gulp-coveralls");
+var del = require("del");
 
 function pathConverter(base) {
   return function(path) {
@@ -28,36 +27,13 @@ function pathConverter(base) {
 
 var Path = {
   input: pathConverter("./"),
-  compiled: pathConverter("./target/compiled/"),
   bundle: pathConverter("./target/bundle/"),
   dist: pathConverter("./target/dist/")
 };
 
-var tsProject = typescript.createProject({
-  typescript: require("typescript"),
-  target: "ES5", sortOutput: true, module: "commonjs",
-  noImplicitAny: true,
-  noEmitOnError: true
-});
-
-function typescript_build(src, option) {
-  return function() {
-    return gulp.src(src, option)
-      .pipe(sourcemaps.init())
-      .pipe(typescript(tsProject))
-      .pipe(sourcemaps.write())
-      .pipe(gulp.dest(Path.compiled()));
-  };
-}
-
-gulp.task("build:typescript",
-          typescript_build(Path.input("src/**/*.ts"), {base: Path.input()}));
-gulp.task("test:typescript", ["build:typescript"],
-          typescript_build(Path.input("test/**/*.ts"), {base: Path.input()}));
-
-
-gulp.task("build:bundle", ["build:typescript"], function() {
-  return browserify(Path.compiled("src/index.js"))
+gulp.task("build:bundle", function() {
+  return browserify(Path.input("src/index.ts"))
+    .plugin("tsify", { target: "ES5", noImplicitAny: true })
     .bundle()
     .pipe(source("index.js"))
     .pipe(gulp.dest(Path.bundle("src")))
@@ -74,6 +50,7 @@ function test_bundle(isWatch) {
       return bundler
         .bundle()
         .pipe(source(chunk.relative))
+        .pipe(rename({extname: ".js"}))
         .pipe(gulp.dest(Path.bundle()));
     };
   }
@@ -96,9 +73,10 @@ function test_bundle(isWatch) {
         option.packageCache = {};
       }
 
-      var bundler = browserify(chunk.path, option);
-      bundler.transform('espowerify');
-      bundler.transform(istanbul({ defaultIgnore: false }));
+      var bundler = browserify(chunk.path, option)
+            .plugin("tsify", { target: "ES5", noImplicitAny: true })
+            .transform('espowerify')
+            .transform(istanbul({ defaultIgnore: false }));
 
       if (isWatch) {
         bundler = watchify(bundler);
@@ -109,14 +87,15 @@ function test_bundle(isWatch) {
   }
 
   return function() {
-    return gulp.src(Path.compiled("test/**/*.js"), {base: Path.compiled()})
+    return gulp.src(Path.input("test/**/*.ts"), {base: Path.input()})
       .pipe(browserified())
+      .pipe(rename({extname: ".js"}))
       .pipe(gulp.dest(Path.bundle()));
   };
 }
 
-gulp.task("test:bundle", ["test:typescript"], test_bundle(false));
-gulp.task("watch:bundle", ["test:typescript"], test_bundle(true));
+gulp.task("test:bundle", test_bundle(false));
+gulp.task("watch:bundle", test_bundle(true));
 
 
 var userscriptBaseName = {
@@ -169,16 +148,9 @@ gulp.task("watch", ["watch:bundle"], function() {
     singleRun: false,
     autoWatch: true
   });
-
-  return gulp.watch([Path.input("test/**/*.ts"),
-                     Path.input("src/**/*.ts"),
-                     "typings/**/*.d.ts",
-                     "!**/.#*"],
-                    ["test:typescript"]);
 });
 
 gulp.task("clean", function(done) {
-  var del = require("del");
   del(["./target/"], done);
 });
 

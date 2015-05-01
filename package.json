@@ -42,9 +42,7 @@
     "gulp-coveralls": "^0.1.4",
     "gulp-merge": "^0.1.0",
     "gulp-rename": "^1.2.2",
-    "gulp-sourcemaps": "^1.5.2",
     "gulp-template": "^3.0.0",
-    "gulp-typescript": "^2.6.0",
     "gulp-uglify": "^1.2.0",
     "karma": "^0.12.32",
     "karma-coverage": "^0.3.1",
@@ -55,7 +53,7 @@
     "mocha": "^2.2.4",
     "through2": "^0.6.5",
     "tsd": "^0.6.0-beta.5",
-    "typescript": "^1.5.0-alpha",
+    "tsify": "git://github.com/fredericlb/tsify.git",
     "vinyl-source-stream": "^1.1.0",
     "watchify": "^3.2.1"
   },

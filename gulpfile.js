@@ -49,6 +49,10 @@ function test_bundle(isWatch) {
     return function() {
       return bundler
         .bundle()
+        .on("error", function(err) {
+          console.error(err.toString());
+          this.emit("end");
+        })
         .pipe(source(chunk.relative))
         .pipe(rename({extname: ".js"}))
         .pipe(gulp.dest(Path.bundle()));
@@ -87,9 +91,15 @@ function test_bundle(isWatch) {
   }
 
   return function() {
-    return gulp.src(Path.input("test/**/*.ts"), {base: Path.input()})
-      .pipe(browserified())
-      .pipe(rename({extname: ".js"}))
+    var bundle = gulp.src(Path.input("test/**/*.ts"), {base: Path.input()})
+          .pipe(browserified());
+    if (isWatch) {
+      bundle = bundle.on("error", function(err) {
+        console.error(err.toString());
+        this.emit("end");
+      });
+    }
+    return bundle.pipe(rename({extname: ".js"}))
       .pipe(gulp.dest(Path.bundle()));
   };
 }

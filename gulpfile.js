@@ -1,20 +1,20 @@
 "use strict";
 
-var gulp = require("gulp");
 var browserify = require("browserify");
-var source = require("vinyl-source-stream");
+var istanbul = require("browserify-istanbul");
+var del = require("del");
+var gulp = require("gulp");
+var buffer = require("gulp-buffer");
 var concat = require("gulp-concat");
+var coveralls = require("gulp-coveralls");
 var merge = require("gulp-merge");
+var rename = require("gulp-rename");
 var template = require("gulp-template");
-var through = require("through2");
 var uglify = require("gulp-uglify");
 var karma = require("karma").server;
+var through = require("through2");
 var watchify = require("watchify");
-var rename = require("gulp-rename");
-var buffer = require("gulp-buffer");
-var istanbul = require("browserify-istanbul");
-var coveralls = require("gulp-coveralls");
-var del = require("del");
+var source = require("vinyl-source-stream");
 
 function pathConverter(base) {
   return function(path) {

@@ -12,7 +12,10 @@ var rename = require("gulp-rename");
 var sourcemaps = require("gulp-sourcemaps");
 var template = require("gulp-template");
 var uglify = require("gulp-uglify");
+var lcov_sourcemap = require("lcov-sourcemap");
 var karma = require("karma").server;
+var path = require("path");
+var through = require("through2");
 var watchify = require("watchify");
 var source = require("vinyl-source-stream");
 
@@ -150,8 +153,39 @@ gulp.task("clean", function(done) {
   del(["./target/"], done);
 });
 
-gulp.task("coveralls", function() {
-  return gulp.src("./target/coverage/**/lcov.info")
+gulp.task("convert-lcov", function() {
+  return gulp.src("./target/coverage/*/lcov.info", {base: "./"})
+    .pipe(through.obj(function(chunk, end, cb) {
+      var self = this;
+      if (chunk.isBuffer()) {
+        lcov_sourcemap(chunk.relative, { spec: Path.bundle("test/spec.js.map") }, Path.bundle("test"))
+          .then(function(lcov) {
+            lcov = lcov.replace(/^SF:(.*)/gm, function(line, dir) {
+              return "SF:" + path.resolve("./target/coverage/converted/", dir);
+            });
+            var skipped = false;
+            lcov = lcov.split("\n").filter(function(line) {
+              if (/^SF:(.*)$/.test(line)) {
+                skipped = (RegExp.$1.indexOf(path.resolve(".", "src")) !== 0) &&
+                  (RegExp.$1.indexOf(path.resolve(".", "test")) !== 0);
+              }
+              return !skipped;
+            }).join("\n");
+            chunk.contents = new Buffer(lcov);
+            self.push(chunk);
+            cb();
+          });
+      } else {
+        this.push(chunk);
+        cb();
+      }
+    }))
+    .pipe(rename("lcov_converted.info"))
+    .pipe(gulp.dest("./target/coverage/converted/"));
+});
+
+gulp.task("coveralls", ["convert-lcov"], function() {
+  return gulp.src("./target/coverage/converted/lcov_converted.info")
     .pipe(coveralls());
 });
 

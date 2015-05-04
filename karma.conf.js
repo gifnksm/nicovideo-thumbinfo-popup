@@ -79,8 +79,6 @@ module.exports = function(config) {
       reporters: [{
         type: 'lcovonly',
         dir: 'target/coverage'
-      }, {
-        type: 'text-summary'
       }]
     }
   });

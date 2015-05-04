@@ -1,18 +1,18 @@
 "use strict";
 
 var browserify = require("browserify");
-var istanbul = require("browserify-istanbul");
 var del = require("del");
+var glob = require("glob");
 var gulp = require("gulp");
 var buffer = require("gulp-buffer");
 var concat = require("gulp-concat");
 var coveralls = require("gulp-coveralls");
-var merge = require("gulp-merge");
+var extractor = require("gulp-extract-sourcemap");
 var rename = require("gulp-rename");
+var sourcemaps = require("gulp-sourcemaps");
 var template = require("gulp-template");
 var uglify = require("gulp-uglify");
 var karma = require("karma").server;
-var through = require("through2");
 var watchify = require("watchify");
 var source = require("vinyl-source-stream");
 
@@ -31,76 +31,62 @@ var Path = {
   dist: pathConverter("./target/dist/")
 };
 
-gulp.task("build:bundle", function() {
-  return browserify(Path.input("src/index.ts"))
+gulp.task("build:bundle:normal", function() {
+  return browserify(Path.input("src/index.ts"), {debug: true, basedir: "."})
     .plugin("tsify", { target: "ES5", noImplicitAny: true })
     .bundle()
     .pipe(source("index.js"))
-    .pipe(gulp.dest(Path.bundle("src")))
+    .pipe(buffer())
+    .pipe(extractor({
+      basedir: Path.bundle("src"),
+      removeSourcesContent: true
+    }))
+    .pipe(gulp.dest(Path.bundle("src")));
+});
+
+gulp.task("build:bundle:min", ["build:bundle:normal"], function() {
+  return gulp.src(Path.bundle("src/index.js"))
     .pipe(rename({extname: ".min.js"}))
+    .pipe(sourcemaps.init({loadMaps: true}))
     .pipe(buffer())
     .pipe(uglify())
+    .pipe(sourcemaps.write("./", {includeContent: false}))
     .pipe(gulp.dest(Path.bundle("src")));
 });
 
 
 function test_bundle(isWatch) {
-  function bundle(chunk, bundler) {
-    return function() {
+  return function() {
+    var files = glob.sync("test/**/*.ts").map(Path.input);
+
+    var option = {debug: true, basedir: "." };
+    if (isWatch) {
+      option.cache = {};
+      option.packageCache = {};
+    }
+
+    var bundler = browserify(files, option)
+          .plugin("tsify", { target: "ES5", noImplicitAny: true })
+          .transform('espowerify');
+
+    if (isWatch) {
+      bundler = watchify(bundler);
+      bundler.on("update", bundle);
+    }
+
+    function bundle() {
       return bundler
         .bundle()
-        .on("error", function(err) {
-          console.error(err.toString());
-          this.emit("end");
-        })
-        .pipe(source(chunk.relative))
-        .pipe(rename({extname: ".js"}))
-        .pipe(gulp.dest(Path.bundle()));
-    };
-  }
-
-  function transform(fun) {
-    return through.obj(function(chunk, end, cb) {
-      if (chunk.isBuffer()) {
-        chunk.contents = fun(chunk);
-        this.push(chunk);
-      }
-      cb();
-    });
-  }
-
-  function browserified() {
-    return transform(function(chunk) {
-      var option = {debug: true};
-      if (isWatch) {
-        option.cache = {};
-        option.packageCache = {};
-      }
-
-      var bundler = browserify(chunk.path, option)
-            .plugin("tsify", { target: "ES5", noImplicitAny: true })
-            .transform('espowerify')
-            .transform(istanbul({ defaultIgnore: false }));
-
-      if (isWatch) {
-        bundler = watchify(bundler);
-        bundler.on('update', bundle(chunk, bundler));
-      }
-      return bundler.bundle();
-    });
-  }
-
-  return function() {
-    var bundle = gulp.src(Path.input("test/**/*.ts"), {base: Path.input()})
-          .pipe(browserified());
-    if (isWatch) {
-      bundle = bundle.on("error", function(err) {
-        console.error(err.toString());
-        this.emit("end");
-      });
+        .pipe(source("spec.js"))
+        .pipe(buffer())
+        .pipe(extractor({
+          basedir: Path.bundle("test"),
+          removeSourcesContent: true
+        }))
+        .pipe(gulp.dest(Path.bundle("test")));
     }
-    return bundle.pipe(rename({extname: ".js"}))
-      .pipe(gulp.dest(Path.bundle()));
+
+    return bundle();
   };
 }
 
@@ -133,7 +119,7 @@ var bundleSrcName = {
       .pipe(gulp.dest(Path.dist()));
   });
 
-  gulp.task("build:" + type, ["build:meta:" + type, "build:bundle"], function() {
+  gulp.task("build:" + type, ["build:meta:" + type, "build:bundle:" + type], function() {
     gulp.src([Path.dist(baseName + ".meta.js"), Path.bundle("src/" + src)])
       .pipe(concat(baseName + ".user.js"))
       .pipe(gulp.dest(Path.dist()));

@@ -30,6 +30,7 @@ module.exports = function(config) {
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
+      'target/bundle/test/**/*.js': ['coverage']
     },
 
 
@@ -78,8 +79,6 @@ module.exports = function(config) {
       reporters: [{
         type: 'lcovonly',
         dir: 'target/coverage'
-      }, {
-        type: 'text'
       }, {
         type: 'text-summary'
       }]

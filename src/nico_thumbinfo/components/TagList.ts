@@ -22,12 +22,10 @@ class TagList extends React.Component<TagList.Props, TagList.State> {
 
     render() {
         const RD = React.DOM;
-        return RD.div(
-            null,
-            RD.strong(null, `タグ(${this.props.tags.length}): `),
-            this.props.tags.map((tag) => {
-                return [" ", React.createElement(Tag, {tag: tag, key: tag.name})];
-            })
+        return RD.dl(
+            {className: "tag-list"},
+            RD.dt(null, `タグ (${this.props.tags.length}): `),
+            this.props.tags.map(tag => React.createElement(Tag, {tag: tag, key: tag.name}))
        );
     }
 }

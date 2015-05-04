@@ -19,27 +19,37 @@ class Tag extends React.Component<Tag.Props, Tag.State> {
         tag: React.PropTypes.instanceOf(TagData).isRequired
     };
 
+    renderStar() {
+        return React.DOM.span({style: {color: "#F90"}}, "★");
+    }
+    renderBracket(child: React.ReactNode) {
+        return React.DOM.span({style: {color: "#F30"}}, "[", child, "]");
+    }
+
     render() {
         const RD = React.DOM;
         let tag = this.props.tag;
 
-        let link = RD.a({href: "http://www.nicovideo.jp/tag/" + encodeURIComponent(tag.name)},
-                        tag.name);
-        let bracket = (child: React.ReactNode) => {
-            return RD.span({style: {color: "#F30"}}, "[", child, "]");
-        };
-        let star = () => RD.span({style: {color: "#F90"}}, "★");
-
-        if (tag.isCategory && tag.isLocked) {
-            return RD.span(null, bracket(star()), link);
-        }
+        let marker: React.ReactNode = null;
         if (tag.isCategory) {
-            return RD.span(null, bracket("C"), link);
+            if (tag.isLocked) {
+                marker = this.renderBracket(this.renderStar());
+            } else {
+                marker = this.renderBracket("C");
+            }
+        } else {
+            if (tag.isLocked) {
+                marker = this.renderStar();
+            } else {
+                marker = null;
+            }
         }
-        if (tag.isLocked) {
-            return RD.span(null, star(), link);
-        }
-        return RD.span(null, link);
+
+        return RD.dd(
+            {className: "tag"},
+            marker,
+            RD.a({href: "http://www.nicovideo.jp/tag/" + encodeURIComponent(tag.name)},
+                 tag.name));
     }
 }
 

@@ -44,8 +44,8 @@ export default class RawVideoData {
         return new RawVideoData(key, DataSource.V3VideoArray);
     }
 
-    static createGetThumbInfo(key: VideoKey): RawVideoData {
-        return new RawVideoData(key, DataSource.GetThumbInfo);
+    static createGetThumbinfo(key: VideoKey): RawVideoData {
+        return new RawVideoData(key, DataSource.GetThumbinfo);
     }
 
     get key() { return this._key; }

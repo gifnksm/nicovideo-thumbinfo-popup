@@ -10,10 +10,10 @@ import {Option, Some, None} from "option-t";
 describe("nico_thumbinfo/stores/VideoData", () => {
     let key = VideoKey.fromVideoId("sm9");
 
-    let getThumbInfo = RawVideoData.createGetThumbInfo(key);
-    getThumbInfo.description = ["getthumbinfo description"];
-    getThumbInfo.title = "getthumbinfo title";
-    getThumbInfo.lastResBody = "getthumbinfo lastResBody";
+    let getThumbinfo = RawVideoData.createGetThumbinfo(key);
+    getThumbinfo.description = ["getthumbinfo description"];
+    getThumbinfo.title = "getthumbinfo title";
+    getThumbinfo.lastResBody = "getthumbinfo lastResBody";
 
     let videoArray = RawVideoData.createV3VideoArray(key);
     videoArray.description = ["videoarray description"];
@@ -34,14 +34,14 @@ describe("nico_thumbinfo/stores/VideoData", () => {
             assert(data.description.length === 1)
             assert(data.description[0] === value[0]);
         }
-        check(getThumbInfo, <string[]>getThumbInfo.description);
+        check(getThumbinfo, <string[]>getThumbinfo.description);
         check(videoArray, <string[]>videoArray.description);
         check(watchPage, <string[]>watchPage.description);
     });
 
     it("should overwrite the property with higher priority rawVideoData's value.", () => {
         let data = new VideoData(key);
-        data.pushRawVideoData(getThumbInfo);
+        data.pushRawVideoData(getThumbinfo);
         data.pushRawVideoData(videoArray);
 
         assert(data.description === videoArray.description);
@@ -49,20 +49,20 @@ describe("nico_thumbinfo/stores/VideoData", () => {
         assert(data.description === watchPage.description);
 
         data = new VideoData(key);
-        data.pushRawVideoData(getThumbInfo);
+        data.pushRawVideoData(getThumbinfo);
         data.pushRawVideoData(watchPage);
         assert(data.description === watchPage.description);
     });
 
     it("should not overwrite the property when higher priority rawVideoData's value is undefined.", () => {
         let data = new VideoData(key);
-        data.pushRawVideoData(getThumbInfo);
+        data.pushRawVideoData(getThumbinfo);
         data.pushRawVideoData(videoArray);
         data.pushRawVideoData(watchPage);
 
         assert(data.description === watchPage.description);
         assert(data.title === videoArray.title);
-        assert(data.lastResBody === getThumbInfo.lastResBody);
+        assert(data.lastResBody === getThumbinfo.lastResBody);
     })
 });
 

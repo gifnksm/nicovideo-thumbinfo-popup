@@ -107,30 +107,26 @@ module DescriptionParser {
         ].join("|");
 
         export const LinkMap = (() => {
-            let pairs: {[index: string]: string | ((id: string) => string)} = {
-                [Video]: "http://www.nicovideo.jp/watch/",
-                [VideoFull]: "http://www.nicovideo.jp/",
-                [Seiga]: "http://seiga.nicovideo.jp/watch/",
-                [Live]: "http://live.nicovideo.jp/watch/",
-                [Community]: "http://com.nicovideo.jp/community/",
-                [Channel]: "http://ch.nicovideo.jp/channel/",
-                [Direct]: "http://chokuhan.nicovideo.jp/products/detail/",
-                [App]: "http://app.nicovideo.jp/app/",
-                [Jikkyo]: "http://jk.nicovideo.jp/watch/",
-                [Commons]: "http://www.niconicommons.jp/material/",
-                [News]: "http://news.nicovideo.jp/watch/",
-                [WwwNicovideo]: "http://www.nicovideo.jp/",
-                [SeigaNicovideo]: "http://seiga.nicovideo.jp/",
-                [DicNicovideo]: "http://dic.nicovideo.jp/id/",
-                [MyVideo]: (id: string) => `http://www.nicovideo.jp/user/${id}/video`
+            let pairs: {[index: string]: ((id: string) => string)} = {
+                [Video]: id => "http://www.nicovideo.jp/watch/" + id,
+                [VideoFull]: id => "http://www.nicovideo.jp/" + id,
+                [Seiga]: id => "http://seiga.nicovideo.jp/watch/" + id,
+                [Live]: id => "http://live.nicovideo.jp/watch/" + id,
+                [Community]: id => "http://com.nicovideo.jp/community/" + id,
+                [Channel]: id => "http://ch.nicovideo.jp/channel/" + id,
+                [Direct]: id => "http://chokuhan.nicovideo.jp/products/detail/" + id,
+                [App]: id => "http://app.nicovideo.jp/app/" + id,
+                [Jikkyo]: id => "http://jk.nicovideo.jp/watch/" + id,
+                [Commons]: id => "http://www.niconicommons.jp/material/" + id,
+                [News]: id => "http://news.nicovideo.jp/watch/" + id,
+                [WwwNicovideo]: id => "http://www.nicovideo.jp/" + id,
+                [SeigaNicovideo]: id => "http://seiga.nicovideo.jp/" + id,
+                [DicNicovideo]: id => "http://dic.nicovideo.jp/id/" + id,
+                [MyVideo]: id => `http://www.nicovideo.jp/user/${id}/video`
             };
 
             let map: any = {};
-            for (let key in pairs) {
-                if (!pairs.hasOwnProperty(key)) {
-                    continue;
-                }
-
+            for (let key of Object.keys(pairs)) {
                 for (let pre of key.split("|")) {
                     map[pre] = pairs[key];
                 }
@@ -181,13 +177,7 @@ module DescriptionParser {
                 console.error("Unknown prefix: ", prefix);
                 return [id];
             }
-            let url: string;
-            if (typeof linkGen === "string") {
-                url = linkGen + id;
-            } else {
-                url = linkGen(id);
-            }
-            return [{name: "a", attr: {href: url}, children: [id]}];
+            return [{name: "a", attr: {href: linkGen(id)}, children: [id]}];
         }, input);
     }
 

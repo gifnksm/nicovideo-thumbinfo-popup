@@ -2,7 +2,7 @@
 "use strict";
 
 import NicoThumbinfo from "../../../../src/nico_thumbinfo/components/Base";
-import GetThumbInfoParser from "../../../../src/nico_thumbinfo/stores/parser/GetThumbInfoParser";
+import GetThumbinfoParser from "../../../../src/nico_thumbinfo/stores/parser/GetThumbinfoParser";
 import VideoKey from "../../../../src/nico_thumbinfo/stores/VideoKey";
 import RawVideoData from "../../../../src/nico_thumbinfo/stores/RawVideoData";
 import VideoData from "../../../../src/nico_thumbinfo/stores/VideoData";
@@ -63,7 +63,7 @@ describe("nico_thumbinfo/components/Base", () => {
         document.body.appendChild(div);
 
         return getUrl("/base/etc/resource/getthumbinfo/sm9")
-            .then(input => GetThumbInfoParser.parse(key, input))
+            .then(input => GetThumbinfoParser.parse(key, input))
             .then(rawData => {
                 assert(rawData instanceof RawVideoData);
                 if (rawData instanceof RawVideoData) {

@@ -32,7 +32,10 @@ class Description extends React.Component<Description.Props, Description.State> 
 
     render() {
         const RD = React.DOM;
-        return RD.div(null, ...this.props.description.map((elem: DescElem) => this._renderElement(elem)));
+        return RD.div(
+            {className: "description"},
+            ...this.props.description.map((elem: DescElem) => this._renderElement(elem))
+        );
     }
 }
 

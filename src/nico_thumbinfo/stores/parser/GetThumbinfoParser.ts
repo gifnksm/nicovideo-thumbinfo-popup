@@ -12,7 +12,7 @@ export enum ErrorCode {
     Deleted, Community, NotFound
 }
 
-export class GetThumbInfoError {
+export class GetThumbinfoError {
     code: ErrorCode;
     description: string;
     constructor(code: ErrorCode, description: string) {
@@ -21,10 +21,10 @@ export class GetThumbInfoError {
     }
 }
 
-export default class GetThumbInfoParser {
+export default class GetThumbinfoParser {
     private static parser: DOMParser = new DOMParser();
 
-    static parse(key: VideoKey, input: string): Promise<RawVideoData|GetThumbInfoError> {
+    static parse(key: VideoKey, input: string): Promise<RawVideoData|GetThumbinfoError> {
         return new Promise((resolve, reject) => {
             let xml = this.parser.parseFromString(input, "application/xml");
 
@@ -67,7 +67,7 @@ export default class GetThumbInfoParser {
     }
 
     private static _parseOk(key: VideoKey, xml: XMLDocument): RawVideoData {
-        let data = RawVideoData.createGetThumbInfo(key);
+        let data = RawVideoData.createGetThumbinfo(key);
         let user: User = new User();
         let channel: Channel = new Channel();
 
@@ -176,7 +176,7 @@ export default class GetThumbInfoParser {
         return data;
     }
 
-    private static _parseFail(key: VideoKey, xml: XMLDocument): GetThumbInfoError {
+    private static _parseFail(key: VideoKey, xml: XMLDocument): GetThumbinfoError {
         let code: ErrorCode;
         let desc: string;
 
@@ -220,6 +220,6 @@ export default class GetThumbInfoParser {
             }
         }
 
-        return new GetThumbInfoError(code, desc);
+        return new GetThumbinfoError(code, desc);
     }
 }

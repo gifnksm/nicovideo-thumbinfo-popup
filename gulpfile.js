@@ -180,12 +180,28 @@ gulp.task("convert-lcov", function() {
         cb();
       }
     }))
-    .pipe(rename("lcov_converted.info"))
+    .pipe(rename("lcov_all.info"))
+    .pipe(gulp.dest("./target/coverage/converted/"))
+    .pipe(through.obj(function(chunk, end, cb) {
+      if (chunk.isBuffer()) {
+        var skipped = false;
+        var lcov = chunk.contents.toString().split("\n").filter(function(line) {
+          if (/^SF:(.*)$/.test(line)) {
+            skipped = (RegExp.$1.indexOf(path.resolve(".", "src")) !== 0);
+          }
+          return !skipped;
+        }).join("\n");
+        chunk.contents = new Buffer(lcov);
+      }
+      this.push(chunk);
+      cb();
+    }))
+    .pipe(rename("lcov_src.info"))
     .pipe(gulp.dest("./target/coverage/converted/"));
 });
 
 gulp.task("coveralls", ["convert-lcov"], function() {
-  return gulp.src("./target/coverage/converted/lcov_converted.info")
+  return gulp.src("./target/coverage/converted/lcov_src.info")
     .pipe(coveralls());
 });
 

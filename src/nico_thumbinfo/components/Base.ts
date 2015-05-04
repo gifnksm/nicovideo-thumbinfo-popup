@@ -82,22 +82,4 @@ class Base extends React.Component<Base.Props, Base.State> {
     }
 }
 
-function fillZero(n: number, width: number): string {
-    let s = n.toString();
-    for (let i = s.length; i < width; i++) {
-        s = '0' + s;
-    }
-    return s;
-}
-
-function date2str(date: Date): string {
-    let year = fillZero(date.getFullYear(), 4);
-    let month = fillZero(date.getMonth() + 1, 2);
-    let day = fillZero(date.getDate(), 2);
-    let hour = fillZero(date.getHours(), 2);
-    let min = fillZero(date.getMinutes(), 2);
-    let sec = fillZero(date.getSeconds(), 2);
-    return `${year}年${month}月${day}日 ${hour}:${min}:${sec}`
-}
-
 export default Base;

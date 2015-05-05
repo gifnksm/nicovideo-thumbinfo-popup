@@ -6,25 +6,25 @@
   "bundle": "typings/tsd.d.ts",
   "installed": {
     "mocha/mocha.d.ts": {
-      "commit": "b0056383b51495b373a32b791de8112fcafe2ace"
+      "commit": "f3244190e20af6901e865f4cc58127d19216baa1"
     },
     "power-assert/power-assert.d.ts": {
-      "commit": "b0056383b51495b373a32b791de8112fcafe2ace"
+      "commit": "f3244190e20af6901e865f4cc58127d19216baa1"
     },
     "empower/empower.d.ts": {
-      "commit": "b0056383b51495b373a32b791de8112fcafe2ace"
+      "commit": "f3244190e20af6901e865f4cc58127d19216baa1"
     },
     "power-assert-formatter/power-assert-formatter.d.ts": {
-      "commit": "b0056383b51495b373a32b791de8112fcafe2ace"
+      "commit": "f3244190e20af6901e865f4cc58127d19216baa1"
     },
     "react/react.d.ts": {
-      "commit": "b0056383b51495b373a32b791de8112fcafe2ace"
+      "commit": "f3244190e20af6901e865f4cc58127d19216baa1"
     },
     "es6-promise/es6-promise.d.ts": {
-      "commit": "7ca8add069411b3bde47fad7208706801cde8656"
+      "commit": "f3244190e20af6901e865f4cc58127d19216baa1"
     },
     "node/node.d.ts": {
-      "commit": "00e7f3fede5f2df55b56c72f40a144824f0f0bfa"
+      "commit": "f3244190e20af6901e865f4cc58127d19216baa1"
     }
   }
 }

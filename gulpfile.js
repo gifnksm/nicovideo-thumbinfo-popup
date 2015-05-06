@@ -12,7 +12,8 @@ var rename = require("gulp-rename");
 var sourcemaps = require("gulp-sourcemaps");
 var template = require("gulp-template");
 var uglify = require("gulp-uglify");
-var lcov_sourcemap = require("lcov-sourcemap");
+var gutil = require("gulp-util");
+var lcovSourcemap = require("lcov-sourcemap");
 var karma = require("karma").server;
 var path = require("path");
 var through = require("through2");
@@ -34,18 +35,70 @@ var Path = {
   dist: pathConverter("./target/dist/")
 };
 
-gulp.task("build:bundle:normal", function() {
-  return browserify(Path.input("src/index.ts"), {debug: true, basedir: "."})
-    .plugin("tsify", { target: "ES5", noImplicitAny: true })
-    .bundle()
-    .pipe(source("index.js"))
-    .pipe(buffer())
-    .pipe(extractor({
-      basedir: Path.bundle("src"),
-      removeSourcesContent: true
-    }))
-    .pipe(gulp.dest(Path.bundle("src")));
-});
+function doBundle(pattern, outName, isDebug, isWatch) {
+  return function() {
+    var files = glob.sync(pattern).map(Path.input);
+    var outDir = path.join(Path.bundle(), path.dirname(outName));
+    outName = path.basename(outName);
+    var outPath = path.join(outDir, outName);
+
+    var option = {debug: true, basedir: "." };
+    if (isWatch) {
+      option.cache = {};
+      option.packageCache = {};
+    }
+
+    var bundler = browserify(files, option)
+          .plugin("tsify", { target: "ES5", noImplicitAny: true });
+
+    if (isDebug) {
+      bundler = bundler.transform('espowerify');
+    }
+
+    if (isWatch) {
+      bundler = watchify(bundler);
+      bundler.on("update", function(files) {
+        gutil.log("Watchify update: '" + gutil.colors.cyan(outPath) + "':");
+        files.forEach(function(file) { gutil.log("\t" + file); });
+      });
+      bundler.on("update", bundle);
+      bundler.on("log", function(msg) {
+        gutil.log("Watchify: '" + gutil.colors.cyan(outPath) + "': " + msg);
+      });
+    }
+
+    function bundle() {
+      var b = bundler.bundle();
+
+      b = b.on("error", function(err) {
+        gutil.log(gutil.colors.red("Browserify compile error:") +
+                  " '" +
+                  gutil.colors.cyan(outPath) + "'");
+        gutil.log("\t" + err.message);
+
+        if (isWatch) {
+          this.emit("end");
+        } else {
+          process.exit(1);
+        }
+      });
+
+      return b.pipe(source(outName))
+        .pipe(buffer())
+        .pipe(extractor({
+          basedir: outDir,
+          removeSourcesContent: true
+        }))
+        .pipe(gulp.dest(outDir));
+    }
+
+    return bundle();
+  };
+}
+
+gulp.task("build:bundle:normal", doBundle("src/index.ts", "src/index.js", false, false));
+gulp.task("test:bundle", doBundle("test/**/*-spec.ts", "test/spec.js", true, false));
+gulp.task("watch:test:bundle", doBundle("test/**/*-spec.ts", "test/spec.js", true, true));
 
 gulp.task("build:bundle:min", ["build:bundle:normal"], function() {
   return gulp.src(Path.bundle("src/index.js"))
@@ -57,46 +110,6 @@ gulp.task("build:bundle:min", ["build:bundle:normal"], function() {
     .pipe(gulp.dest(Path.bundle("src")));
 });
 
-
-function test_bundle(isWatch) {
-  return function() {
-    var files = glob.sync("test/**/*.ts").map(Path.input);
-
-    var option = {debug: true, basedir: "." };
-    if (isWatch) {
-      option.cache = {};
-      option.packageCache = {};
-    }
-
-    var bundler = browserify(files, option)
-          .plugin("tsify", { target: "ES5", noImplicitAny: true })
-          .transform('espowerify');
-
-    if (isWatch) {
-      bundler = watchify(bundler);
-      bundler.on("update", bundle);
-    }
-
-    function bundle() {
-      return bundler
-        .bundle()
-        .pipe(source("spec.js"))
-        .pipe(buffer())
-        .pipe(extractor({
-          basedir: Path.bundle("test"),
-          removeSourcesContent: true
-        }))
-        .pipe(gulp.dest(Path.bundle("test")));
-    }
-
-    return bundle();
-  };
-}
-
-gulp.task("test:bundle", test_bundle(false));
-gulp.task("watch:bundle", test_bundle(true));
-
-
 var userscriptBaseName = {
   normal: "nicovideothumbinfopopup",
   min: "nicovideothumbinfopopup.min"
@@ -106,12 +119,11 @@ var bundleSrcName = {
   min: "index.min.js"
 };
 
-["normal", "min"].forEach(function(type) {
+function doBuildMeta(type) {
+  var baseUrl = "https://raw.githubusercontent.com/gifnksm/nicovideo-thumbinfo-popup/master/";
   var baseName = userscriptBaseName[type];
-  var src = bundleSrcName[type];
 
-  gulp.task("build:meta:" + type, function () {
-    var baseUrl = "https://raw.githubusercontent.com/gifnksm/nicovideo-thumbinfo-popup/master/";
+  return function() {
     return gulp.src("./etc/userscript/header.txt")
       .pipe(template({
         pkg: require("./package.json"),
@@ -120,15 +132,24 @@ var bundleSrcName = {
       }))
       .pipe(rename(baseName + ".meta.js"))
       .pipe(gulp.dest(Path.dist()));
-  });
+  };
+}
 
-  gulp.task("build:" + type, ["build:meta:" + type, "build:bundle:" + type], function() {
-    gulp.src([Path.dist(baseName + ".meta.js"), Path.bundle("src/" + src)])
+function doBuild(type) {
+  var baseName = userscriptBaseName[type];
+  var src = bundleSrcName[type];
+
+  return function() {
+    return gulp.src([Path.dist(baseName + ".meta.js"), Path.bundle("src/" + src)])
       .pipe(concat(baseName + ".user.js"))
       .pipe(gulp.dest(Path.dist()));
-  });
-});
+  };
+}
 
+["normal", "min"].forEach(function(type) {
+  gulp.task("build:meta:" + type, doBuildMeta(type));
+  gulp.task("build:" + type, ["build:meta:" + type, "build:bundle:" + type], doBuild(type));
+});
 gulp.task("build", ["build:normal", "build:min"]);
 
 gulp.task("test", ["test:bundle"], function(done) {
@@ -141,7 +162,7 @@ gulp.task("test", ["test:bundle"], function(done) {
   });
 });
 
-gulp.task("watch", ["watch:bundle"], function() {
+gulp.task("watch", ["watch:test:bundle"], function() {
   karma.start({
     configFile: __dirname + "/karma.conf.js",
     singleRun: false,
@@ -153,25 +174,30 @@ gulp.task("clean", function(done) {
   del(["./target/"], done);
 });
 
+function convertLcovAbsPath(lcov) {
+  return lcov.replace(/^SF:(.*)/gm, function(line, dir) {
+    return "SF:" + path.resolve("./target/coverage/converted/", dir);
+  });
+}
+
+function filterLcovFile(lcov, cond) {
+  var skipped = false;
+  return lcov.split("\n").filter(function(line) {
+    if (/^SF:(.*)$/.test(line)) {
+      skipped = !cond(RegExp.$1);
+    }
+    return !skipped;
+  }).join("\n");
+}
+
 gulp.task("convert-lcov", function() {
   return gulp.src("./target/coverage/*/lcov.info", {base: "./"})
     .pipe(through.obj(function(chunk, end, cb) {
       var self = this;
       if (chunk.isBuffer()) {
-        lcov_sourcemap(chunk.relative, { spec: Path.bundle("test/spec.js.map") }, Path.bundle("test"))
+        lcovSourcemap(chunk.relative, { spec: Path.bundle("test/spec.js.map") }, Path.bundle("test"))
           .then(function(lcov) {
-            lcov = lcov.replace(/^SF:(.*)/gm, function(line, dir) {
-              return "SF:" + path.resolve("./target/coverage/converted/", dir);
-            });
-            var skipped = false;
-            lcov = lcov.split("\n").filter(function(line) {
-              if (/^SF:(.*)$/.test(line)) {
-                skipped = (RegExp.$1.indexOf(path.resolve(".", "src")) !== 0) &&
-                  (RegExp.$1.indexOf(path.resolve(".", "test")) !== 0);
-              }
-              return !skipped;
-            }).join("\n");
-            chunk.contents = new Buffer(lcov);
+            chunk.contents = new Buffer(convertLcovAbsPath(lcov));
             self.push(chunk);
             cb();
           });
@@ -184,14 +210,21 @@ gulp.task("convert-lcov", function() {
     .pipe(gulp.dest("./target/coverage/converted/"))
     .pipe(through.obj(function(chunk, end, cb) {
       if (chunk.isBuffer()) {
-        var skipped = false;
-        var lcov = chunk.contents.toString().split("\n").filter(function(line) {
-          if (/^SF:(.*)$/.test(line)) {
-            skipped = (RegExp.$1.indexOf(path.resolve(".", "src")) !== 0);
-          }
-          return !skipped;
-        }).join("\n");
-        chunk.contents = new Buffer(lcov);
+        chunk.contents = new Buffer(filterLcovFile(chunk.contents.toString(), function(file) {
+          return file.indexOf(path.resolve(".", "src")) === 0 ||
+            file.indexOf(path.resolve(".", "test")) === 0;
+        }));
+      }
+      this.push(chunk);
+      cb();
+    }))
+    .pipe(rename("lcov_mine.info"))
+    .pipe(gulp.dest("./target/coverage/converted/"))
+    .pipe(through.obj(function(chunk, end, cb) {
+      if (chunk.isBuffer()) {
+        chunk.contents = new Buffer(filterLcovFile(chunk.contents.toString(), function(file) {
+          return file.indexOf(path.resolve(".", "src")) === 0;
+        }));
       }
       this.push(chunk);
       cb();

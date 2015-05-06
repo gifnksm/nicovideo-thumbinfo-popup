@@ -60,6 +60,7 @@
     "watchify": "^3.2.1"
   },
   "dependencies": {
+    "flux": "^2.0.3",
     "option-t": "^0.9.1"
   }
 }

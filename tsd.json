@@ -9,25 +9,25 @@
       "commit": "f3244190e20af6901e865f4cc58127d19216baa1"
     },
     "power-assert/power-assert.d.ts": {
-      "commit": "f3244190e20af6901e865f4cc58127d19216baa1"
+      "commit": "6fb56c5277d6fda738080c11415c79513b64317e"
     },
     "empower/empower.d.ts": {
-      "commit": "f3244190e20af6901e865f4cc58127d19216baa1"
+      "commit": "6fb56c5277d6fda738080c11415c79513b64317e"
     },
     "power-assert-formatter/power-assert-formatter.d.ts": {
-      "commit": "f3244190e20af6901e865f4cc58127d19216baa1"
+      "commit": "6fb56c5277d6fda738080c11415c79513b64317e"
     },
     "react/react.d.ts": {
-      "commit": "f3244190e20af6901e865f4cc58127d19216baa1"
+      "commit": "6fb56c5277d6fda738080c11415c79513b64317e"
     },
     "es6-promise/es6-promise.d.ts": {
       "commit": "f3244190e20af6901e865f4cc58127d19216baa1"
     },
     "node/node.d.ts": {
-      "commit": "f3244190e20af6901e865f4cc58127d19216baa1"
+      "commit": "6fb56c5277d6fda738080c11415c79513b64317e"
     },
     "flux/flux.d.ts": {
-      "commit": "f3244190e20af6901e865f4cc58127d19216baa1"
+      "commit": "6fb56c5277d6fda738080c11415c79513b64317e"
     }
   }
 }

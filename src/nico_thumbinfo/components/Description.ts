@@ -2,12 +2,12 @@
 "use strict";
 
 import * as React from "react";
-import {DescriptionElement as DescElem} from "../stores/RawVideoData";
+import {DescriptionNode as DNode} from "../stores/DescriptionNode";
 
 
 module Description {
     export interface Props {
-        description: DescElem[];
+        description: DNode[];
     }
     export interface State {}
 }
@@ -20,21 +20,11 @@ class Description extends React.Component<Description.Props, Description.State> 
         description: React.PropTypes.arrayOf(React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.object])).isRequired
     };
 
-    private _renderElement(elem: DescElem): React.ReactNode {
-        const RD = React.DOM;
-
-        if (typeof elem === "string") {
-            return elem;
-        } else {
-            return React.createElement(elem.name, elem.attr, elem.children.map((elem: DescElem) => this._renderElement(elem)));
-        }
-    }
-
     render() {
         const RD = React.DOM;
         return RD.div(
             {className: "description"},
-            ...this.props.description.map((elem: DescElem) => this._renderElement(elem))
+            ...this.props.description.map((node: DNode) => node.render())
         );
     }
 }

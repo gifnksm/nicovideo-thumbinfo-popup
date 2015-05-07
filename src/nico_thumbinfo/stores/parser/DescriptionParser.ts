@@ -2,10 +2,12 @@
 "use strict";
 
 import VideoKey from "../VideoKey";
-import {DescriptionElement} from "../RawVideoData";
+import {DescriptionNode as DNode,
+        DescriptionElement as DElement,
+        DescriptionText as DText} from "../DescriptionNode";
 
 module DescriptionParser {
-    export function  parse(input: NodeList): DescriptionElement[] {
+    export function  parse(input: NodeList): DNode[] {
         let desc = _nodeList2Description(input);
         desc = _convertAnchors(_convertUrls, desc);
         desc = _convertAnchors(_convertIds, desc);
@@ -13,67 +15,53 @@ module DescriptionParser {
         return desc;
     }
 
-    function _nodeList2Description(input: NodeList): DescriptionElement[] {
-        return Array.prototype.slice.call(input).map((node: Node) => {
+    function _nodeList2Description(input: NodeList): DNode[] {
+        return Array.prototype.slice.call(input).map((node: Node): DNode => {
             switch (node.nodeType) {
             case Node.ELEMENT_NODE:
                 let attrs: any = {};
                 for (let attr of Array.prototype.slice.call(node.attributes)) {
                     attrs[attr.name] = attr.value;
                 }
-                return <DescriptionElement> {
-                    name: node.nodeName.toLowerCase(),
-                    attr: attrs, children: _nodeList2Description(node.childNodes)
-                };
+                return new DElement(node.nodeName.toLowerCase(), attrs, _nodeList2Description(node.childNodes));
 
             default:
-                return node.textContent;
+                return new DText(node.textContent);
             }
         });
     }
 
-    function _convertTexts(conv: (input: string) => DescriptionElement[], input: DescriptionElement[]): DescriptionElement[] {
-        let output: DescriptionElement[] = [];
-        for (let elem of input) {
-            if (typeof elem === "string") {
-                output.push(...conv(elem));
-            } else {
-                output.push({ name: elem.name, attr: elem.attr, children: _convertAnchors(conv, elem.children) });
-            }
+    function _convertTexts(conv: (input: string) => DNode[], input: DNode[]): DNode[] {
+        let output: DNode[] = [];
+        for (let node of input) {
+            output.push(...node.mapText(text => conv(text.text)));
         }
         return output;
     }
 
-    function _convertAnchors(conv: (input: string) => DescriptionElement[], input: DescriptionElement[]): DescriptionElement[] {
-        let output: DescriptionElement[] = [];
-        for (let elem of input) {
-            if (typeof elem === "string") {
-                output.push(...conv(elem));
-            } else {
-                if (elem.name === "a") {
-                    output.push(elem);
-                } else {
-                    output.push({ name: elem.name, attr: elem.attr, children: _convertAnchors(conv, elem.children) });
-                }
-            }
+    function _convertAnchors(conv: (input: string) => DNode[], input: DNode[]): DNode[] {
+        let output: DNode[] = [];
+        for (let node of input) {
+            output.push(...node.mapTextCond(elem => elem.name !== "a",
+                                            text => conv(text.text)));
         }
         return output;
     }
 
-    function _regExpConverter(regExp: RegExp, conv: (m: RegExpExecArray) => DescriptionElement[], input: string): DescriptionElement[] {
+    function _regExpConverter(regExp: RegExp, conv: (m: RegExpExecArray) => DNode[], input: string): DNode[] {
         let rest = input;
-        let output: DescriptionElement[] = [];
+        let output: DNode[] = [];
 
         let m: RegExpExecArray;
         while (rest !== "" && (m = regExp.exec(rest)) !== null) {
             if (m.index !== 0) {
-                output.push(m.input.slice(0, m.index));
+                output.push(new DText(m.input.slice(0, m.index)));
             }
             output.push(...conv(m));
             rest = m.input.slice(m.index + m[0].length);
         }
         if (rest !== "") {
-            output.push(rest);
+            output.push(new DText(rest));
         }
 
         return output;
@@ -147,7 +135,7 @@ module DescriptionParser {
     const IdRegExp = new RegExp(RegExpStr.Id);
     const SpaceRegExp = new RegExp("(?:\\s|　){3,}");
 
-    function _convertUrls(input: string): DescriptionElement[] {
+    function _convertUrls(input: string): DNode[] {
         return _regExpConverter(UrlRegExp, (m) => {
             let url = m[0];
             switch (m[1]) {
@@ -163,11 +151,11 @@ module DescriptionParser {
             default:
                 break;
             }
-            return [{name: "a", attr: {href: url}, children: [m[0]]}];
+            return [new DElement("a", {href: url}, [new DText(m[0])])];
         }, input);
     }
 
-    function _convertIds(input: string): DescriptionElement[] {
+    function _convertIds(input: string): DNode[] {
         return _regExpConverter(IdRegExp, (m) => {
             let id = m[0];
             let prefix = m[1];
@@ -175,15 +163,15 @@ module DescriptionParser {
             let linkGen = Prefix.LinkMap[prefix];
             if (linkGen === undefined) {
                 console.error("Unknown prefix: ", prefix);
-                return [id];
+                return [new DText(id)];
             }
-            return [{name: "a", attr: {href: linkGen(id)}, children: [id]}];
+            return [new DElement("a", {href: linkGen(id)}, [new DText(id)])];
         }, input);
     }
 
-    function  _convertSpaces(input: string): DescriptionElement[] {
+    function  _convertSpaces(input: string): DNode[] {
         return _regExpConverter(SpaceRegExp, (m) => {
-            return [{name: "br"}];
+            return [new DElement("br")];
         }, input);
     }
 }

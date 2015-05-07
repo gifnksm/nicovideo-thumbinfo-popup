@@ -6,8 +6,7 @@ import VideoKey from "./VideoKey";
 import TagData from "./TagData";
 import TagListData from "./TagListData";
 import Uploader from "./Uploader";
-
-export type DescriptionElement = string | { name: string, attr?: any, children?: DescriptionElement[] };
+import {DescriptionNode} from "./DescriptionNode";
 
 export default class RawVideoData {
     _key: VideoKey;
@@ -17,7 +16,7 @@ export default class RawVideoData {
     videoId: string = undefined;
 
     title: string = undefined;
-    description: DescriptionElement[] = undefined;
+    description: DescriptionNode[] = undefined;
     thumbnailUrl: string = undefined;
     postedAt: Date = undefined;
     lengthInSeconds: number = undefined;

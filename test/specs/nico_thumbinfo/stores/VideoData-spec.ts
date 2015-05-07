@@ -4,6 +4,7 @@
 import VideoKey from "../../../../src/nico_thumbinfo/stores/VideoKey";
 import VideoData from "../../../../src/nico_thumbinfo/stores/VideoData";
 import RawVideoData from "../../../../src/nico_thumbinfo/stores/RawVideoData";
+import {DescriptionText as DText} from "../../../../src/nico_thumbinfo/stores/DescriptionNode";
 import * as assert from "power-assert";
 import {Option, Some, None} from "option-t";
 
@@ -11,16 +12,16 @@ describe("nico_thumbinfo/stores/VideoData", () => {
     let key = VideoKey.fromVideoId("sm9");
 
     let getThumbinfo = RawVideoData.createGetThumbinfo(key);
-    getThumbinfo.description = ["getthumbinfo description"];
+    getThumbinfo.description = [new DText("getthumbinfo description")];
     getThumbinfo.title = "getthumbinfo title";
     getThumbinfo.lastResBody = "getthumbinfo lastResBody";
 
     let videoArray = RawVideoData.createV3VideoArray(key);
-    videoArray.description = ["videoarray description"];
+    videoArray.description = [new DText("videoarray description")];
     videoArray.title = "videoarray title";
 
     let watchPage = RawVideoData.createWatchPage(key);
-    watchPage.description = ["watchpage description"];
+    watchPage.description = [new DText("watchpage description")];
 
     it("should empty when no raw data is pushed.", () => {
         let data = new VideoData(key);
@@ -28,15 +29,15 @@ describe("nico_thumbinfo/stores/VideoData", () => {
     });
 
     it("should returns pushed data.", () => {
-        function check(raw: RawVideoData, value: string[]) {
+        function check(raw: RawVideoData, value: DText[]) {
             let data = new VideoData(key);
             data.pushRawVideoData(raw);
             assert(data.description.length === 1)
-            assert(data.description[0] === value[0]);
+            assert((<DText[]>data.description)[0].text === value[0].text);
         }
-        check(getThumbinfo, <string[]>getThumbinfo.description);
-        check(videoArray, <string[]>videoArray.description);
-        check(watchPage, <string[]>watchPage.description);
+        check(getThumbinfo, <DText[]>getThumbinfo.description);
+        check(videoArray, <DText[]>videoArray.description);
+        check(watchPage, <DText[]>watchPage.description);
     });
 
     it("should overwrite the property with higher priority rawVideoData's value.", () => {

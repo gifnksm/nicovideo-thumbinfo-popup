@@ -71,10 +71,9 @@ function doBundle(pattern, outName, isDebug, isWatch) {
       var b = bundler.bundle();
 
       b = b.on("error", function(err) {
-        gutil.log(gutil.colors.red("Browserify compile error:") +
-                  " '" +
-                  gutil.colors.cyan(outPath) + "'");
-        gutil.log("\t" + err.message);
+        gutil.log("[" + gutil.colors.yellow("Browserify") + "] '" +
+                  gutil.colors.cyan(outPath) + "' " +
+                  gutil.colors.red("error: ") + err.message);
 
         if (isWatch) {
           this.emit("end");

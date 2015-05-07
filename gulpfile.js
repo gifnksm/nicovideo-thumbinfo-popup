@@ -95,19 +95,17 @@ function doBundle(pattern, outName, isDebug, isWatch) {
   };
 }
 
-gulp.task("build:bundle:normal", doBundle("src/index.ts", "src/index.js", false, false));
-gulp.task("test:bundle", doBundle("test/**/*-spec.ts", "test/spec.js", true, false));
-gulp.task("watch:test:bundle", doBundle("test/**/*-spec.ts", "test/spec.js", true, true));
-
-gulp.task("build:bundle:min", ["build:bundle:normal"], function() {
-  return gulp.src(Path.bundle("src/index.js"))
-    .pipe(rename({extname: ".min.js"}))
-    .pipe(sourcemaps.init({loadMaps: true}))
-    .pipe(buffer())
-    .pipe(uglify())
-    .pipe(sourcemaps.write("./", {includeContent: false}))
-    .pipe(gulp.dest(Path.bundle("src")));
-});
+function doBundleMin() {
+  return function() {
+    return gulp.src(Path.bundle("src/index.js"))
+      .pipe(rename({extname: ".min.js"}))
+      .pipe(sourcemaps.init({loadMaps: true}))
+      .pipe(buffer())
+      .pipe(uglify())
+      .pipe(sourcemaps.write("./", {includeContent: false}))
+      .pipe(gulp.dest(Path.bundle("src")));
+  };
+}
 
 var userscriptBaseName = {
   normal: "nicovideothumbinfopopup",
@@ -145,6 +143,13 @@ function doBuild(type) {
   };
 }
 
+gulp.task("build:bundle:normal", doBundle("src/index.ts", "src/index.js", false, false));
+gulp.task("build:bundle:min", ["build:bundle:normal"], doBundleMin());
+gulp.task("test:bundle", doBundle("test/**/*-spec.ts", "test/spec.js", true, false));
+
+gulp.task("watch:build:bundle:normal", doBundle("src/index.ts", "src/index.js", false, true));
+gulp.task("watch:test:bundle", doBundle("test/**/*-spec.ts", "test/spec.js", true, true));
+
 ["normal", "min"].forEach(function(type) {
   gulp.task("build:meta:" + type, doBuildMeta(type));
   gulp.task("build:" + type, ["build:meta:" + type, "build:bundle:" + type], doBuild(type));
@@ -161,13 +166,25 @@ gulp.task("test", ["test:bundle"], function(done) {
   });
 });
 
-gulp.task("watch", ["watch:test:bundle"], function() {
+gulp.task("watch:build", ["watch:build:bundle:normal"], function() {
+  gulp.watch(Path.bundle("src/index.js"), doBundleMin());
+  ["normal", "min"].forEach(function(type) {
+    var baseName = userscriptBaseName[type];
+    var src = bundleSrcName[type];
+    gulp.watch("./etc/userscript/header.txt", doBuildMeta(type));
+    gulp.watch([Path.dist(baseName + ".meta.js"), Path.bundle("src/" + src)], doBuild(type));
+  });
+});
+
+gulp.task("watch:test", ["watch:test:bundle"], function() {
   karma.start({
     configFile: __dirname + "/karma.conf.js",
     singleRun: false,
     autoWatch: true
   });
 });
+
+gulp.task("watch", ["watch:build", "watch:test"]);
 
 gulp.task("clean", function(done) {
   del(["./target/"], done);

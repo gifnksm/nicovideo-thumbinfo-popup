@@ -50,7 +50,7 @@
     "karma-coverage": "^0.3.1",
     "karma-firefox-launcher": "^0.1.4",
     "karma-mocha": "^0.1.10",
-    "lcov-sourcemap": "^0.1.2",
+    "lcov-sourcemap": "git://github.com/gifnksm/lcov-sourcemap.git",
     "main-bower-files": "^2.7.0",
     "mocha": "^2.2.4",
     "through2": "^0.6.5",

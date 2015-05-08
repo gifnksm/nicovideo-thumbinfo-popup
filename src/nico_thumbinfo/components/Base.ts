@@ -10,6 +10,7 @@ import VideoData from "../stores/VideoData";
 import VideoDataStore, {VideoDataStoreInterface} from "../stores/VideoDataStore";
 
 import {DataAttributeValue} from "./constants";
+import Thumbnail from "./Thumbnail";
 import CounterList from "./CounterList";
 import HeaderList from "./HeaderList";
 import TagList from "./TagList";
@@ -71,7 +72,7 @@ class Base extends React.Component<Base.Props, Base.State> {
                 [DataAttributeName.PopupContent]: DataAttributeValue.PopupContent,
                 className: "content"
             },
-            RD.img({src: data.thumbnailUrl, className: "thumbnail"}),
+            React.createElement(Thumbnail, {url: data.thumbnailUrl, deleted: false}), // TODO: Set appropriate value to deleted
             React.createElement(HeaderList, {videoData: data}),
             RD.h1({className: "title"}, RD.a({href: data.watchUrl}, data.title)),
             React.createElement(CounterList, {videoData: data}),

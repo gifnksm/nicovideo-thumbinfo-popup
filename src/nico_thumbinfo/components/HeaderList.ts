@@ -5,6 +5,7 @@ import * as React from "react";
 
 import {ThumbType} from "../stores/constants";
 import VideoData from "../stores/VideoData";
+import HatebuIcon, {Size as HatebuIconSize} from "../../hatebu_icon/components/HatebuIcon";
 
 module HeaderList {
     export interface Props {
@@ -59,7 +60,8 @@ class HeaderList extends React.Component<HeaderList.Props, HeaderList.State> {
             {className: "header"},
             RD.li({className: "posted-at"}, `${date2str(data.postedAt)}投稿 `),
             ...thumbType,
-            RD.li({className: "uploader-name"}, RD.a({href: data.uploader.url}, data.uploader.name))
+            RD.li({className: "uploader-name"}, RD.a({href: data.uploader.url}, data.uploader.name)),
+            RD.li({className: "hatebu-icon"}, React.createElement(HatebuIcon, {url: data.watchUrl}))
         );
     }
 }

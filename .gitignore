@@ -13,3 +13,5 @@ bower_components
 typings
 
 target
+doc/**/dot/*.png
+

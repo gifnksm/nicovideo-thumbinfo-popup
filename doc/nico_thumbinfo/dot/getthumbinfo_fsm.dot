@@ -1,0 +1,45 @@
+digraph getthuminfo_fsm {
+    rankdir = LR;
+
+    node [shape = box];
+
+    init [label = "init", peripheries = 2];
+
+    node [style = filled, fillcolor = "#99cc99", peripheries = 2];
+    completed [label = "completed"];
+
+    node [style = filled, fillcolor = "#9999cc", peripheries = 1];
+    load_getthumbinfo [label = "loading\n(target=getthumbinfo)"];
+    load_getflv [label = "loading\n(target=getflv)"];
+    load_watchpage [label = "loading\n(target=watchpage)"];
+
+    node [style = filled, fillcolor = "#cccc99", peripheries = 1];
+    confirm_deleted [label = "confirm\n(code=deleted)"];
+    confirm_community [label = "confirm\n(code=community)"];
+
+    node [style = filled, fillcolor = "#cc9999", peripheries = 2];
+    error_empty [label = "error\n(code=empty)"];
+    error_invalid [label = "error\n(code=invalid)"];
+    error_deleted [label = "error\n(code=deleted)"];
+    error_community [label = "error\n(code=community)"];
+    error_getflv [label = "error\n(code=getflv)"];
+
+    init -> load_getthumbinfo;
+
+    load_getthumbinfo -> completed [label = "ok"];
+    load_getthumbinfo -> error_empty [label = "empty"];
+    load_getthumbinfo -> error_invalid [label = "NOT_FOUND"];
+    load_getthumbinfo -> confirm_deleted [label = "DELETED"];
+    load_getthumbinfo -> confirm_community [label = "COMMUNITY (key=VID|OTID)"]
+    load_getthumbinfo -> load_getflv [label = "COMMUNITY (key=TID)"];
+
+    confirm_deleted -> load_watchpage;
+    confirm_community -> load_watchpage;
+
+    load_watchpage -> completed;
+    load_watchpage -> error_deleted;
+    load_watchpage -> error_community;
+
+    load_getflv -> error_getflv;
+    load_getflv -> load_getthumbinfo;
+}

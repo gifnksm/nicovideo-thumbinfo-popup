@@ -1,6 +1,6 @@
 /// <reference path="../../typings/common.d.ts" />
 "use strict";
 
-export enum PayloadSources {
+export const enum PayloadSources {
     Server, Store, View
 }

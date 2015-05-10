@@ -3,7 +3,7 @@
 
 import * as React from "react";
 
-export enum Size {
+export const enum Size {
     Normal, Small, Large
 }
 

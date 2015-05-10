@@ -1,14 +1,14 @@
 /// <reference path="../../../typings/common.d.ts" />
 "use strict";
 
-export enum DataSource {
+export const enum DataSource {
     Merge,
     WatchPage,
     V3VideoArray,
     GetThumbinfo
 }
 
-export enum ThumbType {
+export const enum ThumbType {
     Unknown,
     Video,
     MyMemory,

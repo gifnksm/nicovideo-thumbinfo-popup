@@ -8,7 +8,7 @@ import VideoKey from "../VideoKey";
 import RawVideoData from "../RawVideoData";
 import DescriptionParser from "./DescriptionParser";
 
-export enum ErrorCode {
+export const enum ErrorCode {
     Deleted, Community, NotFound
 }
 

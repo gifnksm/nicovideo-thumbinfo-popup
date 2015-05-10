@@ -3,7 +3,7 @@
 
 const UAHeader = "User-Agent";
 
-enum Method {
+const enum Method {
     Get, Head, Post, Put, Delete
 }
 

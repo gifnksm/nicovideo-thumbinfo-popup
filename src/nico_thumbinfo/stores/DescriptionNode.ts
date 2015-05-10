@@ -5,7 +5,7 @@ import * as React from "react";
 
 export interface DescriptionNode {
     render(): React.ReactNode;
-    mapElementCond(cond: (elem: DescriptionElement) => boolean, 
+    mapElementCond(cond: (elem: DescriptionElement) => boolean,
                    f: (elem: DescriptionElement) => DescriptionNode[]): DescriptionNode[];
     mapTextCond(cond: (elem: DescriptionElement) => boolean,
                 f: (text: DescriptionText) => DescriptionNode[]): DescriptionNode[];

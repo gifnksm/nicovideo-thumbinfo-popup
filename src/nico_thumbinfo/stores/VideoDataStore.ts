@@ -54,13 +54,20 @@ class VideoDataStore implements VideoDataStoreInterface {
     private _dispatchListener(payload: Payload) {
         let action = payload.action;
         if (action instanceof NicoThumbinfoAction) {
-            let key = action.key;
-            let organizer = this._organizerMap.get(key.valueOf());
-            if (organizer !== undefined) {
-                if (organizer.handleAction(action)) {
-                    this._emitChange(key);
-                }
-            }
+            this._handleNicoThumbinfoAction(action);
+        }
+    }
+
+    private _handleNicoThumbinfoAction(action: NicoThumbinfoAction) {
+        let key = action.key;
+        let organizer = this._organizerMap.get(key.valueOf());
+        if (organizer === undefined) {
+            return;
+        }
+
+        let callback = () => this._emitChange(key);
+        if (organizer.handleAction(action, callback)) {
+            this._emitChange(key);
         }
     }
 }

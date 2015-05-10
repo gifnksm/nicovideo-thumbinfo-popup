@@ -9,29 +9,37 @@ digraph getthuminfo_fsm {
     completed [label = "completed"];
 
     node [style = filled, fillcolor = "#9999cc", peripheries = 1];
-    load_getthumbinfo [label = "loading\n(target=getthumbinfo)"];
-    load_getflv [label = "loading\n(target=getflv)"];
-    load_watchpage [label = "loading\n(target=watchpage)"];
+    load_getthumbinfo [label = "loading\n(target=GetThumbinfo)"];
+    load_getflv [label = "loading\n(target=GetFlv)"];
+    load_watchpage [label = "loading\n(target=WatchPage)"];
 
     node [style = filled, fillcolor = "#cccc99", peripheries = 1];
-    confirm_deleted [label = "confirm\n(code=deleted)"];
-    confirm_community [label = "confirm\n(code=community)"];
+    confirm_deleted [label = "confirm\n(errcode=deleted)"];
+    confirm_community [label = "confirm\n(errcode=community)"];
 
     node [style = filled, fillcolor = "#cc9999", peripheries = 2];
-    error_empty [label = "error\n(code=empty)"];
-    error_invalid [label = "error\n(code=invalid)"];
-    error_deleted [label = "error\n(code=deleted)"];
-    error_community [label = "error\n(code=community)"];
-    error_getflv [label = "error\n(code=getflv)"];
+    error_status [label = "error\n(errcode=Status)"];
+    error_empty [label = "error\n(errcode=Empty)"];
+    error_invalid [label = "error\n(errcode=Invalid)"];
+    error_deleted [label = "error\n(errcode=Deleted)"];
+    error_community [label = "error\n(errcode=Community)"];
+    error_notfound [ label = "error\n(errcode=NotFound)"];
+    error_getflv [label = "error\n(errcode=GetFlv)"];
+
+    node [style = filled, fillcolor = "#99cccc", peripheries = 2];
+    abend [label = "abend"];
 
     init -> load_getthumbinfo;
 
     load_getthumbinfo -> completed [label = "ok"];
-    load_getthumbinfo -> error_empty [label = "empty"];
-    load_getthumbinfo -> error_invalid [label = "NOT_FOUND"];
-    load_getthumbinfo -> confirm_deleted [label = "DELETED"];
-    load_getthumbinfo -> confirm_community [label = "COMMUNITY (key=VID|OTID)"]
-    load_getthumbinfo -> load_getflv [label = "COMMUNITY (key=TID)"];
+    load_getthumbinfo -> error_status [label = "errcode=Status"];
+    load_getthumbinfo -> error_empty [label = "errcode=Empty"];
+    load_getthumbinfo -> error_invalid [label = "errcode=Invalid"];
+    load_getthumbinfo -> confirm_deleted [label = "errcode=Deleted"];
+    load_getthumbinfo -> confirm_community [label = "errcode=Community"]
+    load_getthumbinfo -> load_getflv [label = "errcode=CommunitySubThread"];
+    load_getthumbinfo -> error_notfound [label = "errcode=NotFound"];
+    load_getthumbinfo -> abend [label = "fetch getthumbinfo fail"];
 
     confirm_deleted -> load_watchpage;
     confirm_community -> load_watchpage;
@@ -39,7 +47,10 @@ digraph getthuminfo_fsm {
     load_watchpage -> completed;
     load_watchpage -> error_deleted;
     load_watchpage -> error_community;
+    load_watchpage -> abend [ label = "fetch watchpage fail"];
 
     load_getflv -> error_getflv;
-    load_getflv -> load_getthumbinfo;
+    load_getflv -> load_getthumbinfo [label = "ok (TID != OTID)"];
+    load_getflv -> abend [label = "fetch getflv fail"];
+    load_getflv -> confirm_community [label = "ok (TID == OTID)"];
 }

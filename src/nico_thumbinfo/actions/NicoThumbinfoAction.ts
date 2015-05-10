@@ -11,5 +11,5 @@ export default class NicoThumbinfoAction implements Action {
         this._key = key;
     }
 
-    get key(): VideoKey { return this._key; }
+    get key() { return this._key; }
 }

@@ -163,7 +163,7 @@ export default class GetThumbinfoParser {
             case "movie_type":
             case "size_high":
             case "size_low":
-            case "watch_url":
+            case "watch_url": // Ignore. This url may be wrong if this data is fetched by optional thread ID.
             case "embeddable":
             case "no_live_play":
                 break;

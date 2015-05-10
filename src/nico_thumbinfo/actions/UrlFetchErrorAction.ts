@@ -2,20 +2,18 @@
 "use strict";
 
 import VideoKey from "../stores/VideoKey";
+import {DataSource} from "../stores/constants";
 import NicoThumbinfoAction from "./NicoThumbinfoAction";
+import UrlFetchAction from "./UrlFetchAction";
 import UrlFetcher, {Request} from "../../util/UrlFetcher";
 
-export default class UrlFetchErrorAction extends NicoThumbinfoAction {
-    private _request: Request;
+export default class UrlFetchErrorAction extends UrlFetchAction {
     private _error: string;
-    private _requestKey: VideoKey;
-    constructor(key: VideoKey, request: Request, error: string, requestKey: VideoKey) {
-        super(key);
-        this._request = request;
+
+    constructor(key: VideoKey, request: Request, error: string, requestKey: VideoKey, source: DataSource) {
+        super(key, request, requestKey, source);
         this._error = error;
-        this._requestKey = requestKey;
     }
-    get request() { return this._request; }
+
     get error() { return this._error; }
-    get requestKey() { return this._requestKey; }
 }

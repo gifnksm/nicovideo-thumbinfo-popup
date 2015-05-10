@@ -4,12 +4,13 @@
 import VideoKey from "./VideoKey";
 import VideoData from "./VideoData";
 import RawVideoData from "./RawVideoData";
-import GetThumbinfoParser, {GetThumbinfoError, ErrorCode as GetThumbinfoParserErrorCode} from "./parser/GetThumbinfoParser";
-
+import GetThumbinfoResponseHandler, {ErrorInfo as GetThumbinfoErrorInfo, ErrorCode as GetThumbinfoErrorCode} from "./GetThumbinfoResponseHandler";
 import NicoThumbinfoAction from "../actions/NicoThumbinfoAction";
 import NicoThumbinfoActionCreator from "../actions/NicoThumbinfoActionCreator";
+import UrlFetchAction from "../actions/UrlFetchAction";
 import UrlFetchResponseAction from "../actions/UrlFetchResponseAction";
 import UrlFetchErrorAction from "../actions/UrlFetchErrorAction";
+import {DataSource} from "../stores/constants";
 import {Request, Response} from "../../util/UrlFetcher";
 
 export const enum State {
@@ -42,19 +43,11 @@ export module StateStorage {
 
     export class Loading extends StateStorage {
         _url: string;
-        _target: Loading.Target;
-        constructor(url: string, target: Loading.Target) {
+        constructor(url: string) {
             super(State.Loading);
             this._url = url;
-            this._target = target;
         }
         get url() { return this._url; }
-        get target() { return this._target; }
-    }
-    export module Loading {
-        export const enum Target {
-            GetThumbinfo, GetFlv, WatchPage
-        }
     }
 
     export class Confirm extends StateStorage {
@@ -76,172 +69,155 @@ export module StateStorage {
     }
 }
 
+class SourceState {
+    private _state: StateStorage = new StateStorage.Initial();
+    private _errorCode: ErrorCode = undefined;
+    private _errorDetail: string = null;
+
+    get state() { return this._state; }
+    get errorCode() { return this._errorCode; }
+    get errorDetail() { return this._errorDetail; }
+
+    setError(errorCode: ErrorCode, errorDetail: string) {
+        this._errorCode = errorCode;
+        this._errorDetail = errorDetail;
+    }
+
+    transToLoading(url: string) {
+        this._state = new StateStorage.Loading(url);
+    }
+
+    transToConfirm(errorCode: ErrorCode, errorDetail: string) {
+        this._errorCode = errorCode;
+        this._errorDetail = errorDetail;
+        this._state = new StateStorage.Confirm();
+    }
+
+    transToError(errorCode: ErrorCode, errorDetail: string) {
+        this._errorCode = errorCode;
+        this._errorDetail = errorDetail;
+        this._state = new StateStorage.Error();
+    }
+
+    transToCompleted() {
+        this._state = new StateStorage.Completed();
+    }
+
+    transToAbend(error: string) {
+        this._state = new StateStorage.Abend(error);
+    }
+}
+
 export default class VideoDataOrganizer {
     private _key: VideoKey;
-    private _state: StateStorage = new StateStorage.Initial();
     private _videoData: VideoData;
-    private _errorCode: ErrorCode = undefined;
-    private _errorDetail: string;
+    private _getThumbinfoState: SourceState;
 
     constructor(key: VideoKey) {
         this._key = key;
         this._videoData = new VideoData(key);
+        this._getThumbinfoState = new SourceState();
 
-        this._fetchGetThumbinfo();
+        this._fetchGetThumbinfo(this._key);
     }
 
     handleAction(action: NicoThumbinfoAction, callback: () => void): boolean {
-        let state = this._state;
-        if (action instanceof UrlFetchResponseAction) {
-            return this._handleUrlFetchResponse(action, callback);
-        }
-        if (action instanceof UrlFetchErrorAction) {
-            return this._handleUrlFetchError(action, callback);
+        if (action instanceof UrlFetchAction) {
+            switch (action.source) {
+            case DataSource.GetThumbinfo:
+                return this._handleGetThumbinfoResponse(action, callback);
+            }
         }
 
         return false;
     }
 
     get key() { return this._key; }
-    get state() { return this._state.state; }
     get videoData() { return this._videoData; }
-    get errorCode() { return this._errorCode; }
-    get errorDetail() { return this._errorDetail; }
 
-    private _fetchGetThumbinfo(reqKey: VideoKey = this._key) {
+    // TODO: implements
+    // get state() { return this._state.state; }
+    // get errorCode() { return this._errorCode; }
+    // get errorDetail() { return this._errorDetail; }
+
+    private _fetchGetThumbinfo(reqKey: VideoKey) {
         let url = "http://ext.nicovideo.jp/api/getthumbinfo/" + reqKey.id;
         let req = Request.get(url);
-        NicoThumbinfoActionCreator.createUrlFetchAction(this.key, req, reqKey);
-        this._state = new StateStorage.Loading(url, StateStorage.Loading.Target.GetThumbinfo);
+        NicoThumbinfoActionCreator.createUrlFetchAction(this.key, req, reqKey, DataSource.GetThumbinfo);
+        this._getThumbinfoState.transToLoading(url);
     }
 
-    private _fetchGetFlv(reqKey: VideoKey = this._key) {
+    private _fetchGetFlv(reqKey: VideoKey) {
         let url = "http://www.nicovideo.jp/api/getflv/" + reqKey.id;
         let req = Request.get(url);
-        NicoThumbinfoActionCreator.createUrlFetchAction(this.key, req, reqKey);
-        this._state = new StateStorage.Loading(url, StateStorage.Loading.Target.GetFlv);
+        NicoThumbinfoActionCreator.createUrlFetchAction(this.key, req, reqKey, DataSource.GetThumbinfo);
+        this._getThumbinfoState.transToLoading(url);
     }
 
-    private _handleUrlFetchError(action: UrlFetchErrorAction, callback: () => void): boolean {
-        let state = this._state;
-        if ((state instanceof StateStorage.Loading) && (state.url === action.request.url)) {
-            this._state = new StateStorage.Abend(action.error);
+    private _handleGetThumbinfoResponse(action: UrlFetchAction, callback: () => void): boolean {
+        let state = this._getThumbinfoState.state;
+
+        if (!(state instanceof StateStorage.Loading) || (state.url !== action.request.url)) {
+            console.warn("status does not match", state, action);
+            return false;
+        }
+
+        if (action instanceof UrlFetchErrorAction) {
+            this._getThumbinfoState.transToAbend(action.error);
             return true;
         }
 
-        console.warn("Fetch response does not match: ", state, action);
-        return false;
-    }
-
-    private _handleUrlFetchResponse(action: UrlFetchResponseAction, callback: () => void): boolean {
-        let state = this._state;
-
-        if ((state instanceof StateStorage.Loading) && (state.url === action.request.url)) {
-            switch (state.target) {
-            case StateStorage.Loading.Target.GetThumbinfo:
-                return this._handleGetThumbinfoResponse(action, callback);
-
-            case StateStorage.Loading.Target.GetFlv:
-                return this._handleGetFlvResponse(action, callback);
-
-            case StateStorage.Loading.Target.WatchPage:
-                return this._handleWatchPageResponse(action, callback);
-
-            default:
-                console.error("Unknown target: ", state.target);
-            }
+        if (action instanceof UrlFetchResponseAction) {
+            GetThumbinfoResponseHandler.handle(action)
+                .then(
+                    videoData => {
+                        this._videoData.pushRawVideoData(videoData);
+                        this._getThumbinfoState.transToCompleted();
+                        callback();
+                    },
+                    (data: GetThumbinfoErrorInfo) => {
+                        this._handleGetThumbinfoError(data);
+                        callback();
+                    }
+                );
+            return false;
         }
 
         console.warn("Fetch response does not handled: ", state, action);
         return false;
     }
 
-    private _handleGetThumbinfoResponse(action: UrlFetchResponseAction, callback: () => void): boolean {
-        if (action.response.status !== 200) {
-            this._errorCode = ErrorCode.GetThumbinfoStatus;
-            this._errorDetail = action.response.statusText;
-            this._state = new StateStorage.Error();
-            return true;
-        }
-        if (action.response.responesText === "") {
-            this._errorCode = ErrorCode.GetThumbinfoEmpty;
-            this._errorDetail = "";
-            this._state = new StateStorage.Error();
-            return true;
-        }
-
-        GetThumbinfoParser
-            .parse(this._key, action.response.responesText)
-            .then(
-                data => this._handleGetThumbinfoParseResult(action.requestKey, data, callback),
-                error => {
-                    this._state = new StateStorage.Error();
-                    this._errorCode = ErrorCode.GetThumbinfoInvalid;
-                    this._errorDetail = "" + error;
-                    callback();
-                }
-            );
-
-        return false;
-    }
-
-    private _handleGetThumbinfoParseResult(reqKey: VideoKey, data: RawVideoData|GetThumbinfoError, callback: () => void) {
-        // Success
-        if (data instanceof RawVideoData) {
-            this._videoData.pushRawVideoData(data);
-
-            this._state = new StateStorage.Completed();
-            callback();
-            return;
-        }
-
-        // Failure
-        if (data instanceof GetThumbinfoError) {
-            this._updateErrorCodeByGetThumbinfoError(reqKey, data);
-
-            switch (this._errorCode) {
-            case ErrorCode.GetThumbinfoDeleted:
-                this._state = new StateStorage.Confirm();
-                break;
-            case ErrorCode.GetThumbinfoCommunitySubThread:
-                this._fetchGetFlv();
-                break;
-            case ErrorCode.GetThumbinfoCommunity:
-                this._state = new StateStorage.Confirm();
-                break;
-            case ErrorCode.GetThumbinfoNotFound:
-                this._state = new StateStorage.Error();
-                break;
-            default:
-                console.error("Unknown code: ", this._errorCode);
-            }
-
-            callback();
-            return;
-        }
-
-        console.error("invalid data returned.");
-    }
-
-    private _updateErrorCodeByGetThumbinfoError(reqKey: VideoKey, data: GetThumbinfoError) {
-        switch (data.code) {
-        case GetThumbinfoParserErrorCode.Deleted:
-            this._errorCode = ErrorCode.GetThumbinfoDeleted;
+    private _handleGetThumbinfoError(data: GetThumbinfoErrorInfo) {
+        switch (data.errorCode) {
+        case GetThumbinfoErrorCode.Status:
+            this._getThumbinfoState.transToError(ErrorCode.GetThumbinfoStatus, data.errorDetail);
             break;
-        case GetThumbinfoParserErrorCode.Community:
-            if (reqKey.type === VideoKey.Type.ThreadId) {
-                this._errorCode = ErrorCode.GetThumbinfoCommunitySubThread;
-            } else {
-                this._errorCode = ErrorCode.GetThumbinfoCommunity;
-            }
+
+        case GetThumbinfoErrorCode.Empty:
+            this._getThumbinfoState.transToError(ErrorCode.GetThumbinfoEmpty, data.errorDetail);
             break;
-        case GetThumbinfoParserErrorCode.NotFound:
-            this._errorCode = ErrorCode.GetThumbinfoNotFound;
+
+        case GetThumbinfoErrorCode.Invalid:
+            this._getThumbinfoState.transToError(ErrorCode.GetThumbinfoInvalid, data.errorDetail);
             break;
-        default:
-            console.error("Unknown code: ", data.code);
+
+        case GetThumbinfoErrorCode.Deleted:
+            this._getThumbinfoState.transToConfirm(ErrorCode.GetThumbinfoDeleted, data.errorDetail);
+            break;
+
+        case GetThumbinfoErrorCode.Community:
+            this._getThumbinfoState.transToConfirm(ErrorCode.GetThumbinfoCommunity, data.errorDetail);
+            break;
+
+        case GetThumbinfoErrorCode.CommunitySubThread:
+            this._getThumbinfoState.setError(ErrorCode.GetThumbinfoCommunitySubThread, data.errorDetail);
+            this._fetchGetFlv(this._key);
+            break;
+
+        case GetThumbinfoErrorCode.NotFound:
+            this._getThumbinfoState.transToError(ErrorCode.GetThumbinfoNotFound, data.errorDetail);
+            break;
         }
-        this._errorDetail = data.description;
     }
 
     private _handleGetFlvResponse(action: UrlFetchResponseAction, callback: () => void): boolean {

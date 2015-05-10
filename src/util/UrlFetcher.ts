@@ -60,7 +60,7 @@ export class Request {
 
 export interface Response {
     responseHeaders: string;
-    responesText: string;
+    responseText: string;
     status: number;
     statusText: string;
 }

@@ -3,6 +3,7 @@
 
 import UrlFetchResponseAction from "./UrlFetchResponseAction";
 import UrlFetchErrorAction from "./UrlFetchErrorAction";
+import {DataSource} from "../stores/constants";
 import VideoKey from "../stores/VideoKey";
 
 import Action from "../../actions/Action";
@@ -18,11 +19,11 @@ class NicoThumbinfoActionCreator {
         this._fetcher = fetcher;
     }
 
-    createUrlFetchAction(key: VideoKey, req: Request, reqKey: VideoKey) {
+    createUrlFetchAction(key: VideoKey, req: Request, reqKey: VideoKey, source: DataSource) {
         this._fetcher.fetch(req).then(resp => {
-            this._dispatcher.handleStoreEvent(new UrlFetchResponseAction(key, req, resp, reqKey));
+            this._dispatcher.handleStoreEvent(new UrlFetchResponseAction(key, req, resp, reqKey, source));
         }, error => {
-            this._dispatcher.handleStoreEvent(new UrlFetchErrorAction(key, req, error, reqKey));
+            this._dispatcher.handleStoreEvent(new UrlFetchErrorAction(key, req, error, reqKey, source));
         });
     }
 }

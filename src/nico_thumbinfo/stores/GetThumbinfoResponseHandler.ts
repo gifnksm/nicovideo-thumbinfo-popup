@@ -9,8 +9,8 @@ import GetThumbinfoParser, {GetThumbinfoError as ParserError, ErrorCode as Parse
 import UrlFetchResponseAction from "../actions/UrlFetchResponseAction";
 
 export const enum ErrorCode {
-    Status,
-    Empty,
+    HttpStatus,
+    ServerMaintenance,
     Invalid,
     Deleted,
     Community,
@@ -28,7 +28,7 @@ module GetThumbinfoResponseHandler {
         return new Promise((resolve, reject) => {
             if (action.response.status !== 200) {
                 reject(<ErrorInfo>{
-                    errorCode: ErrorCode.Status,
+                    errorCode: ErrorCode.HttpStatus,
                     errorDetail: action.response.statusText
                 });
                 return;
@@ -36,7 +36,7 @@ module GetThumbinfoResponseHandler {
 
             if (action.response.responseText === "") {
                 reject(<ErrorInfo>{
-                    errorCode: ErrorCode.Empty
+                    errorCode: ErrorCode.ServerMaintenance
                 });
                 return;
             }

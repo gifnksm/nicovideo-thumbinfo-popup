@@ -5,18 +5,9 @@ import VideoKey from "./VideoKey";
 import VideoData from "./VideoData";
 import RawVideoData from "./RawVideoData";
 import GetThumbinfoParser, {GetThumbinfoError as ParserError, ErrorCode as ParserErrorCode} from "./parser/GetThumbinfoParser";
+import {ErrorCode} from "./GetThumbinfoFetcher";
 
 import UrlFetchResponseAction from "../actions/UrlFetchResponseAction";
-
-export const enum ErrorCode {
-    HttpStatus,
-    ServerMaintenance,
-    Invalid,
-    Deleted,
-    Community,
-    CommunitySubThread,
-    NotFound
-}
 
 export interface ErrorInfo {
     errorCode: ErrorCode;

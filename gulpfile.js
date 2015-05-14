@@ -9,6 +9,7 @@ var concat = require("gulp-concat");
 var coveralls = require("gulp-coveralls");
 var extractor = require("gulp-extract-sourcemap");
 var rename = require("gulp-rename");
+var sass = require("gulp-sass");
 var sourcemaps = require("gulp-sourcemaps");
 var template = require("gulp-template");
 var uglify = require("gulp-uglify");
@@ -124,6 +125,7 @@ function doBuildMeta(type) {
     return gulp.src("./etc/userscript/header.txt")
       .pipe(template({
         pkg: require("./package.json"),
+        baseUrl: baseUrl,
         updateUrl: baseUrl + baseName + ".meta.js",
         downloadUrl: baseUrl + baseName + ".user.js"
       }))
@@ -143,8 +145,17 @@ function doBuild(type) {
   };
 }
 
+function doBuildStyle() {
+  return function() {
+    return gulp.src("./etc/styles/*.scss")
+      .pipe(sass())
+      .pipe(gulp.dest(Path.dist()));
+  };
+}
+
 gulp.task("build:bundle:normal", doBundle("src/index.ts", "src/index.js", false, false));
 gulp.task("build:bundle:min", ["build:bundle:normal"], doBundleMin());
+gulp.task("build:style", doBuildStyle());
 gulp.task("test:bundle", doBundle("test/**/*-spec.ts", "test/spec.js", true, false));
 
 gulp.task("watch:build:bundle:normal", doBundle("src/index.ts", "src/index.js", false, true));
@@ -154,7 +165,7 @@ gulp.task("watch:test:bundle", doBundle("test/**/*-spec.ts", "test/spec.js", tru
   gulp.task("build:meta:" + type, doBuildMeta(type));
   gulp.task("build:" + type, ["build:meta:" + type, "build:bundle:" + type], doBuild(type));
 });
-gulp.task("build", ["build:normal", "build:min"]);
+gulp.task("build", ["build:normal", "build:min", "build:style"]);
 
 gulp.task("test", ["test:bundle"], function(done) {
   karma.start({
@@ -167,13 +178,24 @@ gulp.task("test", ["test:bundle"], function(done) {
 });
 
 gulp.task("watch:build", ["watch:build:bundle:normal"], function() {
-  gulp.watch(Path.bundle("src/index.js"), doBundleMin());
+  function changed(event) {
+    gutil.log("File: '" + gutil.colors.cyan(event.path) + "' is " + event.type);
+  }
+  gulp.watch(Path.bundle("src/index.js"), doBundleMin())
+    .on("change", changed);
+
   ["normal", "min"].forEach(function(type) {
     var baseName = userscriptBaseName[type];
     var src = bundleSrcName[type];
-    gulp.watch("./etc/userscript/header.txt", doBuildMeta(type));
-    gulp.watch([Path.dist(baseName + ".meta.js"), Path.bundle("src/" + src)], doBuild(type));
+
+    gulp.watch("./etc/userscript/header.txt", doBuildMeta(type))
+      .on("change", changed);
+    gulp.watch([Path.dist(baseName + ".meta.js"), Path.bundle("src/" + src)], doBuild(type))
+      .on("change", changed);
   });
+
+  gulp.watch("./etc/styles/*.scss", doBuildStyle())
+    .on("change", changed);
 });
 
 gulp.task("watch:test", ["watch:test:bundle"], function() {

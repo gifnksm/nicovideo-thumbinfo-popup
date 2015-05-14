@@ -40,7 +40,7 @@ class HeaderList extends React.Component<HeaderList.Props, HeaderList.State> {
                 RD.li({className: "thumb-type " + className}, label),
                 RD.li(
                     {className: "original-video"},
-                    RD.a({href: "http://www.nicovideo.jp/watch/" + data.watchUrl},
+                    RD.a({href: "http://www.nicovideo.jp/watch/" + data.videoId},
                          "\u00bb元動画")
                 )
             ];

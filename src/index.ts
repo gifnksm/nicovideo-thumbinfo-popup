@@ -11,6 +11,8 @@ function render(key: VideoKey, parent: Element) {
     parent.appendChild(div);
 }
 
+GM_addStyle(GM_getResourceText("style"));
+
 render(VideoKey.fromUrl("http://www.nicovideo.jp/watch/sm9").unwrap(), document.body);
 render(VideoKey.fromUrl("http://www.nicovideo.jp/watch/1340979099").unwrap(), document.body);
 render(VideoKey.fromUrl("http://www.nicovideo.jp/watch/1406548974").unwrap(), document.body);

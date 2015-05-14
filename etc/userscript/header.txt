@@ -16,6 +16,9 @@
 // @exclude     http://ext.nicovideo.jp/thumb_community/*
 // @exclude     http://ichiba.nicovideo.jp/parts/*
 // @require     https://cdnjs.cloudflare.com/ajax/libs/react/0.13.1/react.min.js
+// @resource    style ./index.css
+// @grant       GM_addStyle
+// @grant       GM_getResourceText
 // @grant       GM_info
 // @grant       GM_xmlhttpRequest
 // ==/UserScript==

@@ -25,7 +25,7 @@ class VideoDataStore implements VideoDataStoreInterface {
 
     constructor(dispatcher: AppDispatcherInterface) {
         this._dispatcher = dispatcher;
-        this._dispatchToken = this._dispatcher.register(this._dispatchListener);
+        this._dispatchToken = this._dispatcher.register(this._dispatchListener.bind(this));
     }
 
     private _emitChange(key: VideoKey) {

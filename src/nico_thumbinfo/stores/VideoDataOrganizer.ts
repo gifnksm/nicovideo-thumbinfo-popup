@@ -26,10 +26,15 @@ export default class VideoDataOrganizer {
             switch (action.source) {
             case DataSource.GetThumbinfo:
                 let thumbinfoCallback = () => {
-                    this._videoData.pushRawVideoData(this._getThumbinfoFetcher.videoData);
+                    if (this._getThumbinfoFetcher.videoData !== null) {
+                        this._videoData.pushRawVideoData(this._getThumbinfoFetcher.videoData);
+                    }
+                    callback();
                 };
                 if (this._getThumbinfoFetcher.handleAction(action, thumbinfoCallback)) {
-                    this._videoData.pushRawVideoData(this._getThumbinfoFetcher.videoData);
+                    if (this._getThumbinfoFetcher.videoData !== null) {
+                        this._videoData.pushRawVideoData(this._getThumbinfoFetcher.videoData);
+                    }
                     return true;
                 }
                 return false;

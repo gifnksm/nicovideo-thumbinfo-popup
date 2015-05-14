@@ -93,8 +93,8 @@ export default UrlFetcher;
 
 function getUserAgent() {
     let ua = "";
-    if ((<any>window)["GM_info"] !== undefined) {
-        ua += `Greasemonkey/${GM_info.version} ${GM_info.script.name}/${GM_info.version}`;
+    if (typeof GM_info !== "undefined") {
+        ua += `Greasemonkey/${GM_info.version} ${GM_info.script.name}/${GM_info.version} `;
     }
     ua += window.navigator.userAgent;
     return ua;
@@ -102,7 +102,7 @@ function getUserAgent() {
 
 class GmUrlFetcher implements UrlFetcher {
     static get isAvailable(): boolean {
-        return typeof (<any>window)["GM_xmlhttpRequest"] === "function";
+        return typeof GM_xmlhttpRequest === "function";
     }
 
     fetch(request: Request): Promise<Response> {
@@ -128,7 +128,7 @@ class GmUrlFetcher implements UrlFetcher {
 
 class XhrUrlFetcher implements UrlFetcher {
     static get isAvailable(): boolean {
-        return typeof (<any>window)["XMLHttpRequest"] === "function";
+        return typeof XMLHttpRequest === "function";
     }
 
     fetch(request: Request): Promise<Response> {

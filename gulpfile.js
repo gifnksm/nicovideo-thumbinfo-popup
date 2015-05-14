@@ -145,7 +145,7 @@ function doBuild(type) {
   };
 }
 
-function doBuildStyle() {
+function doBuildScss() {
   return function() {
     return gulp.src("./etc/styles/*.scss")
       .pipe(sass())
@@ -155,7 +155,7 @@ function doBuildStyle() {
 
 gulp.task("build:bundle:normal", doBundle("src/index.ts", "src/index.js", false, false));
 gulp.task("build:bundle:min", ["build:bundle:normal"], doBundleMin());
-gulp.task("build:style", doBuildStyle());
+gulp.task("build:scss", doBuildScss());
 gulp.task("test:bundle", doBundle("test/**/*-spec.ts", "test/spec.js", true, false));
 
 gulp.task("watch:build:bundle:normal", doBundle("src/index.ts", "src/index.js", false, true));
@@ -164,8 +164,9 @@ gulp.task("watch:test:bundle", doBundle("test/**/*-spec.ts", "test/spec.js", tru
 ["normal", "min"].forEach(function(type) {
   gulp.task("build:meta:" + type, doBuildMeta(type));
   gulp.task("build:" + type, ["build:meta:" + type, "build:bundle:" + type], doBuild(type));
+  gulp.task("build:" + type + ":only", doBuild(type));
 });
-gulp.task("build", ["build:normal", "build:min", "build:style"]);
+gulp.task("build", ["build:normal", "build:min", "build:scss"]);
 
 gulp.task("test", ["test:bundle"], function(done) {
   karma.start({
@@ -188,13 +189,14 @@ gulp.task("watch:build", ["watch:build:bundle:normal"], function() {
     var baseName = userscriptBaseName[type];
     var src = bundleSrcName[type];
 
-    gulp.watch("./etc/userscript/header.txt", doBuildMeta(type))
+    gulp.watch("./etc/userscript/header.txt", ["build:meta:" + type])
       .on("change", changed);
-    gulp.watch([Path.dist(baseName + ".meta.js"), Path.bundle("src/" + src)], doBuild(type))
+    gulp.watch([Path.dist(baseName + ".meta.js"), Path.bundle("src/" + src)],
+               ["build:" + type + ":only"])
       .on("change", changed);
   });
 
-  gulp.watch("./etc/styles/*.scss", doBuildStyle())
+  gulp.watch("./etc/styles/*.scss", ["build:scss"])
     .on("change", changed);
 });
 

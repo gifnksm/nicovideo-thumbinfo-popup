@@ -6,31 +6,31 @@
   "bundle": "typings/tsd.d.ts",
   "installed": {
     "mocha/mocha.d.ts": {
-      "commit": "f3244190e20af6901e865f4cc58127d19216baa1"
+      "commit": "3d80989bbba37cbe6ef0682c94fa7d8cb95f196d"
     },
     "power-assert/power-assert.d.ts": {
-      "commit": "6fb56c5277d6fda738080c11415c79513b64317e"
+      "commit": "3d80989bbba37cbe6ef0682c94fa7d8cb95f196d"
     },
     "empower/empower.d.ts": {
-      "commit": "6fb56c5277d6fda738080c11415c79513b64317e"
+      "commit": "3d80989bbba37cbe6ef0682c94fa7d8cb95f196d"
     },
     "power-assert-formatter/power-assert-formatter.d.ts": {
-      "commit": "6fb56c5277d6fda738080c11415c79513b64317e"
+      "commit": "3d80989bbba37cbe6ef0682c94fa7d8cb95f196d"
     },
     "react/react.d.ts": {
-      "commit": "6fb56c5277d6fda738080c11415c79513b64317e"
+      "commit": "3d80989bbba37cbe6ef0682c94fa7d8cb95f196d"
     },
     "es6-promise/es6-promise.d.ts": {
-      "commit": "f3244190e20af6901e865f4cc58127d19216baa1"
+      "commit": "3d80989bbba37cbe6ef0682c94fa7d8cb95f196d"
     },
     "node/node.d.ts": {
-      "commit": "6fb56c5277d6fda738080c11415c79513b64317e"
+      "commit": "3d80989bbba37cbe6ef0682c94fa7d8cb95f196d"
     },
     "flux/flux.d.ts": {
-      "commit": "6fb56c5277d6fda738080c11415c79513b64317e"
+      "commit": "3d80989bbba37cbe6ef0682c94fa7d8cb95f196d"
     },
     "greasemonkey/greasemonkey.d.ts": {
-      "commit": "6fb56c5277d6fda738080c11415c79513b64317e"
+      "commit": "3d80989bbba37cbe6ef0682c94fa7d8cb95f196d"
     }
   }
 }

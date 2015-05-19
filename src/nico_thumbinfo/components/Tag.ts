@@ -3,6 +3,7 @@
 
 import * as React from "react";
 import TagData from "../stores/TagData";
+import NicopediaIcon, {Type as NicopediaIconType} from "./NicopediaIcon";
 
 module Tag {
     export interface Props {
@@ -49,7 +50,13 @@ class Tag extends React.Component<Tag.Props, Tag.State> {
             {className: "tag"},
             marker,
             RD.a({href: "http://www.nicovideo.jp/tag/" + encodeURIComponent(tag.name)},
-                 tag.name));
+                 tag.name),
+            React.createElement(NicopediaIcon, {
+                type: NicopediaIconType.Tag,
+                name: tag.name,
+                id: encodeURIComponent(tag.name),
+                registered: tag.nicopediaRegistered
+            }));
     }
 }
 

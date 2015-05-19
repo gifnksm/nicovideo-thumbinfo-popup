@@ -13,6 +13,7 @@ import {DataAttributeValue} from "./constants";
 import Thumbnail from "./Thumbnail";
 import CounterList from "./CounterList";
 import HeaderList from "./HeaderList";
+import NicopediaIcon, {Type as NicopediaIconType} from "./NicopediaIcon";
 import TagList from "./TagList";
 import Description from "./Description";
 
@@ -74,7 +75,14 @@ class Base extends React.Component<Base.Props, Base.State> {
             },
             React.createElement(Thumbnail, {url: data.thumbnailUrl, deleted: false}), // TODO: Set appropriate value to deleted
             React.createElement(HeaderList, {videoData: data}),
-            RD.h1({className: "title"}, RD.a({href: data.watchUrl}, data.title)),
+            RD.h1({className: "title"},
+                  RD.a({href: data.watchUrl}, data.title),
+                  React.createElement(NicopediaIcon, {
+                      type: NicopediaIconType.Video,
+                      name: data.title,
+                      id: data.videoId,
+                      registered: undefined // TODO: Implements
+                  })),
             React.createElement(CounterList, {videoData: data}),
             React.createElement(TagList, {tags: data.tags}),
             React.createElement(Description, {description: data.description}),

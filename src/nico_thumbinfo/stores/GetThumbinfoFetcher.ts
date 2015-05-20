@@ -1,7 +1,7 @@
 /// <reference path="../../../typings/common.d.ts" />
 "use strict";
 
-import {DataSource} from "./constants";
+import {DataSource, FetchTarget} from "./constants";
 import VideoKey from "./VideoKey";
 import RawVideoData from "./RawVideoData";
 import GetThumbinfoResponseHandler from "./GetThumbinfoResponseHandler";
@@ -28,13 +28,11 @@ export const enum ErrorCode {
     DeletedByAdmin,
     DeletedByContentHolder,
     DeletedAsPrivate,
+    AccessLocked,
     Community,
     CommunitySubThread,
     NotFound
 }
-
-const GetThumbinfoApiPrefix = "http://ext.nicovideo.jp/api/getthumbinfo/";
-const GetFlvApiPrefix = "http://www.nicovideo.jp/api/getflv/";
 
 export default class GetThumbinfoFetcher {
     private _state: State = State.Initial;
@@ -58,26 +56,27 @@ export default class GetThumbinfoFetcher {
     }
 
     handleAction(action: UrlFetchAction, callback: () => void): boolean {
-        if (this._state !== State.Initial && this._loadingUrl !== action.request.url) {
-            console.warn("status does not match", this._state, action);
-            return false;
-        }
-
         if (action instanceof UrlFetchErrorAction) {
-            return this._handleErrorResponse(action, callback);
+            switch (action.target) {
+            case FetchTarget.GetThumbinfo:
+            case FetchTarget.GetFlv:
+                return this._handleErrorResponse(action, callback);
+            default:
+                console.warn("Unknown target: ", action);
+                return false;
+            }
         }
 
         if (action instanceof UrlFetchResponseAction) {
-            if (action.request.url.indexOf(GetThumbinfoApiPrefix) === 0) {
+            switch (action.target) {
+            case FetchTarget.GetThumbinfo:
                 return this._handleGetThumbinfoResponse(action, callback);
-            }
-
-            if (action.request.url.indexOf(GetFlvApiPrefix) === 0) {
+            case FetchTarget.GetFlv:
                 return this._handleGetFlvResponse(action, callback);
+            default:
+                console.warn("Unknown target: ", action);
+                return false;
             }
-
-            console.warn("Response does not handled: ", action);
-            return false;
         }
 
         console.warn("Fetch response does not handled: ", action);
@@ -85,18 +84,13 @@ export default class GetThumbinfoFetcher {
     }
 
     private _fetchGetThumbinfo(reqKey: VideoKey) {
-        this._fetchUrl(reqKey, GetThumbinfoApiPrefix + reqKey.id);
+        NicoThumbinfoActionCreator.createGetThumbinfoFetchAction(
+            this._key, reqKey, DataSource.GetThumbinfo);
     }
 
     private _fetchGetFlv(reqKey: VideoKey) {
-        this._fetchUrl(reqKey, GetFlvApiPrefix + reqKey.id);
-    }
-
-    private _fetchUrl(reqKey: VideoKey, url: string) {
-        let req = Request.get(url);
-        NicoThumbinfoActionCreator.createUrlFetchAction(
-            this._key, req, reqKey, DataSource.GetThumbinfo);
-        this._loadingUrl = url;
+        NicoThumbinfoActionCreator.createGetFlvFetchAction(
+            this._key, reqKey, DataSource.GetThumbinfo);
     }
 
     private _handleErrorResponse(
@@ -166,6 +160,10 @@ export default class GetThumbinfoFetcher {
                 break;
             case "cant_get_detail":
                 this._errorCode = ErrorCode.Deleted;
+                this._errorDetail = undefined;
+                break;
+            case "access_locked":
+                this._errorCode = ErrorCode.AccessLocked;
                 this._errorDetail = undefined;
                 break;
             default:

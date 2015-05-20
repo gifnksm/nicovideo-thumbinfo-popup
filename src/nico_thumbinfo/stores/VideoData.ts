@@ -37,6 +37,15 @@ export default class VideoData {
     pushRawVideoData(raw: RawVideoData) {
         this._rawData.push(raw);
         this._rawData.sort((a, b) => a.dataSource - b.dataSource);
+        this.invalidate();
+    }
+
+    clear() {
+        this._rawData = [];
+        this.invalidate();
+    }
+
+    invalidate() {
         this._mergedData = null;
     }
 

@@ -26,15 +26,11 @@ export default class VideoDataOrganizer {
             switch (action.source) {
             case DataSource.GetThumbinfo:
                 let thumbinfoCallback = () => {
-                    if (this._getThumbinfoFetcher.videoData !== null) {
-                        this._videoData.pushRawVideoData(this._getThumbinfoFetcher.videoData);
-                    }
+                    this._updateVideoData();
                     callback();
                 };
                 if (this._getThumbinfoFetcher.handleAction(action, thumbinfoCallback)) {
-                    if (this._getThumbinfoFetcher.videoData !== null) {
-                        this._videoData.pushRawVideoData(this._getThumbinfoFetcher.videoData);
-                    }
+                    this._updateVideoData();
                     return true;
                 }
                 return false;
@@ -51,5 +47,13 @@ export default class VideoDataOrganizer {
     // get state() { return this._state.state; }
     // get errorCode() { return this._errorCode; }
     // get errorDetail() { return this._errorDetail; }
+
+    private _updateVideoData() {
+        this._videoData.clear();
+
+        if (this._getThumbinfoFetcher.videoData !== null) {
+            this._videoData.pushRawVideoData(this._getThumbinfoFetcher.videoData);
+        }
+    }
 }
 

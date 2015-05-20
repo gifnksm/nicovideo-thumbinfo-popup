@@ -7,26 +7,14 @@ import {User, Channel} from "../Uploader";
 import VideoKey from "../VideoKey";
 import RawVideoData from "../RawVideoData";
 import DescriptionParser from "./DescriptionParser";
+import {ErrorCode, ErrorInfo} from "../GetThumbinfoFetcher";
 
-export const enum ErrorCode {
-    Deleted, Community, NotFound
-}
+module GetThumbinfoParser {
+    const Parser = new DOMParser();
 
-export class GetThumbinfoError {
-    code: ErrorCode;
-    description: string;
-    constructor(code: ErrorCode, description: string) {
-        this.code = code;
-        this.description = description;
-    }
-}
-
-export default class GetThumbinfoParser {
-    private static parser: DOMParser = new DOMParser();
-
-    static parse(key: VideoKey, input: string): Promise<RawVideoData|GetThumbinfoError> {
-        return new Promise((resolve, reject) => {
-            let xml = this.parser.parseFromString(input, "application/xml");
+    export function parse(key: VideoKey, input: string): RawVideoData|ErrorInfo {
+        try {
+            let xml = Parser.parseFromString(input, "application/xml");
 
             // パースに失敗した場合、以下のXMLが返される。
             // Firefox の場合、下記要素のみからなる XML 文書が返るが、
@@ -38,42 +26,46 @@ export default class GetThumbinfoParser {
             //     </parsererror>
             let error = xml.getElementsByTagName("parsererror");
             if (error.length > 0) {
-                throw new Error("XML Parse Error: " + error[0].textContent);
+                return new ErrorInfo(ErrorCode.Invalid, "XML Parse Error: " + error[0].textContent);
             }
 
             // レスポンスを簡単にバリデーションする
             let docElem = xml.documentElement;
             if (docElem.nodeName !== "nicovideo_thumb_response") {
-                throw new Error(`XML Format Error: Root element name is "${docElem.nodeName}".`);
+                return new ErrorInfo(ErrorCode.Invalid,
+                                     `XML Format Error: Root element name is "${docElem.nodeName}".`);
             }
             if (!docElem.hasAttribute("status")) {
-                throw new Error(`XML Format Error: Root element does not have "status" attribute.`);
+                return new ErrorInfo(ErrorCode.Invalid,
+                                     `XML Format Error: Root element does not have "status" attribute.`);
             }
 
             let status = xml.documentElement.getAttribute("status");
             switch (status) {
             case "ok":
-                resolve(this._parseOk(key, xml));
-                break;
+                return _parseOk(key, xml);
 
             case "fail":
-                resolve(this._parseFail(key, xml));
-                break;
+                return _parseFail(key, xml);
 
             default:
-                throw new Error(`XML Format Error: Unknown status "${status}".`);
+                return new ErrorInfo(ErrorCode.Invalid,
+                                     `XML Format Error: Unknown status "${status}".`);
             }
-        });
+        } catch (e) {
+            // XMLツリーの走査時にエラーが起きるかもしれないので、念の為catchしておく
+            return new ErrorInfo(ErrorCode.Invalid, "" + e);
+        }
     }
 
-    private static _parseOk(key: VideoKey, xml: XMLDocument): RawVideoData {
+    function _parseOk(key: VideoKey, xml: XMLDocument): RawVideoData|ErrorInfo {
         let data = RawVideoData.createGetThumbinfo(key);
         let user: User = new User();
         let channel: Channel = new Channel();
 
         let thums = xml.getElementsByTagName("thumb");
         if (thums.length === 0) {
-            throw new Error(`XML Format Error: There is no "thumb" element.`);
+            return new ErrorInfo(ErrorCode.Invalid, `XML Format Error: There is no "thumb" element.`);
         }
 
         // for (let node of thums[0].childNodes) {
@@ -176,13 +168,14 @@ export default class GetThumbinfoParser {
         return data;
     }
 
-    private static _parseFail(key: VideoKey, xml: XMLDocument): GetThumbinfoError {
+    function _parseFail(key: VideoKey, xml: XMLDocument): ErrorInfo {
         let code: ErrorCode;
         let desc: string;
 
         let errors = xml.getElementsByTagName("error");
         if (errors.length === 0) {
-            throw new Error(`XML Format Error: There is no "error" element.`);
+            return new ErrorInfo(ErrorCode.Invalid,
+                                 `XML Format Error: There is no "error" element.`);
         }
 
         // for (let node of errors[0].childNodes) {
@@ -220,6 +213,8 @@ export default class GetThumbinfoParser {
             }
         }
 
-        return new GetThumbinfoError(code, desc);
+        return new ErrorInfo(code, desc);
     }
 }
+
+export default GetThumbinfoParser;

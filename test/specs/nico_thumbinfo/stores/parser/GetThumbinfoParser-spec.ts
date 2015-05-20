@@ -1,7 +1,8 @@
 /// <reference path="../../../../../typings/common.d.ts" />
 "use strict";
 
-import GetThumbinfoParser, {ErrorCode, GetThumbinfoError} from "../../../../../src/nico_thumbinfo/stores/parser/GetThumbinfoParser";
+import GetThumbinfoParser from "../../../../../src/nico_thumbinfo/stores/parser/GetThumbinfoParser";
+import {ErrorCode, ErrorInfo} from "../../../../../src/nico_thumbinfo/stores/GetThumbinfoFetcher";
 import RawVideoData from "../../../../../src/nico_thumbinfo/stores/RawVideoData";
 import VideoKey from "../../../../../src/nico_thumbinfo/stores/VideoKey";
 import * as assert from "power-assert";
@@ -30,21 +31,31 @@ function failTest() {
     throw new Error("Expected promise to be rejected but it was fulfilled");
 }
 
+function checkError(code: ErrorCode, key: VideoKey, input: string, reg: RegExp|string) {
+    let data = GetThumbinfoParser.parse(key, input);
+    if (data instanceof ErrorInfo) {
+        assert(data.errorCode === code);
+        if (reg instanceof RegExp) {
+            assert(reg.test(data.errorDetail));
+        } else {
+            assert(data.errorDetail === reg);
+        }
+    } else {
+        console.error("data is not instance of ErrorInfo: ", data);
+        throw new Error("data is not instance of ErrorInfo");
+    }
+}
+
 describe("nico_thumbinfo/stores/parser/GetThumbinfoParser", () => {
     let key = VideoKey.fromVideoId("sm9");
 
     it("should fails if input is empty", () => {
-        return GetThumbinfoParser.parse(key, "")
-            .then(failTest, (e: Error) => {
-                assert(/^XML Parse Error: /.test(e.message))
-            });
+        checkError(ErrorCode.Invalid, key, "", /^XML Parse Error: /);
     });
 
     it("should fails if input is odd but valid XML.", () => {
-        return GetThumbinfoParser.parse(key, "<unknown_element></unknown_element>")
-            .then(failTest, (e: Error) => {
-                assert(e.message === `XML Format Error: Root element name is "unknown_element".`);
-            });
+        checkError(ErrorCode.Invalid, key, "<unknown_element></unknown_element>",
+                   `XML Format Error: Root element name is "unknown_element".`);
     });
 
     it("should return parse result if valid input is given.", () => {
@@ -75,45 +86,24 @@ describe("nico_thumbinfo/stores/parser/GetThumbinfoParser", () => {
     it("should return error if deleted video is given.", () => {
         let key = VideoKey.fromVideoId("sm22532786");
         return getUrl("/base/etc/resource/getthumbinfo/sm22532786")
-            .then(input => GetThumbinfoParser.parse(key, input))
-            .then(data => {
-                if (data instanceof GetThumbinfoError) {
-                    assert(data.code === ErrorCode.Deleted);
-                    assert(data.description === "deleted");
-                } else {
-                    console.error("data is not instance of GetThumbinfoError: ", data);
-                    throw new Error("data is not instance of GetThumbinfoError");
-                }
+            .then(input => {
+                checkError(ErrorCode.Deleted, key, input, "deleted");
             });
     });
 
     it("should return error if community only video is given.", () => {
         let key = VideoKey.fromThreadId("1340979099");
         return getUrl("/base/etc/resource/getthumbinfo/1340979099")
-            .then(input => GetThumbinfoParser.parse(key, input))
-            .then(data => {
-                if (data instanceof GetThumbinfoError) {
-                    assert(data.code === ErrorCode.Community);
-                    assert(data.description === "community");
-                } else {
-                    console.error("data is not instance of GetThumbinfoError: ", data);
-                    throw new Error("data is not instance of GetThumbinfoError");
-                }
+            .then(input => {
+                checkError(ErrorCode.Community, key, input, "community");
             });
     });
 
     it("should return error if outdated video is given.", () => {
         let key = VideoKey.fromThreadId("so19903664");
         return getUrl("/base/etc/resource/getthumbinfo/so19903664")
-            .then(input => GetThumbinfoParser.parse(key, input))
-            .then(data => {
-                if (data instanceof GetThumbinfoError) {
-                    assert(data.code === ErrorCode.NotFound);
-                    assert(data.description === "not found or invalid");
-                } else {
-                    console.error("data is not instance of GetThumbinfoError: ", data);
-                    throw new Error("data is not instance of GetThumbinfoError");
-                }
+            .then(input => {
+                checkError(ErrorCode.NotFound, key, input, "not found or invalid");
             });
     });
 });

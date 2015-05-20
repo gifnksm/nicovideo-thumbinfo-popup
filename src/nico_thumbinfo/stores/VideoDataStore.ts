@@ -65,8 +65,7 @@ class VideoDataStore implements VideoDataStoreInterface {
             return;
         }
 
-        let callback = () => this._emitChange(key);
-        if (organizer.handleAction(action, callback)) {
+        if (organizer.handleAction(action)) {
             this._emitChange(key);
         }
     }

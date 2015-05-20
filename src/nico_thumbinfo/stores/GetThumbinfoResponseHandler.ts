@@ -4,86 +4,37 @@
 import VideoKey from "./VideoKey";
 import VideoData from "./VideoData";
 import RawVideoData from "./RawVideoData";
-import GetThumbinfoParser, {GetThumbinfoError as ParserError, ErrorCode as ParserErrorCode} from "./parser/GetThumbinfoParser";
-import {ErrorCode} from "./GetThumbinfoFetcher";
+import GetThumbinfoParser from "./parser/GetThumbinfoParser";
+import {ErrorCode, ErrorInfo} from "./GetThumbinfoFetcher";
 
 import UrlFetchResponseAction from "../actions/UrlFetchResponseAction";
 
-export interface ErrorInfo {
-    errorCode: ErrorCode;
-    errorDetail?: string;
-}
-
 module GetThumbinfoResponseHandler {
-    export function handle(action: UrlFetchResponseAction): Promise<RawVideoData> {
-        return new Promise((resolve, reject) => {
-            if (action.response.status !== 200) {
-                reject(<ErrorInfo>{
-                    errorCode: ErrorCode.HttpStatus,
-                    errorDetail: action.response.statusText
-                });
-                return;
-            }
-
-            if (action.response.responseText === "") {
-                reject(<ErrorInfo>{
-                    errorCode: ErrorCode.ServerMaintenance
-                });
-                return;
-            }
-
-            resolve(GetThumbinfoParser.parse(action.requestKey, action.response.responseText));
-        }).then(
-            (data: RawVideoData|ParserError) => {
-                let result: RawVideoData = _handleParseResult(action.requestKey, data);
-                return result;
-            },
-            error => {
-                throw <ErrorInfo>{errorCode: ErrorCode.Invalid, errorDetail: "" + error}
-                return null; // dummy return value
-            }
-        );
-    }
-
-    function _handleParseResult(reqKey: VideoKey, data: RawVideoData|ParserError): RawVideoData {
-        // Success
-        if (data instanceof RawVideoData) {
-            return data;
+    export function handle(action: UrlFetchResponseAction): RawVideoData|ErrorInfo {
+        if (action.response.status !== 200) {
+            return new ErrorInfo(ErrorCode.HttpStatus, action.response.statusText);
         }
 
-        // Failure
-        if (data instanceof ParserError) {
-            switch (data.code) {
-            case ParserErrorCode.Deleted:
-                throw <ErrorInfo>{
-                    errorCode: ErrorCode.Deleted,
-                    errorDetail: data.description
-                };
-
-            case ParserErrorCode.Community:
-                if (reqKey.type === VideoKey.Type.ThreadId) {
-                    throw <ErrorInfo>{
-                        errorCode: ErrorCode.CommunitySubThread,
-                        errorDetail: data.description
-                    };
-                }
-                throw <ErrorInfo>{
-                    errorCode: ErrorCode.Community,
-                    errorDetail: data.description
-                };
-
-            case ParserErrorCode.NotFound:
-                throw <ErrorInfo>{
-                    errorCode: ErrorCode.NotFound,
-                    errorDetail: data.description
-                };
-
-            default:
-                throw new Error("Unknown code: " + data.code)
-            }
+        if (action.response.responseText === "") {
+            return new ErrorInfo(ErrorCode.ServerMaintenance);
         }
 
-        throw new Error("invalid data returned.");
+        let result = GetThumbinfoParser.parse(action.requestKey, action.response.responseText);
+
+        if (result instanceof RawVideoData) {
+            return result;
+        }
+
+        if (result instanceof ErrorInfo) {
+            if (result.errorCode === ErrorCode.Community &&
+                action.requestKey.type === VideoKey.Type.ThreadId) {
+                return new ErrorInfo(ErrorCode.CommunitySubThread, result.errorDetail);
+            }
+            return result;
+        }
+
+        console.warn("Unknown result: ", result);
+        return new ErrorInfo(ErrorCode.Invalid, "" + result);
     }
 }
 

@@ -21,15 +21,11 @@ export default class VideoDataOrganizer {
         this._getThumbinfoFetcher = new GetThumbinfoFetcher(key);
     }
 
-    handleAction(action: NicoThumbinfoAction, callback: () => void): boolean {
+    handleAction(action: NicoThumbinfoAction): boolean {
         if (action instanceof UrlFetchAction) {
             switch (action.source) {
             case DataSource.GetThumbinfo:
-                let thumbinfoCallback = () => {
-                    this._updateVideoData();
-                    callback();
-                };
-                if (this._getThumbinfoFetcher.handleAction(action, thumbinfoCallback)) {
+                if (this._getThumbinfoFetcher.handleAction(action)) {
                     this._updateVideoData();
                     return true;
                 }

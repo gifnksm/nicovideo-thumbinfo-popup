@@ -26,6 +26,8 @@ export default class RawVideoData {
     mylistCounter: number = undefined;
     lastResBody: string = undefined;
 
+    nicopediaRegistered: boolean = undefined;
+
     private _tags: TagListData = new TagListData();
 
     uploader: Uploader = undefined;
@@ -66,6 +68,8 @@ export default class RawVideoData {
         if (this.commentCounter === undefined) { this.commentCounter = rawData.commentCounter; }
         if (this.mylistCounter === undefined) { this.mylistCounter = rawData.mylistCounter; }
         if (this.lastResBody === undefined) { this.lastResBody = rawData.lastResBody; }
+
+        if (this.nicopediaRegistered === undefined) { this.nicopediaRegistered = rawData.nicopediaRegistered; }
 
         this._tags.merge(rawData._tags);
 

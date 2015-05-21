@@ -26,6 +26,11 @@ div[data-nicovideo-thumbinfo-popup-content-type="nicovideo-thumbinfo"].content {
         }
     }
 
+    a.nicopedia > img {
+        margin: 0 2px 1px;
+        vertical-align: middle;
+    }
+
     strong {
         font-weight: bold;
     }
@@ -46,7 +51,7 @@ div[data-nicovideo-thumbinfo-popup-content-type="nicovideo-thumbinfo"].content {
 
         > li {
             display: inline;
-            margin: 0 3px 0;
+            margin: 0 3px 0 0;
 
             &.uploader-name {
                 &::before {

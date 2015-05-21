@@ -67,7 +67,8 @@ class NicopediaIcon extends React.Component<NicopediaIcon.Props, NicopediaIcon.S
             break;
         }
 
-        return RD.a({href: href}, RD.img({src: src, alt: alt, title: title}));
+        return RD.a({href: href, className: "nicopedia"},
+                    RD.img({src: src, alt: alt, title: title}));
     }
 }
 

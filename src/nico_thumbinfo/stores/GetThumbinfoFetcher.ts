@@ -9,6 +9,7 @@ import NicoThumbinfoActionCreator from "../actions/NicoThumbinfoActionCreator";
 import UrlFetchAction from "../actions/UrlFetchAction";
 import GetThumbinfoFetchAction from "../actions/GetThumbinfoFetchAction";
 import GetFlvFetchAction from "../actions/GetFlvFetchAction";
+import NicopediaFetchAction, {NicopediaInfo, Type as NicopediaType} from "../actions/NicopediaFetchAction";
 
 import * as querystring from "querystring";
 
@@ -74,6 +75,10 @@ export default class GetThumbinfoFetcher {
             return this._handleGetFlvFetchAction(action);
         }
 
+        if (action instanceof NicopediaFetchAction) {
+            return this._handleNicopediaFetchAction(action);
+        }
+
         console.warn("Fetch response does not handled: ", action);
         return false;
     }
@@ -88,12 +93,38 @@ export default class GetThumbinfoFetcher {
             this._key, reqKey, DataSource.GetThumbinfo);
     }
 
+    private _fetchNicopediaVideo() {
+        if (this._videoData === null) {
+            console.warn("this._videoData === null", this);
+            return;
+        }
+
+        NicoThumbinfoActionCreator.createNicopediaFetchAction(
+            this._key, DataSource.GetThumbinfo,
+            NicopediaType.Video, this._videoData.videoId);
+    }
+
+    private _fetchNicopediaTag() {
+        if (this._videoData === null) {
+            console.warn("this._videoData === null", this);
+            return;
+        }
+
+        for (let tag of this._videoData.tags) {
+            NicoThumbinfoActionCreator.createNicopediaFetchAction(
+                this._key, DataSource.GetThumbinfo,
+                NicopediaType.Article, tag.name);
+        };
+    }
+
     private _handleGetThumbinfoFetchAction(action: GetThumbinfoFetchAction): boolean {
         let payload = action.payload;
 
         if (payload instanceof RawVideoData) {
             this._videoData = payload;
             this._state = State.Completed;
+            this._fetchNicopediaVideo();
+            this._fetchNicopediaTag();
             return true;
         }
 
@@ -116,7 +147,8 @@ export default class GetThumbinfoFetcher {
         }
 
         console.warn("Unknown result: ", payload);
-        return false;
+        this._state = State.Error;
+        return true;
     }
 
     private _handleGetFlvFetchAction(action: GetFlvFetchAction): boolean {
@@ -143,5 +175,48 @@ export default class GetThumbinfoFetcher {
         // エラーコードは初回の getthumbinfo 時に設定されたもののままにする
         this._state = State.Error;
         return true;
+    }
+
+    private _handleNicopediaFetchAction(action: NicopediaFetchAction): boolean {
+        let payload = action.payload;
+
+        if (payload instanceof NicopediaInfo) {
+            if (this._videoData === null) {
+                console.warn("this._videoData === null.", this);
+                return false;
+            }
+
+            switch (payload.type) {
+            case NicopediaType.Article:
+                let found = false;
+                for (let tag of this._videoData.tags) {
+                    if (tag.name === payload.name) {
+                        tag.nicopediaRegistered = payload.registered;
+                        found = true;
+                    }
+                }
+                if (!found) {
+                    console.warn("Not found tag: ", payload.name, action);
+                }
+
+                return found;
+
+            case NicopediaType.Video:
+                this._videoData.nicopediaRegistered = payload.registered;
+                return false;
+
+            default:
+                console.warn("Invalid nicopedia type:", payload.type, action);
+                return false;
+            }
+        }
+
+        if (payload instanceof ErrorInfo) {
+            // Ignore errors
+            return false;
+        }
+
+        console.warn("Invalid nicopedia data:", action);
+        return false;
     }
 }

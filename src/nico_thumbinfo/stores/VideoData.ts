@@ -61,6 +61,7 @@ export default class VideoData {
     get commentCounter() { return this._getMergedData().commentCounter; }
     get mylistCounter() { return this._getMergedData().mylistCounter; }
     get lastResBody() { return this._getMergedData().lastResBody; }
+    get nicopediaRegistered() { return this._getMergedData().nicopediaRegistered; }
     get tags() { return this._getMergedData().tags; }
     get uploader() { return this._getMergedData().uploader; }
 

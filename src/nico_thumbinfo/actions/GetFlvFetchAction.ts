@@ -10,9 +10,8 @@ import UrlFetcher, {Request, Response} from "../../util/UrlFetcher";
 export default class GetFlvFetchAction extends UrlFetchAction {
     private _payload: VideoKey|ErrorInfo;
 
-    constructor(key: VideoKey, request: Request, requestKey: VideoKey,
-                source: DataSource, payload: VideoKey|ErrorInfo) {
-        super(key, request, requestKey, source);
+    constructor(key: VideoKey, request: Request, source: DataSource, payload: VideoKey|ErrorInfo) {
+        super(key, request, source);
         this._payload = payload;
     }
 

@@ -81,7 +81,7 @@ class Base extends React.Component<Base.Props, Base.State> {
                       type: NicopediaIconType.Video,
                       name: data.title,
                       id: data.videoId,
-                      registered: undefined // TODO: Implements
+                      registered: data.nicopediaRegistered
                   })),
             React.createElement(CounterList, {videoData: data}),
             React.createElement(TagList, {tags: data.tags}),

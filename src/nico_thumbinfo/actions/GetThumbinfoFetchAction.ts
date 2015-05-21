@@ -11,9 +11,9 @@ import UrlFetcher, {Request, Response} from "../../util/UrlFetcher";
 export default class GetThumbinfoFetchAction extends UrlFetchAction {
     private _payload: RawVideoData|ErrorInfo;
 
-    constructor(key: VideoKey, request: Request, requestKey: VideoKey,
-                source: DataSource, payload: RawVideoData|ErrorInfo) {
-        super(key, request, requestKey, source);
+    constructor(key: VideoKey, request: Request, source: DataSource,
+                payload: RawVideoData|ErrorInfo) {
+        super(key, request, source);
         this._payload = payload;
     }
 

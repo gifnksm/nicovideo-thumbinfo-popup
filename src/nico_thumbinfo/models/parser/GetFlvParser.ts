@@ -2,7 +2,7 @@
 "use strict";
 
 import VideoKey from "../VideoKey";
-import {ErrorCode, ErrorInfo} from "../GetThumbinfoFetcher";
+import ErrorInfo, {ErrorCode} from "../ErrorInfo";
 
 import * as querystring from "querystring";
 

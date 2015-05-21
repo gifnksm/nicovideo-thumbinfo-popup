@@ -1,11 +1,11 @@
 /// <reference path="../../../../../typings/common.d.ts" />
 "use strict";
 
-import DescriptionParser from "../../../../../src/nico_thumbinfo/stores/parser/DescriptionParser";
-import {DescriptionElement as DElement, DescriptionText as DText} from "../../../../../src/nico_thumbinfo/stores/DescriptionNode";
+import DescriptionParser from "../../../../../src/nico_thumbinfo/models/parser/DescriptionParser";
+import {DescriptionElement as DElement, DescriptionText as DText} from "../../../../../src/nico_thumbinfo/models/DescriptionNode";
 import * as assert from "power-assert";
 
-describe("nico_thumbinfo/stores/parser/DescriptionParser", () => {
+describe("nico_thumbinfo/models/parser/DescriptionParser", () => {
     it("should convert video URLs into links.", () => {
         let node = document.createElement("div");
         node.textContent = "Watch! http://www.nicovideo.jp/watch/sm9";

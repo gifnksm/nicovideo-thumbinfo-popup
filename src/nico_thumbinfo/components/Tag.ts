@@ -2,7 +2,7 @@
 "use strict";
 
 import * as React from "react";
-import TagData from "../stores/TagData";
+import TagData from "../models/TagData";
 import NicopediaIcon, {Type as NicopediaIconType} from "./NicopediaIcon";
 
 module Tag {

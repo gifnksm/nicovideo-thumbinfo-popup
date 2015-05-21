@@ -2,7 +2,7 @@
 "use strict";
 
 import Action from "../../actions/Action";
-import VideoKey from "../stores/VideoKey";
+import VideoKey from "../models/VideoKey";
 
 export default class NicoThumbinfoAction implements Action {
     private _key: VideoKey;

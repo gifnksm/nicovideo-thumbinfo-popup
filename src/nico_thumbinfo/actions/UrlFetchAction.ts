@@ -1,17 +1,35 @@
 /// <reference path="../../../typings/common.d.ts" />
 "use strict";
 
-import VideoKey from "../stores/VideoKey";
-import {DataSource} from "../stores/constants";
 import NicoThumbinfoAction from "./NicoThumbinfoAction";
+
+import VideoKey from "../models/VideoKey";
+
 import UrlFetcher, {Request} from "../../util/UrlFetcher";
+
+export const enum SourceType {
+    GetThumbinfo
+}
+
+export class Source {
+    private _sourceType: SourceType;
+    private _key: VideoKey;
+
+    constructor(sourceType: SourceType, key: VideoKey) {
+        this._sourceType = sourceType;
+        this._key = key;
+    }
+
+    get sourceType() { return this._sourceType; }
+    get key() { return this._key; }
+}
 
 export default class UrlFetchAction extends NicoThumbinfoAction {
     private _request: Request;
-    private _source: DataSource;
+    private _source: Source;
 
-    constructor(key: VideoKey, request: Request, source: DataSource) {
-        super(key);
+    constructor(source: Source, request: Request) {
+        super(source.key);
         this._request = request;
         this._source = source;
     }

@@ -2,12 +2,15 @@
 "use strict";
 
 import {EventEmitter} from "events";
-import VideoKey from "./VideoKey";
 import VideoData from "./VideoData";
 import VideoDataOrganizer from "./VideoDataOrganizer";
+
+import NicoThumbinfoAction from "../actions/NicoThumbinfoAction";
+
+import VideoKey from "../models/VideoKey";
+
 import AppDispatcher, {AppDispatcherInterface} from "../../dispatcher/AppDispatcher";
 import Payload from "../../dispatcher/Payload";
-import NicoThumbinfoAction from "../actions/NicoThumbinfoAction";
 
 const CHANGE_EVENT = "change";
 

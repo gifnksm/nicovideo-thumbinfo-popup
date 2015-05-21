@@ -1,9 +1,9 @@
 /// <reference path="../../../typings/common.d.ts" />
 "use strict";
 
-import {DataSource} from "./constants";
-import VideoKey from "./VideoKey";
-import RawVideoData from "./RawVideoData";
+import {DataSource} from "../models/constants";
+import VideoKey from "../models/VideoKey";
+import RawVideoData from "../models/RawVideoData";
 
 export default class VideoData {
     private _key: VideoKey;

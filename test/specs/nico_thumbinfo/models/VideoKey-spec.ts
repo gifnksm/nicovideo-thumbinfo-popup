@@ -1,13 +1,13 @@
 /// <reference path="../../../../typings/common.d.ts" />
 "use strict";
 
-import VideoKey from "../../../../src/nico_thumbinfo/stores/VideoKey";
+import VideoKey from "../../../../src/nico_thumbinfo/models/VideoKey";
 import * as assert from "power-assert";
 import {Option, Some, None} from "option-t";
 
 const NicoDomain = "www.nicovideo.jp";
 
-describe("nico_thumbinfo/stores/VideoKey", () => {
+describe("nico_thumbinfo/models/VideoKey", () => {
     let getKey = VideoKey.fromUrl;
     function some(url: string, key: VideoKey) {
         assert(getKey(url).unwrap().valueOf() === key.valueOf());

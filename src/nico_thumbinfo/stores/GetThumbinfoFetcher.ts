@@ -1,12 +1,12 @@
 /// <reference path="../../../typings/common.d.ts" />
 "use strict";
 
-import {DataSource} from "./constants";
-import VideoKey from "./VideoKey";
-import RawVideoData from "./RawVideoData";
+import ErrorInfo, {ErrorCode} from "../models/ErrorInfo";
+import VideoKey from "../models/VideoKey";
+import RawVideoData from "../models/RawVideoData";
 
 import NicoThumbinfoActionCreator from "../actions/NicoThumbinfoActionCreator";
-import UrlFetchAction from "../actions/UrlFetchAction";
+import UrlFetchAction, {Source, SourceType} from "../actions/UrlFetchAction";
 import GetThumbinfoFetchAction from "../actions/GetThumbinfoFetchAction";
 import GetFlvFetchAction from "../actions/GetFlvFetchAction";
 import NicopediaFetchAction, {NicopediaInfo, Type as NicopediaType} from "../actions/NicopediaFetchAction";
@@ -17,36 +17,6 @@ export const enum State {
     Initial, Loading, Completed, Error
 }
 
-export const enum ErrorCode {
-    UrlFetch,
-    HttpStatus,
-    ServerMaintenance,
-    Invalid,
-    Deleted,
-    DeletedByUploader,
-    DeletedByAdmin,
-    DeletedByContentHolder,
-    DeletedAsPrivate,
-    AccessLocked,
-    Community,
-    CommunitySubThread,
-    NotFound,
-    Unknown
-}
-
-export class ErrorInfo {
-    private _errorCode: ErrorCode;
-    private _errorDetail: string;
-
-    constructor(errorCode: ErrorCode, errorDetail?: string) {
-        this._errorCode = errorCode;
-        this._errorDetail = errorDetail;
-    }
-
-    get errorCode() { return this._errorCode; }
-    get errorDetail() { return this._errorDetail; }
-}
-
 export default class GetThumbinfoFetcher {
     private _state: State = State.Initial;
     private _loadingUrl: string;
@@ -54,6 +24,7 @@ export default class GetThumbinfoFetcher {
     private _key: VideoKey;
     private _optionalKey: VideoKey = undefined;
     private _videoData: RawVideoData = null;
+    private _source: Source;
 
     get state() { return this._state; }
     get errorInfo() { return this._errorInfo; }
@@ -61,6 +32,7 @@ export default class GetThumbinfoFetcher {
 
     constructor(key: VideoKey) {
         this._key = key;
+        this._source = new Source(SourceType.GetThumbinfo, this._key);
 
         this._fetchGetThumbinfo(this._key);
         this._state = State.Loading;
@@ -84,13 +56,11 @@ export default class GetThumbinfoFetcher {
     }
 
     private _fetchGetThumbinfo(reqKey: VideoKey) {
-        NicoThumbinfoActionCreator.createGetThumbinfoFetchAction(
-            this._key, reqKey, DataSource.GetThumbinfo);
+        NicoThumbinfoActionCreator.createGetThumbinfoFetchAction(this._source, reqKey);
     }
 
     private _fetchGetFlv(reqKey: VideoKey) {
-        NicoThumbinfoActionCreator.createGetFlvFetchAction(
-            this._key, reqKey, DataSource.GetThumbinfo);
+        NicoThumbinfoActionCreator.createGetFlvFetchAction(this._source, reqKey);
     }
 
     private _fetchNicopediaVideo() {
@@ -100,8 +70,7 @@ export default class GetThumbinfoFetcher {
         }
 
         NicoThumbinfoActionCreator.createNicopediaFetchAction(
-            this._key, DataSource.GetThumbinfo,
-            NicopediaType.Video, this._videoData.videoId);
+            this._source, NicopediaType.Video, this._videoData.videoId);
     }
 
     private _fetchNicopediaTag() {
@@ -112,8 +81,7 @@ export default class GetThumbinfoFetcher {
 
         for (let tag of this._videoData.tags) {
             NicoThumbinfoActionCreator.createNicopediaFetchAction(
-                this._key, DataSource.GetThumbinfo,
-                NicopediaType.Article, tag.name);
+                this._source, NicopediaType.Article, tag.name);
         };
     }
 

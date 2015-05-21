@@ -1,19 +1,18 @@
 /// <reference path="../../../typings/common.d.ts" />
 "use strict";
 
-import VideoKey from "../stores/VideoKey";
-import {DataSource} from "../stores/constants";
-import {ErrorCode, ErrorInfo} from "../stores/GetThumbinfoFetcher";
-import RawVideoData from "../stores/RawVideoData";
-import UrlFetchAction from "./UrlFetchAction";
-import UrlFetcher, {Request, Response} from "../../util/UrlFetcher";
+import UrlFetchAction, {Source} from "./UrlFetchAction";
+
+import ErrorInfo, {ErrorCode} from "../models/ErrorInfo";
+import RawVideoData from "../models/RawVideoData";
+
+import {Request} from "../../util/UrlFetcher";
 
 export default class GetThumbinfoFetchAction extends UrlFetchAction {
     private _payload: RawVideoData|ErrorInfo;
 
-    constructor(key: VideoKey, request: Request, source: DataSource,
-                payload: RawVideoData|ErrorInfo) {
-        super(key, request, source);
+    constructor(source: Source, request: Request, payload: RawVideoData|ErrorInfo) {
+        super(source, request);
         this._payload = payload;
     }
 

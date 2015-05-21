@@ -2,9 +2,11 @@
 "use strict";
 
 import NicoThumbinfo from "../../../../src/nico_thumbinfo/components/Base";
-import GetThumbinfoParser from "../../../../src/nico_thumbinfo/stores/parser/GetThumbinfoParser";
-import VideoKey from "../../../../src/nico_thumbinfo/stores/VideoKey";
-import RawVideoData from "../../../../src/nico_thumbinfo/stores/RawVideoData";
+
+import GetThumbinfoParser from "../../../../src/nico_thumbinfo/models/parser/GetThumbinfoParser";
+import VideoKey from "../../../../src/nico_thumbinfo/models/VideoKey";
+import RawVideoData from "../../../../src/nico_thumbinfo/models/RawVideoData";
+
 import VideoData from "../../../../src/nico_thumbinfo/stores/VideoData";
 import {VideoDataStoreInterface} from "../../../../src/nico_thumbinfo/stores/VideoDataStore";
 import * as assert from "power-assert";

@@ -1,13 +1,14 @@
 /// <reference path="../../../../typings/common.d.ts" />
 "use strict";
 
+import DescriptionParser from "./DescriptionParser";
+
 import {ThumbType} from "../constants";
 import TagData from "../TagData";
 import {User, Channel} from "../Uploader";
 import VideoKey from "../VideoKey";
 import RawVideoData from "../RawVideoData";
-import DescriptionParser from "./DescriptionParser";
-import {ErrorCode, ErrorInfo} from "../GetThumbinfoFetcher";
+import ErrorInfo, {ErrorCode} from "../ErrorInfo";
 
 module GetThumbinfoParser {
     const Parser = new DOMParser();

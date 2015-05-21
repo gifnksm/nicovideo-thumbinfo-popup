@@ -1,12 +1,12 @@
 /// <reference path="../../../../typings/common.d.ts" />
 "use strict";
 
-import TagData from "../../../../src/nico_thumbinfo/stores/TagData";
-import TagListData from "../../../../src/nico_thumbinfo/stores/TagListData";
+import TagData from "../../../../src/nico_thumbinfo/models/TagData";
+import TagListData from "../../../../src/nico_thumbinfo/models/TagListData";
 import * as assert from "power-assert";
 import {Option, Some, None} from "option-t";
 
-describe("nico_thumbinfo/stores/TagListData", () => {
+describe("nico_thumbinfo/models/TagListData", () => {
     function checkTag(tag: TagData, name: string, isLocked: boolean, isCategory: boolean, nicopediaRegistered: boolean) {
         assert(tag.name === name);
         assert(tag.isLocked === isLocked);

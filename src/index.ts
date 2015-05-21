@@ -3,7 +3,7 @@
 
 import * as React from "react";
 import NicoThumbinfo from "./nico_thumbinfo/components/Base";
-import VideoKey from "./nico_thumbinfo/stores/VideoKey";
+import VideoKey from "./nico_thumbinfo/models/VideoKey";
 
 function render(key: VideoKey, parent: Element) {
     let div = document.createElement("div");

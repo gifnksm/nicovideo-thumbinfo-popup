@@ -5,7 +5,8 @@ import * as React from "react";
 
 import {DataAttributeName} from "../../components/constants";
 
-import VideoKey from "../stores/VideoKey";
+import VideoKey from "../models/VideoKey";
+
 import VideoData from "../stores/VideoData";
 import VideoDataStore, {VideoDataStoreInterface} from "../stores/VideoDataStore";
 

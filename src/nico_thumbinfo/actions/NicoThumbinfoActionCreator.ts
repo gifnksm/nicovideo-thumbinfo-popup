@@ -1,15 +1,17 @@
 /// <reference path="../../../typings/common.d.ts" />
 "use strict";
 
+import {Source} from "./UrlFetchAction";
 import GetThumbinfoFetchAction from "./GetThumbinfoFetchAction";
 import GetFlvFetchAction from "./GetFlvFetchAction";
 import NicopediaFetchAction, {NicopediaInfo, Type as NicopediaType} from "./NicopediaFetchAction";
-import {DataSource} from "../stores/constants";
-import VideoKey from "../stores/VideoKey";
-import RawVideoData from "../stores/RawVideoData";
-import {ErrorCode, ErrorInfo} from "../stores/GetThumbinfoFetcher";
-import GetThumbinfoParser from "../stores/parser/GetThumbinfoParser";
-import GetFlvParser from "../stores/parser/GetFlvParser";
+
+import ErrorInfo, {ErrorCode} from "../models/ErrorInfo";
+import VideoKey from "../models/VideoKey";
+import RawVideoData from "../models/RawVideoData";
+import GetThumbinfoParser from "../models/parser/GetThumbinfoParser";
+import GetFlvParser from "../models/parser/GetFlvParser";
+
 
 import AppDispatcher, {AppDispatcherInterface} from "../../dispatcher/AppDispatcher";
 import UrlFetcher, {Request, Response} from "../../util/UrlFetcher";
@@ -55,7 +57,7 @@ class NicoThumbinfoActionCreator {
         this._nicopediaFetcher = new CachedUrlFetcher(fetcher);
     }
 
-    createGetThumbinfoFetchAction(key: VideoKey, reqKey: VideoKey, source: DataSource) {
+    createGetThumbinfoFetchAction(source: Source, reqKey: VideoKey) {
         let url = "http://ext.nicovideo.jp/api/getthumbinfo/" + reqKey.id;
         let req = Request.get(url);
 
@@ -65,11 +67,11 @@ class NicoThumbinfoActionCreator {
             resp => this._handleGetThumbinfoResponse(reqKey, resp)
         ).then(payload => {
             this._dispatcher.handleStoreEvent(
-                new GetThumbinfoFetchAction(key, req, source, payload));
+                new GetThumbinfoFetchAction(source, req, payload));
         });
     }
 
-    createGetFlvFetchAction(key: VideoKey, reqKey: VideoKey, source: DataSource) {
+    createGetFlvFetchAction(source: Source, reqKey: VideoKey) {
         let url = "http://www.nicovideo.jp/api/getflv/" + reqKey.id;
         let req = Request.get(url);
 
@@ -79,12 +81,11 @@ class NicoThumbinfoActionCreator {
             this._handleGetFlvResponse
         ).then(payload => {
             this._dispatcher.handleStoreEvent(
-                new GetFlvFetchAction(key, req, source, payload));
+                new GetFlvFetchAction(source, req, payload));
         });
     }
 
-    createNicopediaFetchAction(key: VideoKey, source: DataSource,
-                               type: NicopediaType, name: string) {
+    createNicopediaFetchAction(source: Source, type: NicopediaType, name: string) {
         let category = "";
         switch (type) {
         case NicopediaType.Article:
@@ -107,7 +108,7 @@ class NicoThumbinfoActionCreator {
             resp => this._handleNicopediaResponse(type, name, resp)
         ).then(payload => {
             this._dispatcher.handleStoreEvent(
-                new NicopediaFetchAction(key, req, source, payload));
+                new NicopediaFetchAction(source, req, payload));
         })
     }
 

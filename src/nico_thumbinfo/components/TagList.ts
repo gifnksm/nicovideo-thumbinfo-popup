@@ -2,7 +2,7 @@
 "use strict";
 
 import * as React from "react";
-import TagData from "../stores/TagData";
+import TagData from "../models/TagData";
 import Tag from "./Tag"
 
 module TagList {

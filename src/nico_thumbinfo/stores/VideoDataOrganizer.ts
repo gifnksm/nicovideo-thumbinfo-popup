@@ -1,13 +1,14 @@
 /// <reference path="../../../typings/common.d.ts" />
 "use strict";
 
-import {DataSource} from "./constants";
-import VideoKey from "./VideoKey";
+
 import VideoData from "./VideoData";
 import GetThumbinfoFetcher from "./GetThumbinfoFetcher";
 
 import NicoThumbinfoAction from "../actions/NicoThumbinfoAction";
-import UrlFetchAction from "../actions/UrlFetchAction";
+import UrlFetchAction, {SourceType} from "../actions/UrlFetchAction";
+
+import VideoKey from "../models/VideoKey";
 
 export default class VideoDataOrganizer {
     private _key: VideoKey;
@@ -22,8 +23,8 @@ export default class VideoDataOrganizer {
 
     handleAction(action: NicoThumbinfoAction): boolean {
         if (action instanceof UrlFetchAction) {
-            switch (action.source) {
-            case DataSource.GetThumbinfo:
+            switch (action.source.sourceType) {
+            case SourceType.GetThumbinfo:
                 if (this._getThumbinfoFetcher.handleAction(action)) {
                     this._updateVideoData();
                     return true;

@@ -2,8 +2,7 @@
 "use strict";
 
 import * as React from "react";
-import {DescriptionNode as DNode} from "../stores/DescriptionNode";
-
+import {DescriptionNode as DNode} from "../models/DescriptionNode";
 
 module Description {
     export interface Props {

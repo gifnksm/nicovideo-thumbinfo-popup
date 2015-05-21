@@ -1,10 +1,12 @@
 /// <reference path="../../../../../typings/common.d.ts" />
 "use strict";
 
-import GetThumbinfoParser from "../../../../../src/nico_thumbinfo/stores/parser/GetThumbinfoParser";
-import {ErrorCode, ErrorInfo} from "../../../../../src/nico_thumbinfo/stores/GetThumbinfoFetcher";
-import RawVideoData from "../../../../../src/nico_thumbinfo/stores/RawVideoData";
-import VideoKey from "../../../../../src/nico_thumbinfo/stores/VideoKey";
+import GetThumbinfoParser from "../../../../../src/nico_thumbinfo/models/parser/GetThumbinfoParser";
+
+import ErrorInfo, {ErrorCode} from "../../../../../src/nico_thumbinfo/models/ErrorInfo";
+import RawVideoData from "../../../../../src/nico_thumbinfo/models/RawVideoData";
+import VideoKey from "../../../../../src/nico_thumbinfo/models/VideoKey";
+
 import * as assert from "power-assert";
 
 function getUrl(url: string): Promise<string> {
@@ -46,7 +48,7 @@ function checkError(code: ErrorCode, key: VideoKey, input: string, reg: RegExp|s
     }
 }
 
-describe("nico_thumbinfo/stores/parser/GetThumbinfoParser", () => {
+describe("nico_thumbinfo/models/parser/GetThumbinfoParser", () => {
     let key = VideoKey.fromVideoId("sm9");
 
     it("should fails if input is empty", () => {

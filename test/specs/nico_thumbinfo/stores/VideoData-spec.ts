@@ -1,10 +1,12 @@
 /// <reference path="../../../../typings/common.d.ts" />
 "use strict";
 
-import VideoKey from "../../../../src/nico_thumbinfo/stores/VideoKey";
+import VideoKey from "../../../../src/nico_thumbinfo/models/VideoKey";
+import {DescriptionText as DText} from "../../../../src/nico_thumbinfo/models/DescriptionNode";
+import RawVideoData from "../../../../src/nico_thumbinfo/models/RawVideoData";
+
 import VideoData from "../../../../src/nico_thumbinfo/stores/VideoData";
-import RawVideoData from "../../../../src/nico_thumbinfo/stores/RawVideoData";
-import {DescriptionText as DText} from "../../../../src/nico_thumbinfo/stores/DescriptionNode";
+
 import * as assert from "power-assert";
 import {Option, Some, None} from "option-t";
 

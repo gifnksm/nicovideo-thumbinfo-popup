@@ -3,7 +3,7 @@
 
 import * as React from "react";
 
-import {ThumbType} from "../stores/constants";
+import {ThumbType} from "../models/constants";
 import VideoData from "../stores/VideoData";
 import HatebuIcon, {Size as HatebuIconSize} from "../../hatebu_icon/components/HatebuIcon";
 

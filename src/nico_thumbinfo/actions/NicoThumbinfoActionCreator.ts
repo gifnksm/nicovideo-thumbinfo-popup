@@ -1,35 +1,36 @@
 /// <reference path="../../../typings/common.d.ts" />
 "use strict";
 
-import UrlFetchResponseAction from "./UrlFetchResponseAction";
-import UrlFetchErrorAction from "./UrlFetchErrorAction";
-import {DataSource, FetchTarget} from "../stores/constants";
+import GetThumbinfoFetchAction from "./GetThumbinfoFetchAction";
+import GetFlvFetchAction from "./GetFlvFetchAction";
+import {DataSource} from "../stores/constants";
 import VideoKey from "../stores/VideoKey";
+import RawVideoData from "../stores/RawVideoData";
+import {ErrorCode, ErrorInfo} from "../stores/GetThumbinfoFetcher";
+import GetThumbinfoParser from "../stores/parser/GetThumbinfoParser";
+import GetFlvParser from "../stores/parser/GetFlvParser";
 
-import Action from "../../actions/Action";
 import AppDispatcher, {AppDispatcherInterface} from "../../dispatcher/AppDispatcher";
 import UrlFetcher, {Request, Response} from "../../util/UrlFetcher";
 
-class CachedUrlFetcher {
+class CachedUrlFetcher<T> {
     // TODO: Use ES6 Map
-    _cache: {[index: string]: Promise<Response>} = Object.create(null);
+    _cache: {[index: string]: Promise<T>} = Object.create(null);
     _fetcher: UrlFetcher;
 
     constructor(fetcher: UrlFetcher) {
         this._fetcher = fetcher;
     }
 
-    fetch(request: Request, id: string, dropCache: boolean = false): Promise<Response> {
+    fetch(request: Request, id: string, converter: (resp: Response) => T,
+          dropCache: boolean = false): Promise<T> {
         let promise = this._cache[id];
 
         if (promise === undefined || dropCache) {
             promise = this._fetcher
                 .fetch(request)
-                .catch(error => {
-                    // Drop cache if error response returned
-                    this._cache[id] = undefined;
-                    throw error;
-                    return null; // Dummy return value to resolve type error
+                .then(converter, error => {
+                    return new ErrorInfo(ErrorCode.UrlFetch, error);
                 });
             this._cache[id] = promise;
         }
@@ -40,8 +41,8 @@ class CachedUrlFetcher {
 
 class NicoThumbinfoActionCreator {
     private _dispatcher: AppDispatcherInterface;
-    private _getThumbinfoFetcher: CachedUrlFetcher;
-    private _getFlvFetcher: CachedUrlFetcher;
+    private _getThumbinfoFetcher: CachedUrlFetcher<RawVideoData|ErrorInfo>;
+    private _getFlvFetcher: CachedUrlFetcher<VideoKey|ErrorInfo>;
 
     constructor(dispatcher: AppDispatcherInterface, fetcher: UrlFetcher) {
         this._dispatcher = dispatcher;
@@ -51,27 +52,78 @@ class NicoThumbinfoActionCreator {
 
     createGetThumbinfoFetchAction(key: VideoKey, reqKey: VideoKey, source: DataSource) {
         let url = "http://ext.nicovideo.jp/api/getthumbinfo/" + reqKey.id;
-        this._setupFetchPromise(this._getThumbinfoFetcher, url,
-                                key, reqKey, source, FetchTarget.GetThumbinfo);
+        let req = Request.get(url);
+
+        this._getThumbinfoFetcher.fetch(
+            req,
+            reqKey.valueOf(),
+            resp => this._handleGetThumbinfoResponse(reqKey, resp)
+        ).then(payload => {
+            this._dispatcher.handleStoreEvent(
+                new GetThumbinfoFetchAction(key, req, reqKey, source, payload));
+        });
     }
 
     createGetFlvFetchAction(key: VideoKey, reqKey: VideoKey, source: DataSource) {
         let url = "http://www.nicovideo.jp/api/getflv/" + reqKey.id;
-        this._setupFetchPromise(this._getFlvFetcher, url,
-                                key, reqKey, source, FetchTarget.GetFlv);
+        let req = Request.get(url);
+
+        this._getFlvFetcher.fetch(
+            req,
+            reqKey.valueOf(),
+            this._handleGetFlvResponse
+        ).then(payload => {
+            this._dispatcher.handleStoreEvent(
+                new GetFlvFetchAction(key, req, reqKey, source, payload));
+        });
     }
 
-    _setupFetchPromise(fetcher: CachedUrlFetcher, url: string,
-                       key: VideoKey, reqKey: VideoKey,
-                       source: DataSource, target: FetchTarget) {
-        let req = Request.get(url);
-        fetcher.fetch(req, reqKey.valueOf()).then(resp => {
-            this._dispatcher.handleStoreEvent(
-                new UrlFetchResponseAction(key, req, resp, reqKey, source, target));
-        }, error => {
-            this._dispatcher.handleStoreEvent(
-                new UrlFetchErrorAction(key, req, error, reqKey, source, target));
-        });
+    _handleGetThumbinfoResponse(requestKey: VideoKey, response: Response): RawVideoData|ErrorInfo {
+        if (response.status !== 200) {
+            return new ErrorInfo(ErrorCode.HttpStatus, response.statusText);
+        }
+        if (response.responseText === "") {
+            return new ErrorInfo(ErrorCode.ServerMaintenance);
+        }
+
+        let result = GetThumbinfoParser.parse(requestKey, response.responseText);
+
+        if (result instanceof RawVideoData) {
+            return result;
+        }
+
+        if (result instanceof ErrorInfo) {
+            if (result.errorCode === ErrorCode.Community &&
+                requestKey.type === VideoKey.Type.ThreadId) {
+                return new ErrorInfo(ErrorCode.CommunitySubThread, result.errorDetail);
+            }
+            return result;
+        }
+
+        console.warn("Unknown result: ", result);
+        return new ErrorInfo(ErrorCode.Invalid, "" + result);
+    }
+
+    _handleGetFlvResponse(response: Response): VideoKey|ErrorInfo {
+        if (response.status !== 200) {
+            return new ErrorInfo(ErrorCode.HttpStatus, response.statusText);
+        }
+        if (response.responseText === "") {
+            return new ErrorInfo(ErrorCode.ServerMaintenance);
+        }
+
+        let result = GetFlvParser.parse(response.responseText);
+
+        if (result instanceof VideoKey) {
+            return result;
+        }
+
+        if (result instanceof ErrorInfo) {
+            return result;
+        }
+
+        console.warn("Unknown result: ", result);
+        return new ErrorInfo(ErrorCode.Invalid, "" + result);
     }
 }
 

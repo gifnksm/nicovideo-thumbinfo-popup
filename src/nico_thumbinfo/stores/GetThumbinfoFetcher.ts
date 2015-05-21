@@ -1,16 +1,14 @@
 /// <reference path="../../../typings/common.d.ts" />
 "use strict";
 
-import {DataSource, FetchTarget} from "./constants";
+import {DataSource} from "./constants";
 import VideoKey from "./VideoKey";
 import RawVideoData from "./RawVideoData";
-import GetThumbinfoResponseHandler from "./GetThumbinfoResponseHandler";
 
 import NicoThumbinfoActionCreator from "../actions/NicoThumbinfoActionCreator";
 import UrlFetchAction from "../actions/UrlFetchAction";
-import UrlFetchResponseAction from "../actions/UrlFetchResponseAction";
-import UrlFetchErrorAction from "../actions/UrlFetchErrorAction";
-import {Request, Response} from "../../util/UrlFetcher";
+import GetThumbinfoFetchAction from "../actions/GetThumbinfoFetchAction";
+import GetFlvFetchAction from "../actions/GetFlvFetchAction";
 
 import * as querystring from "querystring";
 
@@ -31,7 +29,8 @@ export const enum ErrorCode {
     AccessLocked,
     Community,
     CommunitySubThread,
-    NotFound
+    NotFound,
+    Unknown
 }
 
 export class ErrorInfo {
@@ -67,27 +66,12 @@ export default class GetThumbinfoFetcher {
     }
 
     handleAction(action: UrlFetchAction): boolean {
-        if (action instanceof UrlFetchErrorAction) {
-            switch (action.target) {
-            case FetchTarget.GetThumbinfo:
-            case FetchTarget.GetFlv:
-                return this._handleErrorResponse(action);
-            default:
-                console.warn("Unknown target: ", action);
-                return false;
-            }
+        if (action instanceof GetThumbinfoFetchAction) {
+            return this._handleGetThumbinfoFetchAction(action);
         }
 
-        if (action instanceof UrlFetchResponseAction) {
-            switch (action.target) {
-            case FetchTarget.GetThumbinfo:
-                return this._handleGetThumbinfoResponse(action);
-            case FetchTarget.GetFlv:
-                return this._handleGetFlvResponse(action);
-            default:
-                console.warn("Unknown target: ", action);
-                return false;
-            }
+        if (action instanceof GetFlvFetchAction) {
+            return this._handleGetFlvFetchAction(action);
         }
 
         console.warn("Fetch response does not handled: ", action);
@@ -104,26 +88,20 @@ export default class GetThumbinfoFetcher {
             this._key, reqKey, DataSource.GetThumbinfo);
     }
 
-    private _handleErrorResponse(action: UrlFetchErrorAction): boolean {
-        this._errorInfo = new ErrorInfo(ErrorCode.UrlFetch, action.error);
-        this._state = State.Error;
-        return true;
-    }
+    private _handleGetThumbinfoFetchAction(action: GetThumbinfoFetchAction): boolean {
+        let payload = action.payload;
 
-    private _handleGetThumbinfoResponse(action: UrlFetchResponseAction): boolean {
-        let data = GetThumbinfoResponseHandler.handle(action);
-
-        if (data instanceof RawVideoData) {
-            this._videoData = data;
+        if (payload instanceof RawVideoData) {
+            this._videoData = payload;
             this._state = State.Completed;
             return true;
         }
 
-        if (data instanceof ErrorInfo) {
-            this._errorInfo = data;
+        if (payload instanceof ErrorInfo) {
+            this._errorInfo = payload;
 
-            if (data.errorCode === ErrorCode.CommunitySubThread ||
-                data.errorCode === ErrorCode.Deleted) {
+            if (payload.errorCode === ErrorCode.CommunitySubThread ||
+                payload.errorCode === ErrorCode.Deleted) {
                 // コミュニティ動画の場合、getflv の optional_thread_id により、
                 // 元動画の情報を取得できる可能性がある
                 // 削除済み動画の場合、getflv の deleted/error により、
@@ -137,83 +115,33 @@ export default class GetThumbinfoFetcher {
             return true;
         }
 
-        console.warn("Unknown result: ", data);
+        console.warn("Unknown result: ", payload);
         return false;
     }
 
-    private _handleGetFlvResponse(action: UrlFetchResponseAction): boolean {
-        // TODO: Check HTTP status
-        let data = querystring.parse(action.response.responseText);
+    private _handleGetFlvFetchAction(action: GetFlvFetchAction): boolean {
+        let payload = action.payload;
 
-        if (data.hasOwnProperty("error")) {
-            switch (data.error) {
-            case "invalid_v1":
-                this._errorInfo = new ErrorInfo(ErrorCode.Deleted);
-                break;
-            case "invalid_v2":
-                this._errorInfo = new ErrorInfo(ErrorCode.DeletedAsPrivate);
-                break;
-            case "invalid_v3":
-                this._errorInfo = new ErrorInfo(ErrorCode.DeletedByContentHolder);
-                break;
-            case "invalid_thread":
-                this._errorInfo = new ErrorInfo(ErrorCode.NotFound);
-                break;
-            case "cant_get_detail":
-                this._errorInfo = new ErrorInfo(ErrorCode.Deleted);
-                break;
-            case "access_locked":
-                this._errorInfo = new ErrorInfo(ErrorCode.AccessLocked);
-                break;
-            default:
-                console.warn("Unknown getflv error:", data.error, action);
-                // エラーコードは初回の getthumbinfo 時に設定されたもののままにする
-                break;
-            }
-
-            this._state = State.Error;
-            return true;
-        }
-
-        if (data.hasOwnProperty("deleted")) {
-            switch (data.deleted) {
-            case 1:
-                this._errorInfo = new ErrorInfo(ErrorCode.DeletedByUploader);
-                break;
-            case 2:
-                this._errorInfo = new ErrorInfo(ErrorCode.DeletedByAdmin);
-                break;
-            case 3:
-                this._errorInfo = new ErrorInfo(ErrorCode.DeletedByContentHolder);
-                break;
-            case 8:
-                this._errorInfo = new ErrorInfo(ErrorCode.DeletedAsPrivate);
-                break;
-            default:
-                console.warn("Unknown getflv deleted:", data.error, action);
-                // エラーコードは初回の getthumbinfo 時に設定されたもののままにする
-                break;
-            }
-
-            this._state = State.Error;
-            return true;
-        }
-
-        if (data.hasOwnProperty("optional_thread_id")) {
-            let key = VideoKey.fromOptionalThreadId(data.optional_thread_id);
-            this._fetchGetThumbinfo(key);
+        if (payload instanceof VideoKey) {
+            this._fetchGetThumbinfo(payload);
             this._state = State.Loading;
             return true;
         }
 
-        if (data.hasOwnProperty("closed")) {
-            console.warn("Not logged in");
+        if (payload instanceof ErrorInfo) {
+            if (payload.errorCode !== ErrorCode.Unknown) {
+                this._errorInfo = payload;
+            } else {
+                console.warn("Unknown getflv error:", action);
+                // エラーコードは初回の getthumbinfo 時に設定されたもののままにする
+            }
+            this._state = State.Error;
+            return true;
         }
 
-        console.warn("Invalid getflv data:", data, action);
+        console.warn("Invalid getflv data:", action);
         // エラーコードは初回の getthumbinfo 時に設定されたもののままにする
         this._state = State.Error;
-
-        return false;
+        return true;
     }
 }

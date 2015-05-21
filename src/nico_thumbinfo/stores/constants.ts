@@ -8,11 +8,6 @@ export const enum DataSource {
     GetThumbinfo
 }
 
-export const enum FetchTarget {
-    GetThumbinfo,
-    GetFlv
-}
-
 export const enum ThumbType {
     Unknown,
     Video,

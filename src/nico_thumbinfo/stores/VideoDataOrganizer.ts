@@ -4,7 +4,6 @@
 import {DataSource} from "./constants";
 import VideoKey from "./VideoKey";
 import VideoData from "./VideoData";
-import RawVideoData from "./RawVideoData";
 import GetThumbinfoFetcher from "./GetThumbinfoFetcher";
 
 import NicoThumbinfoAction from "../actions/NicoThumbinfoAction";

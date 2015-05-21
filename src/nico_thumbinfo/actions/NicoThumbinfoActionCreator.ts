@@ -18,7 +18,7 @@ import UrlFetcher, {Request, Response} from "../../util/UrlFetcher";
 
 class CachedUrlFetcher<T> {
     // TODO: Use ES6 Map
-    _cache: {[index: string]: Promise<T>} = Object.create(null);
+    _cache: {[index: string]: Promise<T|ErrorInfo>} = Object.create(null);
     _fetcher: UrlFetcher;
 
     constructor(fetcher: UrlFetcher) {
@@ -26,9 +26,9 @@ class CachedUrlFetcher<T> {
     }
 
     fetch(
-        request: Request, id: string, converter: (resp: Response) => T,
+        request: Request, id: string, converter: (resp: Response) => T|ErrorInfo,
         dropCache: boolean = false
-    ): Promise<T> {
+    ): Promise<T|ErrorInfo> {
         let promise = this._cache[id];
 
         if (promise === undefined || dropCache) {

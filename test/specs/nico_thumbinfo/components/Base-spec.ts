@@ -62,7 +62,6 @@ describe("nico_thumbinfo/components/Base", () => {
 
         let div = document.createElement('div');
         let component = React.render(React.createElement(NicoThumbinfo, props), div);
-        document.body.appendChild(div);
 
         return getUrl("/base/etc/resource/getthumbinfo/sm9")
             .then(input => GetThumbinfoParser.parse(key, input))

@@ -72,7 +72,12 @@ export default class RawVideoData {
         if (this.nicopediaRegistered === undefined) { this.nicopediaRegistered = rawData.nicopediaRegistered; }
 
         this._tags.merge(rawData._tags);
-
-        if (this.uploader === undefined) { this.uploader = rawData.uploader; }
+        if (this.uploader === undefined) {
+            this.uploader = rawData.uploader;
+        } else if (rawData.uploader !== undefined) {
+            this.uploader.merge(rawData.uploader);
+        } else {
+            // Do nothing
+        }
     }
 }

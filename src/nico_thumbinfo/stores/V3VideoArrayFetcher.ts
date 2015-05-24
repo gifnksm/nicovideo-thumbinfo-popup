@@ -7,7 +7,7 @@ import RawVideoData from "../models/RawVideoData";
 
 import NicoThumbinfoActionCreator from "../actions/NicoThumbinfoActionCreator";
 import UrlFetchAction, {Source, SourceType} from "../actions/UrlFetchAction";
-import GetThumbinfoFetchAction from "../actions/GetThumbinfoFetchAction";
+import V3VideoArrayFetchAction from "../actions/V3VideoArrayFetchAction";
 import GetFlvFetchAction from "../actions/GetFlvFetchAction";
 import NicopediaFetchAction, {NicopediaInfo, Type as NicopediaType} from "../actions/NicopediaFetchAction";
 
@@ -17,7 +17,7 @@ export const enum State {
     Initial, Loading, Completed, Error
 }
 
-export default class GetThumbinfoFetcher {
+export default class V3VideoArrayFetcher {
     private _state: State = State.Initial;
     private _errorInfo: ErrorInfo = undefined;
     private _key: VideoKey;
@@ -30,19 +30,15 @@ export default class GetThumbinfoFetcher {
 
     constructor(key: VideoKey) {
         this._key = key;
-        this._source = new Source(SourceType.GetThumbinfo, this._key);
+        this._source = new Source(SourceType.V3VideoArray, this._key);
 
-        this._fetchGetThumbinfo(this._key);
+        this._fetchV3VideoArray(this._key);
         this._state = State.Loading;
     }
 
     handleAction(action: UrlFetchAction): boolean {
-        if (action instanceof GetThumbinfoFetchAction) {
-            return this._handleGetThumbinfoFetchAction(action);
-        }
-
-        if (action instanceof GetFlvFetchAction) {
-            return this._handleGetFlvFetchAction(action);
+        if (action instanceof V3VideoArrayFetchAction) {
+            return this._handleV3VideoArrayFetchAction(action);
         }
 
         if (action instanceof NicopediaFetchAction) {
@@ -53,12 +49,8 @@ export default class GetThumbinfoFetcher {
         return false;
     }
 
-    private _fetchGetThumbinfo(reqKey: VideoKey) {
-        NicoThumbinfoActionCreator.createGetThumbinfoFetchAction(this._source, reqKey);
-    }
-
-    private _fetchGetFlv(reqKey: VideoKey) {
-        NicoThumbinfoActionCreator.createGetFlvFetchAction(this._source, reqKey);
+    private _fetchV3VideoArray(reqKey: VideoKey) {
+        NicoThumbinfoActionCreator.createV3VideoArrayFetchAction(this._source, reqKey);
     }
 
     private _fetchNicopediaVideo() {
@@ -83,7 +75,7 @@ export default class GetThumbinfoFetcher {
         };
     }
 
-    private _handleGetThumbinfoFetchAction(action: GetThumbinfoFetchAction): boolean {
+    private _handleV3VideoArrayFetchAction(action: V3VideoArrayFetchAction): boolean {
         let payload = action.payload;
 
         if (payload instanceof RawVideoData) {
@@ -96,49 +88,12 @@ export default class GetThumbinfoFetcher {
 
         if (payload instanceof ErrorInfo) {
             this._errorInfo = payload;
-
-            if (payload.errorCode === ErrorCode.CommunitySubThread ||
-                payload.errorCode === ErrorCode.Deleted) {
-                // コミュニティ動画の場合、getflv の optional_thread_id により、
-                // 元動画の情報を取得できる可能性がある
-                // 削除済み動画の場合、getflv の deleted/error により、
-                // 詳細な削除理由が取得できる可能性がある
-                this._fetchGetFlv(this._key);
-                this._state = State.Loading;
-            } else {
-                this._state = State.Error;
-            }
+            this._state = State.Error;
 
             return true;
         }
 
         console.warn("Unknown result: ", payload);
-        this._state = State.Error;
-        return true;
-    }
-
-    private _handleGetFlvFetchAction(action: GetFlvFetchAction): boolean {
-        let payload = action.payload;
-
-        if (payload instanceof VideoKey) {
-            this._fetchGetThumbinfo(payload);
-            this._state = State.Loading;
-            return true;
-        }
-
-        if (payload instanceof ErrorInfo) {
-            if (payload.errorCode !== ErrorCode.Unknown) {
-                this._errorInfo = payload;
-            } else {
-                console.warn("Unknown getflv error:", action);
-                // エラーコードは初回の getthumbinfo 時に設定されたもののままにする
-            }
-            this._state = State.Error;
-            return true;
-        }
-
-        console.warn("Invalid getflv data:", action);
-        // エラーコードは初回の getthumbinfo 時に設定されたもののままにする
         this._state = State.Error;
         return true;
     }

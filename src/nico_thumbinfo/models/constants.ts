@@ -14,5 +14,9 @@ export const enum ThumbType {
     MyMemory,
     Community,
     CommunityOnly,
-    Deleted
+    Deleted,
+    DeletedByUploader,
+    DeletedByAdmin,
+    DeletedByContentHolder,
+    DeletedAsPrivate
 }

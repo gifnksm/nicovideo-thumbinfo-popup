@@ -69,6 +69,7 @@ module GetThumbinfoParser {
             return new ErrorInfo(ErrorCode.Invalid, `XML Format Error: There is no "thumb" element.`);
         }
 
+        // TODO: Stop using Array.prototype.slice
         // for (let node of thums[0].childNodes) {
         for (let node of Array.prototype.slice.call(thums[0].childNodes)) {
             if (node.nodeType !== Node.ELEMENT_NODE) {
@@ -99,7 +100,7 @@ module GetThumbinfoParser {
 
             case "title": data.title = text; break;
             case "description":
-                data.description = DescriptionParser.parse(node.childNodes);
+                data.description = DescriptionParser.parse(node.childNodes, true);
                 break;
             case "thumbnail_url": data.thumbnailUrl = text; break;
             case "first_retrieve": data.postedAt = new Date(text); break;
@@ -179,6 +180,7 @@ module GetThumbinfoParser {
                                  `XML Format Error: There is no "error" element.`);
         }
 
+        // TODO: Stop using Array.prototype.slice
         // for (let node of errors[0].childNodes) {
         for (let node of Array.prototype.slice.call(errors[0].childNodes)) {
             if (node.nodeType !== Node.ELEMENT_NODE) {

@@ -3,12 +3,13 @@
 
 import ParseResult from "./ParseResult";
 
-import GetThumbinfoParser from "../../../../../src/nico_thumbinfo/models/parser/GetThumbinfoParser";
+import V3VideoArrayParser from "../../../../../src/nico_thumbinfo/models/parser/V3VideoArrayParser";
 
 import {DataSource} from "../../../../../src/nico_thumbinfo/models/constants";
+import {ThumbType} from "../../../../../src/nico_thumbinfo/models/constants";
+import VideoKey from "../../../../../src/nico_thumbinfo/models/VideoKey";
 import ErrorInfo, {ErrorCode} from "../../../../../src/nico_thumbinfo/models/ErrorInfo";
 import RawVideoData from "../../../../../src/nico_thumbinfo/models/RawVideoData";
-import VideoKey from "../../../../../src/nico_thumbinfo/models/VideoKey";
 
 import * as assert from "power-assert";
 
@@ -33,7 +34,7 @@ function getUrl(url: string): Promise<string> {
 }
 
 function checkError(code: ErrorCode, key: VideoKey, input: string, reg: RegExp|string) {
-    let data = GetThumbinfoParser.parse(key, input);
+    let data = V3VideoArrayParser.parse(key, input);
     if (data instanceof ErrorInfo) {
         assert(data.errorCode === code);
         if (reg instanceof RegExp) {
@@ -47,7 +48,7 @@ function checkError(code: ErrorCode, key: VideoKey, input: string, reg: RegExp|s
     }
 }
 
-describe("nico_thumbinfo/models/parser/GetThumbinfoParser", () => {
+describe("nico_thumbinfo/models/parser/V3VideoArrayParser", () => {
     let key = VideoKey.fromVideoId("sm9");
 
     it("should fails if input is empty", () => {
@@ -60,32 +61,26 @@ describe("nico_thumbinfo/models/parser/GetThumbinfoParser", () => {
     });
 
     it("should return parse result if valid input is given.", () => {
-        return getUrl("/base/etc/resource/getthumbinfo/sm9")
-            .then(input => GetThumbinfoParser.parse(key, input))
-            .then(data => assert.deepEqual(ParseResult["sm9"](DataSource.GetThumbinfo), data));
+        return getUrl("/base/etc/resource/v3videoarray/sm9")
+            .then(input => V3VideoArrayParser.parse(key, input))
+            .then(data => assert.deepEqual(ParseResult["sm9"](DataSource.V3VideoArray), data));
     });
-
-    it("should return error if deleted video is given.", () => {
+    it("should return parse result if deleted video is given.", () => {
         let key = VideoKey.fromVideoId("sm22532786");
-        return getUrl("/base/etc/resource/getthumbinfo/sm22532786")
-            .then(input => {
-                checkError(ErrorCode.Deleted, key, input, "deleted");
-            });
+        return getUrl("/base/etc/resource/v3videoarray/sm22532786")
+            .then(input => V3VideoArrayParser.parse(key, input))
+            .then(data => assert.deepEqual(ParseResult["sm22532786"](DataSource.V3VideoArray), data));
     });
-
-    it("should return error if community only video is given.", () => {
+    it("should return parse result if community only video is given.", () => {
         let key = VideoKey.fromThreadId("1340979099");
-        return getUrl("/base/etc/resource/getthumbinfo/1340979099")
-            .then(input => {
-                checkError(ErrorCode.Community, key, input, "community");
-            });
+        return getUrl("/base/etc/resource/v3videoarray/1340979099")
+            .then(input => V3VideoArrayParser.parse(key, input))
+            .then(data => assert.deepEqual(ParseResult["1340979099"](DataSource.V3VideoArray), data));
     });
-
     it("should return error if outdated video is given.", () => {
-        let key = VideoKey.fromThreadId("so19903664");
-        return getUrl("/base/etc/resource/getthumbinfo/so19903664")
-            .then(input => {
-                checkError(ErrorCode.NotFound, key, input, "not found or invalid");
-            });
+        let key = VideoKey.fromVideoId("so19903664");
+        return getUrl("/base/etc/resource/v3videoarray/so19903664")
+            .then(input => V3VideoArrayParser.parse(key, input))
+            .then(data => assert.deepEqual(ParseResult["so19903664"](DataSource.V3VideoArray), data));
     });
 });

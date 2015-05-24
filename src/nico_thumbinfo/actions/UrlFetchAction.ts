@@ -8,7 +8,7 @@ import VideoKey from "../models/VideoKey";
 import UrlFetcher, {Request} from "../../util/UrlFetcher";
 
 export const enum SourceType {
-    GetThumbinfo
+    GetThumbinfo, V3VideoArray
 }
 
 export class Source {

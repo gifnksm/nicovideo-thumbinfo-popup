@@ -7,11 +7,15 @@ import {DescriptionNode as DNode,
         DescriptionText as DText} from "../DescriptionNode";
 
 module DescriptionParser {
-    export function  parse(input: NodeList): DNode[] {
+    export function  parse(input: NodeList, convertSpaces: boolean): DNode[] {
         let desc = _nodeList2Description(input);
+        desc = _convertTexts(_convertLinks, desc);
+        desc = _convertTexts(_convertBrs, desc);
         desc = _convertAnchors(_convertUrls, desc);
         desc = _convertAnchors(_convertIds, desc);
-        desc = _convertTexts(_convertSpaces, desc);
+        if (convertSpaces) {
+            desc = _convertTexts(_convertSpaces, desc);
+        }
         return desc;
     }
 
@@ -131,9 +135,23 @@ module DescriptionParser {
         export const Id = `(${Prefix.AutoLink})\\d+`;
     }
 
+    const AnchorRegExp = new RegExp("<a href=\"(.*?)\">(.*?)</a>");
+    const BrRegExp = new RegExp("<br */?>");
     const UrlRegExp = new RegExp(RegExpStr.Url);
     const IdRegExp = new RegExp(RegExpStr.Id);
     const SpaceRegExp = new RegExp("(?:\\s|　){3,}");
+
+    function  _convertLinks(input: string): DNode[] {
+        return _regExpConverter(AnchorRegExp, (m) => {
+            return [new DElement("a", {href: RegExp.$1}, [new DText(RegExp.$2)])];
+        }, input);
+    }
+
+    function  _convertBrs(input: string): DNode[] {
+        return _regExpConverter(BrRegExp, (m) => {
+            return [new DElement("br")];
+        }, input);
+    }
 
     function _convertUrls(input: string): DNode[] {
         return _regExpConverter(UrlRegExp, (m) => {

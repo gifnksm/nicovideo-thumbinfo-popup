@@ -4,6 +4,7 @@
 import {Source} from "./UrlFetchAction";
 import GetThumbinfoFetchAction from "./GetThumbinfoFetchAction";
 import GetFlvFetchAction from "./GetFlvFetchAction";
+import V3VideoArrayFetchAction from "./V3VideoArrayFetchAction";
 import NicopediaFetchAction, {NicopediaInfo, Type as NicopediaType} from "./NicopediaFetchAction";
 
 import ErrorInfo, {ErrorCode} from "../models/ErrorInfo";
@@ -11,7 +12,7 @@ import VideoKey from "../models/VideoKey";
 import RawVideoData from "../models/RawVideoData";
 import GetThumbinfoParser from "../models/parser/GetThumbinfoParser";
 import GetFlvParser from "../models/parser/GetFlvParser";
-
+import V3VideoArrayParser from "../models/parser/V3VideoArrayParser";
 
 import AppDispatcher, {AppDispatcherInterface} from "../../dispatcher/AppDispatcher";
 import UrlFetcher, {Request, Response} from "../../util/UrlFetcher";
@@ -49,12 +50,14 @@ class NicoThumbinfoActionCreator {
     private _getThumbinfoFetcher: CachedUrlFetcher<RawVideoData|ErrorInfo>;
     private _getFlvFetcher: CachedUrlFetcher<VideoKey|ErrorInfo>;
     private _nicopediaFetcher: CachedUrlFetcher<NicopediaInfo|ErrorInfo>;
+    private _v3VideoArrayFetcher: CachedUrlFetcher<RawVideoData|ErrorInfo>;
 
     constructor(dispatcher: AppDispatcherInterface, fetcher: UrlFetcher) {
         this._dispatcher = dispatcher;
         this._getThumbinfoFetcher = new CachedUrlFetcher(fetcher);
         this._getFlvFetcher = new CachedUrlFetcher(fetcher);
         this._nicopediaFetcher = new CachedUrlFetcher(fetcher);
+        this._v3VideoArrayFetcher = new CachedUrlFetcher(fetcher);
     }
 
     createGetThumbinfoFetchAction(source: Source, reqKey: VideoKey) {
@@ -110,6 +113,20 @@ class NicoThumbinfoActionCreator {
             this._dispatcher.handleStoreEvent(
                 new NicopediaFetchAction(source, req, payload));
         })
+    }
+
+    createV3VideoArrayFetchAction(source: Source, reqKey: VideoKey) {
+        let url = "http://i.nicovideo.jp/v3/video.array?v=" + reqKey.id;
+        let req = Request.get(url);
+
+        this._v3VideoArrayFetcher.fetch(
+            req,
+            reqKey.valueOf(),
+            resp => this._handleV3VideoArrayResponse(reqKey, resp)
+        ).then(payload => {
+            this._dispatcher.handleStoreEvent(
+                new V3VideoArrayFetchAction(source, req, payload));
+        });
     }
 
     _handleGetThumbinfoResponse(requestKey: VideoKey, response: Response): RawVideoData|ErrorInfo {
@@ -173,6 +190,26 @@ class NicoThumbinfoActionCreator {
         }
 
         return new ErrorInfo(ErrorCode.Unknown);
+    }
+
+    _handleV3VideoArrayResponse(requestKey: VideoKey, response: Response): RawVideoData|ErrorInfo {
+        if (response.status !== 200) {
+            return new ErrorInfo(ErrorCode.HttpStatus, response.statusText);
+        }
+        if (response.responseText === "") {
+            return new ErrorInfo(ErrorCode.ServerMaintenance);
+        }
+
+        let result = V3VideoArrayParser.parse(requestKey, response.responseText);
+        if (result instanceof RawVideoData) {
+            return result;
+        }
+
+        if (result instanceof ErrorInfo) {
+            return result;
+        }
+        console.warn("Unknown result: ", result);
+        return new ErrorInfo(ErrorCode.Invalid, "" + result);
     }
 }
 

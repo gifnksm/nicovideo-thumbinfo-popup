@@ -13,7 +13,7 @@ describe("nico_thumbinfo/models/parser/DescriptionParser", () => {
             new DText("Watch! "),
             new DElement("a", {href: "http://www.nicovideo.jp/watch/sm9"},
                          [new DText("http://www.nicovideo.jp/watch/sm9")]),
-        ], DescriptionParser.parse(node.childNodes));
+        ], DescriptionParser.parse(node.childNodes, true));
     });
 
     it("should convert video IDs into links.", () => {
@@ -24,7 +24,7 @@ describe("nico_thumbinfo/models/parser/DescriptionParser", () => {
             new DElement("a", {href: "http://www.nicovideo.jp/watch/sm9"},
                          [new DText("sm9")]),
             new DText(" asdf")
-        ], DescriptionParser.parse(node.childNodes));
+        ], DescriptionParser.parse(node.childNodes, true));
     });
 
     it("should convert many spaces into break lines.", () => {
@@ -34,7 +34,7 @@ describe("nico_thumbinfo/models/parser/DescriptionParser", () => {
             new DText("hello"),
             new DElement("br"),
             new DText("world")
-        ], DescriptionParser.parse(node.childNodes));
+        ], DescriptionParser.parse(node.childNodes, true));
     });
 
     it("should not convert IDs in anchors.", () => {
@@ -46,6 +46,6 @@ describe("nico_thumbinfo/models/parser/DescriptionParser", () => {
         assert.deepEqual([
             new DText("asdf"),
             new DElement("a", {}, [new DText("sm9")]),
-        ], DescriptionParser.parse(node.childNodes));
+        ], DescriptionParser.parse(node.childNodes, true));
     });
 });

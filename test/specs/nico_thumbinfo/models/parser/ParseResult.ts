@@ -17,7 +17,7 @@ function tag(name: string, isCategory?: boolean, isLocked?: boolean): TagData {
     return tag;
 }
 
-const ParseResult: {[index: string]: (source: DataSource) => RawVideoData} = {
+const ParseResult: {[index: string]: (source: DataSource, key?: VideoKey) => RawVideoData} = {
     "sm9": (source: DataSource) => {
         let data: RawVideoData;
         let locked = source === DataSource.GetThumbinfo ? true : undefined;
@@ -188,6 +188,197 @@ const ParseResult: {[index: string]: (source: DataSource) => RawVideoData} = {
         data.tags.push(tag("丸投げは基本", false));
         data.uploader = new Channel();
         data.uploader.id = "2526034";
+        return data;
+    },
+    "sm1": (source: DataSource) => {
+        let data = RawVideoData.createV3VideoArray(VideoKey.fromVideoId("sm1"));
+        data.thumbType = ThumbType.DeletedAsPrivate;
+        data.videoId = "sm1";
+        data.title = undefined;
+        data.description = [
+            new DElement("br"),
+            new DElement("br"),
+            new DElement("span", {style: "background:#FFCCCC; color:#FF0000;"}, [
+                new DElement("span", {id: "deleted_message_default"}, [
+                    new DText("この動画は削除されました。")
+                ]),
+                new DElement("span", {id: "deleted_message_ext",
+                                      value: "This video has been deleted" })
+            ])
+        ];
+        data.postedAt = new Date("2007-04-16T02:59:43+09:00");
+        data.lengthInSeconds = 0;
+        data.viewCounter = 2956;
+        data.commentCounter = 2308;
+        data.mylistCounter = 4098;
+        data.lastResBody = undefined;
+        data.tags.push(tag("sm1", false));
+        data.tags.push(tag("次：sm2", false));
+        data.tags.push(tag("201304290248", false));
+
+        data.uploader = new User();
+        data.uploader.id = "6";
+        return data;
+    },
+    "sm24": (source: DataSource) => {
+        let data = RawVideoData.createV3VideoArray(VideoKey.fromVideoId("sm24"));
+        data.thumbType = ThumbType.DeletedByContentHolder;
+        data.videoId = "sm24";
+        data.title = "おかもんたの朝メチャ！　";
+        data.description = [
+            new DText("ガツンてやってやりゃいいんだよガツンとさ！"),
+            new DElement("br"),
+            new DElement("br"),
+            new DElement("span", {style: "background:#FFCCCC; color:#FF0000;"}, [
+                new DElement("span", {id: "deleted_message_default"}, [
+                    new DText("この動画は株式会社フジテレビジョンの権利を侵害していたため、または申し立てがあったため削除されました。")
+                ]),
+                new DElement("span", {id: "deleted_message_ext",
+                                      value: "This video has been deleted due to Fuji Television Network, Inc. 's rights infringement or notice of motion." })
+            ])
+        ];
+        data.postedAt = new Date("2007-03-06T04:35:11+09:00");
+        data.thumbnailUrl = "http://tn-skr1.smilevideo.jp/smile?i=24";
+        data.lengthInSeconds = 85;
+        data.viewCounter = 75170;
+        data.commentCounter = 1695;
+        data.mylistCounter = 74;
+        data.lastResBody = undefined;
+        data.tags.push(tag("おかもんた", false));
+        data.tags.push(tag("朝メチャ！", false));
+        data.tags.push(tag("朝ズバッ！のパロ", false));
+        data.tags.push(tag("ゆゆ式", false));
+        data.tags.push(tag("ご注文はうさぎですか?", false));
+        data.tags.push(tag("涼宮ハルヒの憂鬱", false));
+        data.tags.push(tag("ストライクウィッチーズ", false));
+        data.tags.push(tag("けいおん！", false));
+        data.tags.push(tag("ひだまりスケッチ", false));
+        data.tags.push(tag("魔法少女まどか☆マギカ", false));
+
+        data.uploader = new User();
+        data.uploader.id = "13987";
+        return data;
+    },
+    "1182590816": (source: DataSource, key: VideoKey = VideoKey.fromThreadId("1182590816")) => {
+        let data = RawVideoData.createV3VideoArray(key);
+        data.thumbType = ThumbType.Video;
+        data.videoId = "sm500873";
+        data.title = "組曲『ニコニコ動画』 ";
+        data.description = [
+            new DElement("font", {size: "+2"}, [
+                new DText("700万再生、ありがとうございました。"),
+                new DElement("br"),
+                new DText("記念動画公開中です ⇒ ("),
+                new DElement("a", {href: "http://www.nicovideo.jp/watch/sm14242201"}, [
+                    new DText("sm14242201")
+                ]),
+                new DText(")"),
+                new DElement("br")
+            ]),
+            new DElement("br"),
+            new DText("ニコニコ動画(β・γ)で人気のあった曲などを繋いでひとつの曲にしてみました(2度目)。全33曲。"),
+            new DElement("br"),
+            new DElement("font", {size: "-2"}, [
+                new DText("※多くの方を誤解させてしまっているようですが(申し訳ないです)、厳密には「組曲」ではなく「メドレー」です。"),
+                new DElement("br"),
+                new DText("「組曲という名前のメドレー」だと思ってください。")
+            ]),
+            new DElement("br"),
+            new DElement("br"),
+            new DElement("a", {href: "http://www.nicovideo.jp/mylist/1535765"}, [
+                new DText("mylist/1535765")
+            ]),
+            new DElement("br"),
+            new DElement("a", {href: "http://www.nicovideo.jp/user/145217"}, [
+                new DText("user/145217")
+            ])
+        ];
+        data.postedAt = new Date("2007-06-23T18:27:06+09:00");
+        data.thumbnailUrl = "http://tn-skr2.smilevideo.jp/smile?i=500873";
+        data.lengthInSeconds = 648;
+        data.viewCounter = 8747261;
+        data.commentCounter = 4406924;
+        data.mylistCounter = 139935;
+        data.lastResBody = undefined;
+        data.tags.push(tag("音楽", true));
+        data.tags.push(tag("アレンジ", false));
+        data.tags.push(tag("組曲『ニコニコ動画』", false));
+        data.tags.push(tag("空気の読めるWMP", false));
+        data.tags.push(tag("ニコニコオールスター", false));
+        data.tags.push(tag("しも", false));
+        data.tags.push(tag("ニコニコメドレー殿堂入り", false));
+        data.tags.push(tag("ニコニコメドレーシリーズ", false));
+        data.tags.push(tag("RC時代の豪傑", false));
+        data.tags.push(tag("職人の遊び場", false));
+
+        data.uploader = new User();
+        data.uploader.id = "145217";
+        return data;
+    },
+    "1199124049": (source: DataSource) => {
+        let data = ParseResult["1182590816"](source, VideoKey.fromThreadId("1199124049"));
+        data.thumbType = ThumbType.MyMemory;
+        data.viewCounter = 8747273;
+        data.mylistCounter = 139935;
+        data.commentCounter = 1100;
+        return data;
+    },
+    "1406548974": (source: DataSource) => {
+        let data = RawVideoData.createV3VideoArray(VideoKey.fromThreadId("1406548974"));
+        data.thumbType = ThumbType.Community;
+        data.videoId = "sm24109050";
+        data.title = "【実況】純情無垢な僕がドリームクラブGogo.　その27(最終回)";
+        data.description = [
+            new DText("ゲームは終わっても僕らのドリクラは終わらない！"),
+            new DElement("br"),
+            new DText("なんだかんだで美月ちゃん可愛かったので良し。"),
+            new DElement("br"),
+            new DText("またいつかね！"),
+            new DElement("br"),
+            new DElement("br"),
+            new DText("最初 【"),
+            new DElement("a", {href: "http://www.nicovideo.jp/watch/sm23421770"}, [
+                new DText("sm23421770")
+            ]),
+            new DText("】　 ←　その26 【"),
+            new DElement("a", {href: "http://www.nicovideo.jp/watch/sm24085907"}, [
+                new DText("sm24085907")
+            ]),
+            new DText("】　次の実況 【まだ】→"),
+            new DElement("br"),
+            new DText("動画にコメント打てない人用 【"),
+            new DElement("a", {href: "http://www.nicovideo.jp/watch/sm24109050"}, [
+                new DText("sm24109050")
+            ]),
+            new DText("】"),
+            new DElement("br"),
+            new DText("この実況のマイリスト 【"),
+            new DElement("a", {href: "http://www.nicovideo.jp/mylist/43820926"}, [
+                new DText("mylist/43820926")
+            ]),
+            new DText("】　その他の実況とか 【"),
+            new DElement("a", {href: "http://www.nicovideo.jp/mylist/14920168"}, [
+                new DText("mylist/14920168")
+            ]),
+            new DText("】"),
+            new DElement("br")
+        ];
+        data.postedAt = new Date("2014-07-28T20:52:48+09:00");
+        data.thumbnailUrl = "http://tn-skr3.smilevideo.jp/smile?i=24109050";
+        data.lengthInSeconds = 1357;
+        data.viewCounter = 3848;
+        data.commentCounter = 0;
+        data.mylistCounter = 28;
+        data.lastResBody = undefined;
+        data.tags.push(tag("ゲーム", true));
+        data.tags.push(tag("実況プレイ動画", false));
+        data.tags.push(tag("ドリームクラブGogo.", false));
+        data.tags.push(tag("オンナスキーP", false));
+        data.tags.push(tag("美月", false));
+        data.tags.push(tag("続いていくだ", false));
+
+        data.uploader = new User();
+        data.uploader.id = "14906592";
         return data;
     }
 };

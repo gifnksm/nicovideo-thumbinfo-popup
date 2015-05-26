@@ -7,10 +7,27 @@ import {DescriptionNode as DNode,
         DescriptionText as DText} from "../DescriptionNode";
 
 module DescriptionParser {
-    export function  parse(input: NodeList, convertSpaces: boolean): DNode[] {
-        let desc = _nodeList2Description(input);
-        desc = _convertTexts(_convertLinks, desc);
-        desc = _convertTexts(_convertBrs, desc);
+    const Parser = new DOMParser();
+
+    /**
+     * 説明文中で利用可能なHTMLタグにマッチする正規表現
+     *
+     * 利用可能なタグについては下記URLを参照。
+     * a, span については、一般会員は利用不可能だが、
+     * 公式動画で利用される場合があるため許容している。
+     *
+     * 参考: http://blog.nicovideo.jp/niconews/ni033472.html
+     */
+    const SafeHtmlElementRegExp = /^(?:font|b|i|s|u|br|a|span)$/;
+
+    export function parse(input: string, convertSpaces: boolean): DNode[] {
+        // DOMParser で HTML 文書の一部分をパースすると html/head/body 要素などが追加される。
+        // この挙動はブラウザ毎に動作が違うかもしれないので、
+        // あらかじめめ追加しておくことで予想外の結果となることを防ぐ。
+        let html = "<html><head></head><body>" + input + "</body></html>";
+        let doc = Parser.parseFromString(html, "text/html");
+
+        let desc = _nodeList2Description(doc.body.childNodes);
         desc = _convertAnchors(_convertUrls, desc);
         desc = _convertAnchors(_convertIds, desc);
         if (convertSpaces) {
@@ -19,20 +36,59 @@ module DescriptionParser {
         return desc;
     }
 
+    function _escapeHtml(input: string): string {
+        return input.replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+
     function _nodeList2Description(input: NodeList): DNode[] {
-        return Array.prototype.slice.call(input).map((node: Node): DNode => {
+        let results: DNode[] = [];
+
+        // TODO: Use ES6 for-of
+        // for (let node of input) {
+        for (let node of Array.prototype.slice.call(input)) {
             switch (node.nodeType) {
             case Node.ELEMENT_NODE:
+                let name = node.nodeName.toLowerCase();
+
+                // 未知のHTMLをそのまま文章中に追加するのは危険なので、
+                // ホワイトリスト方式で安全なもののみ追加する。
+                if (!SafeHtmlElementRegExp.test(name)) {
+                    let attrs = Array.prototype.map.call(node.attributes, (attr: Attr) => {
+                        return `${_escapeHtml(attr.name)}="${_escapeHtml(attr.value)}"`;
+                    });
+                    attrs.unshift(name);
+
+                    if (node.childNodes === null) {
+                        results.push(new DText(`<${attrs.join(" ")}/>`));
+                    } else {
+                        results.push(new DText(`<${attrs.join(" ")}>`),
+                                     ..._nodeList2Description(node.childNodes),
+                                     new DText(`</${name}>`));
+                    }
+                    break;
+                }
+
                 let attrs: any = {};
+                // TODO: Use ES6 for-of
+                // for (let attr of node.attributes) {
                 for (let attr of Array.prototype.slice.call(node.attributes)) {
                     attrs[attr.name] = attr.value;
                 }
-                return new DElement(node.nodeName.toLowerCase(), attrs, _nodeList2Description(node.childNodes));
+                let children = _nodeList2Description(node.childNodes);
+
+                results.push(new DElement(name, attrs, children));
+                break;
 
             default:
-                return new DText(node.textContent);
+                results.push(new DText(node.textContent));
+                break;
             }
-        });
+        }
+        return results;
     }
 
     function _convertTexts(conv: (input: string) => DNode[], input: DNode[]): DNode[] {
@@ -135,23 +191,9 @@ module DescriptionParser {
         export const Id = `(${Prefix.AutoLink})\\d+`;
     }
 
-    const AnchorRegExp = new RegExp("<a href=\"(.*?)\">(.*?)</a>");
-    const BrRegExp = new RegExp("<br */?>");
     const UrlRegExp = new RegExp(RegExpStr.Url);
     const IdRegExp = new RegExp(RegExpStr.Id);
     const SpaceRegExp = new RegExp("(?:\\s|　){3,}");
-
-    function  _convertLinks(input: string): DNode[] {
-        return _regExpConverter(AnchorRegExp, (m) => {
-            return [new DElement("a", {href: RegExp.$1}, [new DText(RegExp.$2)])];
-        }, input);
-    }
-
-    function  _convertBrs(input: string): DNode[] {
-        return _regExpConverter(BrRegExp, (m) => {
-            return [new DElement("br")];
-        }, input);
-    }
 
     function _convertUrls(input: string): DNode[] {
         return _regExpConverter(UrlRegExp, (m) => {

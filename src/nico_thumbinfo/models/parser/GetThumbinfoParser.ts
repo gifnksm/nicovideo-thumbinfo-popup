@@ -100,7 +100,7 @@ module GetThumbinfoParser {
 
             case "title": data.title = text; break;
             case "description":
-                data.description = DescriptionParser.parse(node.childNodes, true);
+                data.description = DescriptionParser.parse(text, true);
                 break;
             case "thumbnail_url": data.thumbnailUrl = text; break;
             case "first_retrieve": data.postedAt = new Date(text); break;

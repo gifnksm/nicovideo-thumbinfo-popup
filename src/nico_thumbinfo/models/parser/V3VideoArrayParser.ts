@@ -154,7 +154,7 @@ module V3VideoArrayParser {
                 data.title = text;
                 break;
             case "description":
-                data.description = DescriptionParser.parse(node.childNodes, false);
+                data.description = DescriptionParser.parse(text, false);
                 break;
             case "length_in_seconds":
                 data.lengthInSeconds = parseInt(text, 10);
@@ -229,10 +229,14 @@ module V3VideoArrayParser {
             case "num_res":
                 data.commentCounter = parseInt(text, 10);
                 break;
+            case "community_id":
+                if (data.thumbType === ThumbType.MyMemory) {
+                    data.thumbType = ThumbType.Community;
+                }
+                break;
 
             case "id":
             case "public":
-            case "community_id":
                 break;
             default:
                 console.warn("Unknown element:", node);

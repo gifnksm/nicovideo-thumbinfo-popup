@@ -1,9 +1,11 @@
 /// <reference path="../../../typings/common.d.ts" />
 "use strict";
 
-import * as React from "react";
 import TagData from "../models/TagData";
 import NicopediaIcon, {Type as NicopediaIconType} from "./NicopediaIcon";
+
+import * as React from "react";
+import {Option, Some, None} from "option-t";
 
 module Tag {
     export interface Props {
@@ -32,14 +34,14 @@ class Tag extends React.Component<Tag.Props, Tag.State> {
         let tag = this.props.tag;
 
         let marker: React.ReactNode = null;
-        if (tag.isCategory) {
-            if (tag.isLocked) {
+        if (tag.isCategory.unwrapOr(false)) {
+            if (tag.isLocked.unwrapOr(false)) {
                 marker = this.renderBracket(this.renderStar());
             } else {
                 marker = this.renderBracket("C");
             }
         } else {
-            if (tag.isLocked) {
+            if (tag.isLocked.unwrapOr(false)) {
                 marker = this.renderStar();
             } else {
                 marker = null;

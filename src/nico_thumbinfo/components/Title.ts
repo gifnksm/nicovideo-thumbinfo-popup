@@ -4,13 +4,14 @@
 import NicopediaIcon, {Type as NicopediaIconType} from "./NicopediaIcon";
 
 import * as React from "react";
+import {Option, Some, None} from "option-t";
 
 module Title {
     export interface Props {
-        title: string;
+        title: Option<string>;
         watchUrl: string;
-        videoId: string;
-        nicopediaRegistered: boolean;
+        id: string;
+        nicopediaRegistered: Option<boolean>;
     }
     export interface State {}
 }
@@ -19,36 +20,26 @@ class Title extends React.Component<Title.Props, Title.State> {
     static defaultProps = <Title.Props> {
         title: undefined,
         watchUrl: undefined,
-        videoId: undefined,
+        id: undefined,
         nicopediaRegistered: undefined
     };
     static propsTypes = <React.ValidationMap<Title.Props>> {
         title: React.PropTypes.string.isRequired,
         watchUrl: React.PropTypes.string.isRequired,
-        videoId: React.PropTypes.string.isRequired,
+        id: React.PropTypes.string.isRequired,
         nicopediaRegistered: React.PropTypes.bool.isRequired
     };
 
     render() {
         const RD = React.DOM;
 
-        let {title, watchUrl, videoId, nicopediaRegistered} = this.props;
-        if (title === undefined) {
-            title = `(タイトル不明: ${this.props.videoId})`;
-        }
-
-        let anchor: React.ReactNode;
-        if (watchUrl === undefined) {
-            anchor = title;
-        } else {
-            anchor = RD.a({href: watchUrl}, title);
-        }
-
+        let title = this.props.title.unwrapOr(`(タイトル不明: ${this.props.id})`);
+        let anchor = RD.a({href: this.props.watchUrl}, title);
         let pedia = React.createElement(NicopediaIcon, {
             type: NicopediaIconType.Video,
             name: title,
-            id: videoId,
-            registered: nicopediaRegistered
+            id: this.props.id,
+            registered: this.props.nicopediaRegistered
         });
 
         return RD.h1({className: "title"}, anchor, pedia);

@@ -4,10 +4,11 @@
 import NicopediaIcon, {Type as NicopediaIconType} from "./NicopediaIcon";
 
 import * as React from "react";
+import {Option, Some, None} from "option-t";
 
 module LastResBody {
     export interface Props {
-        value: string;
+        value: Option<string>;
     }
     export interface State {}
 }
@@ -17,18 +18,15 @@ class LastResBody extends React.Component<LastResBody.Props, LastResBody.State> 
         value: undefined
     };
     static propsTypes = <React.ValidationMap<LastResBody.Props>> {
-        value: React.PropTypes.string.isRequired
+        value: React.PropTypes.object.isRequired
     };
 
     render() {
         const RD = React.DOM;
 
-        let value = this.props.value;
-        if (value === undefined) {
-            return null;
-        }
-
-        return RD.div({className: "last-res-body"}, value);
+        return this.props.value.map(value => {
+            return RD.div({className: "last-res-body"}, value);
+        }).unwrapOr(null);
     }
 }
 

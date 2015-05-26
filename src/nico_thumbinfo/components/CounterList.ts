@@ -1,8 +1,10 @@
 /// <reference path="../../../typings/common.d.ts" />
 "use strict";
 
-import * as React from "react";
 import VideoData from "../stores/VideoData";
+
+import * as React from "react";
+import {Option, Some, None} from "option-t";
 
 module CounterList {
     export interface Props {
@@ -19,18 +21,12 @@ class CounterList extends React.Component<CounterList.Props, CounterList.State> 
         videoData: React.PropTypes.instanceOf(VideoData).isRequired
     };
 
-    private _renderLength(length: number): string {
-        if (length === undefined) {
-            return "???";
-        }
-        return length2str(length);
+    private _renderLength(length: Option<number>): string {
+        return length.map(length2str).unwrapOr("???");
     }
 
-    private _renderCounter(viewCounter: number): string {
-        if (length === undefined) {
-            return "???";
-        }
-        return viewCounter.toLocaleString();
+    private _renderCounter(viewCounter: Option<number>): string {
+        return viewCounter.map(counter => counter.toLocaleString()).unwrapOr("???");
     }
 
     render() {

@@ -2,10 +2,11 @@
 "use strict";
 
 import * as React from "react";
+import {Option, Some, None} from "option-t";
 
 module Thumbnail {
     export interface Props {
-        url: string;
+        url: Option<string>;
         deleted: boolean;
     }
     export interface State {
@@ -19,7 +20,7 @@ class Thumbnail extends React.Component<Thumbnail.Props, Thumbnail.State> {
         deleted: undefined
     };
     static propsTypes = <React.ValidationMap<Thumbnail.Props>> {
-        url: React.PropTypes.string.isRequired,
+        url: React.PropTypes.object.isRequired,
         deleted: React.PropTypes.bool.isRequired
     };
 
@@ -44,11 +45,7 @@ class Thumbnail extends React.Component<Thumbnail.Props, Thumbnail.State> {
                 attr.style = {width: 0, height: 0};
             }
         } else {
-            if (this.props.url === undefined) {
-                attr.src = "";
-            } else {
-                attr.src = this.props.url;
-            }
+            attr.src = this.props.url.unwrapOr("");
         }
 
         return RD.img(attr);

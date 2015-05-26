@@ -8,29 +8,31 @@ import TagListData from "./TagListData";
 import Uploader from "./Uploader";
 import {DescriptionNode} from "./DescriptionNode";
 
+import {Option, Some, None} from "option-t";
+
 export default class RawVideoData {
     _key: VideoKey;
     _dataSource: DataSource;
 
-    thumbType: ThumbType = undefined;
-    videoId: string = undefined;
+    thumbType: Option<ThumbType> = new None<ThumbType>();
+    videoId: Option<string> = new None<string>();
 
-    title: string = undefined;
-    description: DescriptionNode[] = undefined;
-    thumbnailUrl: string = undefined;
-    postedAt: Date = undefined;
-    lengthInSeconds: number = undefined;
+    title: Option<string> = new None<string>();
+    description: Option<DescriptionNode[]> = new None<DescriptionNode[]>();
+    thumbnailUrl: Option<string> = new None<string>();
+    postedAt: Option<Date> = new None<Date>();
+    lengthInSeconds: Option<number> = new None<number>();
 
-    viewCounter: number = undefined;
-    commentCounter: number = undefined;
-    mylistCounter: number = undefined;
-    lastResBody: string = undefined;
+    viewCounter: Option<number> = new None<number>();
+    commentCounter: Option<number> = new None<number>();
+    mylistCounter: Option<number> = new None<number>();
+    lastResBody: Option<string> = new None<string>();
 
-    nicopediaRegistered: boolean = undefined;
+    nicopediaRegistered: Option<boolean> = new None<boolean>();
 
     private _tags: TagListData = new TagListData();
 
-    uploader: Uploader = undefined;
+    uploader: Option<Uploader> = new None<Uploader>();
 
     constructor(key: VideoKey, source: DataSource) {
         this._key = key;
@@ -53,31 +55,31 @@ export default class RawVideoData {
     get dataSource() { return this._dataSource; }
     get tags() { return this._tags.tags; }
 
-    merge(rawData: RawVideoData) {
+    merge(other: RawVideoData) {
         // key と source はマージしない
-        if (this.thumbType === undefined) { this.thumbType = rawData.thumbType; }
-        if (this.videoId === undefined) { this.videoId = rawData.videoId; }
+        this.thumbType = this.thumbType.or(other.thumbType);
+        this.videoId = this.videoId.or(other.videoId);
 
-        if (this.title === undefined) { this.title = rawData.title; }
-        if (this.description === undefined) { this.description = rawData.description; }
-        if (this.thumbnailUrl === undefined) { this.thumbnailUrl = rawData.thumbnailUrl; }
-        if (this.postedAt === undefined) { this.postedAt = rawData.postedAt; }
-        if (this.lengthInSeconds === undefined) { this.lengthInSeconds = rawData.lengthInSeconds; }
+        this.title = this.title.or(other.title);
+        this.description = this.description.or(other.description);
+        this.thumbnailUrl = this.thumbnailUrl.or(other.thumbnailUrl);
+        this.postedAt = this.postedAt.or(other.postedAt);
+        this.lengthInSeconds = this.lengthInSeconds.or(other.lengthInSeconds);
 
-        if (this.viewCounter === undefined) { this.viewCounter = rawData.viewCounter; }
-        if (this.commentCounter === undefined) { this.commentCounter = rawData.commentCounter; }
-        if (this.mylistCounter === undefined) { this.mylistCounter = rawData.mylistCounter; }
-        if (this.lastResBody === undefined) { this.lastResBody = rawData.lastResBody; }
+        this.viewCounter = this.viewCounter.or(other.viewCounter);
+        this.commentCounter = this.commentCounter.or(other.commentCounter);
+        this.mylistCounter = this.mylistCounter.or(other.mylistCounter);
+        this.lastResBody = this.lastResBody.or(other.lastResBody);
 
-        if (this.nicopediaRegistered === undefined) { this.nicopediaRegistered = rawData.nicopediaRegistered; }
+        this.nicopediaRegistered = this.nicopediaRegistered.or(other.nicopediaRegistered);
 
-        this._tags.merge(rawData._tags);
-        if (this.uploader === undefined) {
-            this.uploader = rawData.uploader;
-        } else if (rawData.uploader !== undefined) {
-            this.uploader.merge(rawData.uploader);
-        } else {
-            // Do nothing
-        }
+        this._tags.merge(other._tags);
+
+        this.uploader = this.uploader.map(self => {
+            return other.uploader.mapOr(self, other => {
+                self.merge(other);
+                return self;
+            });
+        }).or(other.uploader);
     }
 }

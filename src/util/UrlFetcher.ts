@@ -1,6 +1,8 @@
 /// <reference path="../../typings/common.d.ts" />
 "use strict";
 
+import {Option, Some, None} from "option-t";
+
 const UAHeader = "User-Agent";
 
 const enum Method {
@@ -71,18 +73,20 @@ interface UrlFetcher {
 }
 
 module UrlFetcher {
-    var instance: UrlFetcher = null;
+    var instance: Option<UrlFetcher> = new None<UrlFetcher>();
 
     export function getInstance(): UrlFetcher {
-        if (instance !== null) {
-            return instance;
+        if (instance.isSome) {
+            return instance.unwrap();
         }
 
         if (GmUrlFetcher.isAvailable) {
-            return instance = new GmUrlFetcher();
+            instance = new Some(new GmUrlFetcher());
+            return instance.unwrap();
         }
         if (XhrUrlFetcher.isAvailable) {
-            return instance = new XhrUrlFetcher();
+            instance = new Some(new XhrUrlFetcher());
+            return instance.unwrap();
         }
 
         throw new Error("No UrlFetcher available.");

@@ -1,9 +1,10 @@
 /// <reference path="../../../typings/common.d.ts" />
 "use strict";
 
-import * as React from "react";
 import TagData from "../models/TagData";
 import Tag from "./Tag"
+
+import * as React from "react";
 
 module TagList {
     export interface Props {

@@ -9,15 +9,15 @@ import {Option, Some, None} from "option-t";
 describe("nico_thumbinfo/models/TagListData", () => {
     function checkTag(tag: TagData, name: string, isLocked: boolean, isCategory: boolean, nicopediaRegistered: boolean) {
         assert(tag.name === name);
-        assert(tag.isLocked === isLocked);
-        assert(tag.isCategory === isCategory);
-        assert(tag.nicopediaRegistered === nicopediaRegistered);
+        assert(tag.isLocked.unwrapOr(undefined) === isLocked);
+        assert(tag.isCategory.unwrapOr(undefined) === isCategory);
+        assert(tag.nicopediaRegistered.unwrapOr(undefined) === nicopediaRegistered);
     }
     function genBase(n0 = "a", n1 = "b", n2 = "c") {
         let tags = [new TagData(n0), new TagData(n1), new TagData(n2)];
-        tags[0].isLocked = true;
-        tags[1].isCategory = false;
-        tags[2].nicopediaRegistered = true;
+        tags[0].isLocked = new Some(true);
+        tags[1].isCategory = new Some(false);
+        tags[2].nicopediaRegistered = new Some(true);
 
         let list = new TagListData();
         list.tags.push(...tags);
@@ -25,9 +25,9 @@ describe("nico_thumbinfo/models/TagListData", () => {
     }
     function genExtend(n0 = "a", n1 = "b", n2 = "c") {
         let tags = [new TagData(n0), new TagData(n1), new TagData(n2)];
-        tags[1].isLocked = false;
-        tags[2].isCategory = true;
-        tags[0].nicopediaRegistered = false;
+        tags[1].isLocked = new Some(false);
+        tags[2].isCategory = new Some(true);
+        tags[0].nicopediaRegistered = new Some(false);
 
         let list = new TagListData();
         list.tags.push(...tags);

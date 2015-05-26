@@ -1,12 +1,14 @@
 /// <reference path="../../../typings/common.d.ts" />
 "use strict";
 
-import * as React from "react";
 import {DescriptionNode as DNode} from "../models/DescriptionNode";
+
+import * as React from "react";
+import {Option, Some, None} from "option-t";
 
 module Description {
     export interface Props {
-        description: DNode[];
+        description: Option<DNode[]>;
     }
     export interface State {}
 }
@@ -16,15 +18,17 @@ class Description extends React.Component<Description.Props, Description.State> 
         description: null
     };
     static propTypes = <React.ValidationMap<Description.Props>> {
-        description: React.PropTypes.arrayOf(React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.object])).isRequired
+        description: React.PropTypes.object.isRequired
     };
 
     render() {
         const RD = React.DOM;
-        return RD.div(
-            {className: "description"},
-            ...this.props.description.map((node: DNode) => node.render())
-        );
+        return this.props.description.map(description => {
+            return RD.div(
+                {className: "description"},
+                ...description.map((node: DNode) => node.render())
+            );
+        }).unwrapOr(null);
     }
 }
 

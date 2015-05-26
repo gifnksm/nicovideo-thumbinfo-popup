@@ -10,9 +10,17 @@ import VideoKey from "../VideoKey";
 import RawVideoData from "../RawVideoData";
 import ErrorInfo, {ErrorCode} from "../ErrorInfo";
 
-interface ParserState {
-    key: VideoKey;
-    main_category?: string;
+import {Option, Some, None} from "option-t";
+
+class ParserState {
+    _key: VideoKey;
+    main_category: Option<string> = new None<string>();
+
+    constructor(key: VideoKey) {
+        this._key = key;
+    }
+
+    get key() { return this._key; }
 }
 
 module V3VideoArrayParser {
@@ -70,7 +78,7 @@ module V3VideoArrayParser {
 
     function _parseVideoInfo(key: VideoKey, videoInfo: Element): RawVideoData|ErrorInfo {
         let data = RawVideoData.createV3VideoArray(key);
-        let state = <ParserState>{key: key};
+        let state = new ParserState(key);
 
         // TODO: Stop using Array.prototype.slice
         // for (let node of videoInfo.childNodes) {
@@ -121,11 +129,11 @@ module V3VideoArrayParser {
 
             switch (node.nodeName) {
             case "id":
-                data.videoId = text;
+                data.videoId = new Some(text);
                 break;
             case "user_id":
-                user.id = text;
-                data.uploader = user;
+                user.id = new Some(text);
+                data.uploader = new Some(user);
                 break;
             case "deleted":
                 switch (text) {
@@ -134,16 +142,16 @@ module V3VideoArrayParser {
                     // 後で上書きさせるため、thumbType は設定しない
                     break;
                 case "1":
-                    data.thumbType = ThumbType.DeletedByUploader;
+                    data.thumbType = new Some(ThumbType.DeletedByUploader);
                     break;
                 case "2":
-                    data.thumbType = ThumbType.DeletedByAdmin;
+                    data.thumbType = new Some(ThumbType.DeletedByAdmin);
                     break;
                 case "3":
-                    data.thumbType = ThumbType.DeletedByContentHolder;
+                    data.thumbType = new Some(ThumbType.DeletedByContentHolder);
                     break;
                 case "8":
-                    data.thumbType = ThumbType.DeletedAsPrivate;
+                    data.thumbType = new Some(ThumbType.DeletedAsPrivate);
                     break;
                 default:
                     console.warn("Unknown deleted value:", node);
@@ -151,43 +159,43 @@ module V3VideoArrayParser {
                 }
                 break;
             case "title":
-                data.title = text;
+                data.title = new Some(text);
                 break;
             case "description":
-                data.description = DescriptionParser.parse(text, false);
+                data.description = new Some(DescriptionParser.parse(text, false));
                 break;
             case "length_in_seconds":
-                data.lengthInSeconds = parseInt(text, 10);
+                data.lengthInSeconds = new Some(parseInt(text, 10));
                 break;
             case "thumbnail_url":
-                data.thumbnailUrl = text;
+                data.thumbnailUrl = new Some(text);
                 break;
             case "first_retrieve":
-                data.postedAt = new Date(text);
+                data.postedAt = new Some(new Date(text));
                 break;
             case "default_thread":
-                if (data.thumbType === undefined) {
+                if (data.thumbType.isNone) {
                     if (state.key.type === VideoKey.Type.ThreadId &&
                         text !== state.key.id) {
-                        data.thumbType = ThumbType.MyMemory;
+                        data.thumbType = new Some(ThumbType.MyMemory);
                     } else {
-                        data.thumbType = ThumbType.Video;
+                        data.thumbType = new Some(ThumbType.Video);
                     }
                 }
                 break;
             case "view_counter":
-                data.viewCounter = parseInt(text, 10);
+                data.viewCounter = new Some(parseInt(text, 10));
                 break;
             case "mylist_counter":
-                data.mylistCounter = parseInt(text, 10);
+                data.mylistCounter = new Some(parseInt(text, 10));
                 break;
             case "option_flag_community":
                 if (!!parseInt(text, 10)) {
-                    data.thumbType = ThumbType.CommunityOnly;
+                    data.thumbType = new Some(ThumbType.CommunityOnly);
                 }
                 break;
             case "main_category":
-                state.main_category = text;
+                state.main_category = new Some(text);
                 break;
 
             case "size_low":
@@ -227,11 +235,11 @@ module V3VideoArrayParser {
 
             switch (node.nodeName) {
             case "num_res":
-                data.commentCounter = parseInt(text, 10);
+                data.commentCounter = new Some(parseInt(text, 10));
                 break;
             case "community_id":
-                if (data.thumbType === ThumbType.MyMemory) {
-                    data.thumbType = ThumbType.Community;
+                if (data.thumbType.mapOr(false, type => type === ThumbType.MyMemory)) {
+                    data.thumbType = new Some(ThumbType.Community);
                 }
                 break;
 
@@ -259,7 +267,7 @@ module V3VideoArrayParser {
 
             switch (node.nodeName) {
             case "num_res":
-                data.commentCounter = parseInt(text, 10);
+                data.commentCounter = new Some(parseInt(text, 10));
                 break;
 
             case "id":
@@ -286,8 +294,8 @@ module V3VideoArrayParser {
 
             switch (node.nodeName) {
             case "channel_id":
-                channel.id = text;
-                data.uploader = channel;
+                channel.id = new Some(text);
+                data.uploader = new Some(channel);
                 break;
 
             case "title_url":
@@ -320,13 +328,7 @@ module V3VideoArrayParser {
                 if (tagElem.length === 0) {
                     break;
                 }
-                let name = tagElem[0].textContent;
-                let tag = new TagData(name);
-                tag.isLocked = undefined;
-                tag.isCategory = (state.main_category !== undefined &&
-                                  state.main_category === name);
-                tag.nicopediaRegistered = undefined;
-                data.tags.push(tag);
+                data.tags.push(_parseTagInfo(state, tagElem[0]));
                 break;
 
             default:
@@ -334,6 +336,18 @@ module V3VideoArrayParser {
                 break;
             }
         }
+    }
+
+    function _parseTagInfo(state: ParserState, tagElem: Node) {
+        let name = tagElem.textContent;
+        let tag = new TagData(name);
+        let isCategory = state
+            .main_category
+            .mapOr(false, main_category => main_category === name);
+
+        tag.isCategory = new Some(isCategory);
+
+        return tag;
     }
 }
 

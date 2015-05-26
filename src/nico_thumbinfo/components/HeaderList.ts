@@ -1,12 +1,13 @@
 /// <reference path="../../../typings/common.d.ts" />
 "use strict";
 
-import * as React from "react";
-
 import {ThumbType} from "../models/constants";
 import Uploader from "../models/Uploader";
 import VideoData from "../stores/VideoData";
 import HatebuIcon, {Size as HatebuIconSize} from "../../hatebu_icon/components/HatebuIcon";
+
+import * as React from "react";
+import {Option, Some, None} from "option-t";
 
 module HeaderList {
     export interface Props {
@@ -23,81 +24,73 @@ class HeaderList extends React.Component<HeaderList.Props, HeaderList.State> {
         videoData: React.PropTypes.instanceOf(VideoData).isRequired
     };
 
-    private _renderThumbType(thumbType: ThumbType, videoId: string): React.ReactNode[] {
+    private _renderThumbType(optThumbType: Option<ThumbType>, optVideoId: Option<string>): React.ReactNode[] {
         const RD = React.DOM;
 
-        if (thumbType === undefined) {
-            return [];
-        }
+        return optThumbType.mapOrElse(() => [], thumbType => {
+            switch (thumbType) {
+            case ThumbType.Video:
+                return [];
+            case ThumbType.MyMemory:
+            case ThumbType.Community:
+                let [className, label] = thumbType === ThumbType.MyMemory
+                    ? ["mymemory", "マイメモリー"]
+                    : ["community", "コミュニティー"];
+                let link = optVideoId.mapOr(null, videoId => {
+                    return RD.li(
+                        {className: "original-video"},
+                        RD.a({href: "http://www.nicovideo.jp/watch/" + videoId},
+                             "\u00bb元動画")
+                    );
+                });
 
-        switch (thumbType) {
-        case ThumbType.Video:
-            break;
-        case ThumbType.MyMemory:
-        case ThumbType.Community:
-            let [className, label] = thumbType === ThumbType.MyMemory
-                ? ["mymemory", "マイメモリー"]
-                : ["community", "コミュニティー"];
-
-            return [
-                RD.li({className: "thumb-type " + className}, label),
-                RD.li(
-                    {className: "original-video"},
-                    RD.a({href: "http://www.nicovideo.jp/watch/" + videoId},
-                         "\u00bb元動画")
-                )
-            ];
-        case ThumbType.CommunityOnly:
-            return [RD.li({className: "thumb-type community"}, "コミュニティー限定動画")];
-        case ThumbType.Deleted:
-            return [RD.li({className: "thumb-type deleted"}, "削除済み")];
-        case ThumbType.DeletedByUploader:
-            return [RD.li({className: "thumb-type deleted"}, "投稿者削除")];
-        case ThumbType.DeletedByAdmin:
-            return [RD.li({className: "thumb-type deleted"}, "利用規約違反削除")];
-        case ThumbType.DeletedByContentHolder:
-            return [RD.li({className: "thumb-type deleted"}, "権利者削除")];
-        case ThumbType.DeletedAsPrivate:
-            return [RD.li({className: "thumb-type deleted"}, "非表示")];
-        default:
-            console.warn("Unknown thumbType: ", thumbType);
-            break;
-        }
-
-        return [];
+                return [RD.li({className: "thumb-type " + className}, label), link];
+            case ThumbType.CommunityOnly:
+                return [RD.li({className: "thumb-type community"}, "コミュニティー限定動画")];
+            case ThumbType.Deleted:
+                return [RD.li({className: "thumb-type deleted"}, "削除済み")];
+            case ThumbType.DeletedByUploader:
+                return [RD.li({className: "thumb-type deleted"}, "投稿者削除")];
+            case ThumbType.DeletedByAdmin:
+                return [RD.li({className: "thumb-type deleted"}, "利用規約違反削除")];
+            case ThumbType.DeletedByContentHolder:
+                return [RD.li({className: "thumb-type deleted"}, "権利者削除")];
+            case ThumbType.DeletedAsPrivate:
+                return [RD.li({className: "thumb-type deleted"}, "非表示")];
+            default:
+                console.warn("Unknown thumbType: ", thumbType);
+                break;
+            }
+        });
     }
 
-    private _renderPostedAt(postedAt: Date): React.ReactNode {
+    private _renderPostedAt(optPostedAt: Option<Date>): React.ReactNode {
         const RD = React.DOM;
 
-        if (postedAt === undefined) {
-            return RD.li({className: "posted-at"}, "投稿日不明");
-        }
-        return RD.li({className: "posted-at"}, `${date2str(postedAt)}投稿 `);
+        let text = optPostedAt.mapOr("投稿日不明",
+                                     postedAt => `${date2str(postedAt)}投稿 `);
+        return RD.li({className: "posted-at"}, text);
     }
 
-    private _renderUploaderName(uploader: Uploader): React.ReactNode {
+    private _renderUploaderName(optUploader: Option<Uploader>): React.ReactNode {
         const RD = React.DOM;
 
-        let name = uploader.name;
-        if (name === undefined) {
-            name = "loading...";
-        }
+        let name = optUploader
+            .andThen(uploader => uploader.name)
+            .unwrapOr("投稿者不明");
 
-        return RD.li({className: "uploader-name"},
-                     RD.a({href: uploader.url}, name));
+        let text = optUploader.andThen<React.ReactNode>(uploader => {
+            return uploader.url.map(url => RD.a({href: url}, name));
+        }).unwrapOr(name);
+
+        return RD.li({className: "uploader-name"}, text);
     }
 
     private _renderHatebuIcon(watchUrl: string): React.ReactNode {
         const RD = React.DOM;
-
-        if (watchUrl === undefined) {
-            return null;
-        }
         return RD.li({className: "hatebu-icon"},
                      React.createElement(HatebuIcon, {url: watchUrl}));
     }
-
 
     render() {
         const RD = React.DOM;

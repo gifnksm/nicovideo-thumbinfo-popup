@@ -57,12 +57,11 @@ export default class VideoDataOrganizer {
     private _updateVideoData() {
         this._videoData.clear();
 
-        if (this._getThumbinfoFetcher.videoData !== null) {
-            this._videoData.pushRawVideoData(this._getThumbinfoFetcher.videoData);
-        }
-        if (this._v3VideoArrayFetcher.videoData !== null) {
-            this._videoData.pushRawVideoData(this._v3VideoArrayFetcher.videoData);
-        }
+        this._getThumbinfoFetcher.videoData.map(videoData => {
+            this._videoData.pushRawVideoData(videoData);
+        });
+        this._v3VideoArrayFetcher.videoData.map(videoData => {
+            this._videoData.pushRawVideoData(videoData);
+        });
     }
 }
-

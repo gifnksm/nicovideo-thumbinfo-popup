@@ -11,6 +11,7 @@ import GetThumbinfoFetchAction from "../actions/GetThumbinfoFetchAction";
 import GetFlvFetchAction from "../actions/GetFlvFetchAction";
 import NicopediaFetchAction, {NicopediaInfo, Type as NicopediaType} from "../actions/NicopediaFetchAction";
 
+import {Option, Some, None} from "option-t";
 import * as querystring from "querystring";
 
 export const enum State {
@@ -18,11 +19,12 @@ export const enum State {
 }
 
 export default class GetThumbinfoFetcher {
-    private _state: State = State.Initial;
-    private _errorInfo: ErrorInfo = undefined;
     private _key: VideoKey;
-    private _videoData: RawVideoData = null;
     private _source: Source;
+
+    private _state: State = State.Initial;
+    private _errorInfo: Option<ErrorInfo> = new None<ErrorInfo>();
+    private _videoData: Option<RawVideoData> = new None<RawVideoData>();
 
     get state() { return this._state; }
     get errorInfo() { return this._errorInfo; }
@@ -62,32 +64,39 @@ export default class GetThumbinfoFetcher {
     }
 
     private _fetchNicopediaVideo() {
-        if (this._videoData === null) {
-            console.warn("this._videoData === null", this);
+        if (this._videoData.isNone) {
+            console.warn("this._videoData.isNone", this);
             return;
         }
 
-        NicoThumbinfoActionCreator.createNicopediaFetchAction(
-            this._source, NicopediaType.Video, this._videoData.videoId);
+        this._videoData.map(videoData => {
+            videoData.videoId.map(videoId => {
+                NicoThumbinfoActionCreator.createNicopediaFetchAction(
+                    this._source, NicopediaType.Video, videoId);
+            });
+        });
     }
 
     private _fetchNicopediaTag() {
-        if (this._videoData === null) {
-            console.warn("this._videoData === null", this);
+        if (this._videoData.isNone) {
+            console.warn("this._videoData.isNone", this);
             return;
         }
 
-        for (let tag of this._videoData.tags) {
-            NicoThumbinfoActionCreator.createNicopediaFetchAction(
-                this._source, NicopediaType.Article, tag.name);
-        };
+        this._videoData.map(videoData => {
+            for (let tag of videoData.tags) {
+                NicoThumbinfoActionCreator.createNicopediaFetchAction(
+                    this._source, NicopediaType.Article, tag.name);
+            };
+        });
+
     }
 
     private _handleGetThumbinfoFetchAction(action: GetThumbinfoFetchAction): boolean {
         let payload = action.payload;
 
         if (payload instanceof RawVideoData) {
-            this._videoData = payload;
+            this._videoData = new Some(payload);
             this._state = State.Completed;
             this._fetchNicopediaVideo();
             this._fetchNicopediaTag();
@@ -95,7 +104,7 @@ export default class GetThumbinfoFetcher {
         }
 
         if (payload instanceof ErrorInfo) {
-            this._errorInfo = payload;
+            this._errorInfo = new Some(payload);
 
             if (payload.errorCode === ErrorCode.CommunitySubThread ||
                 payload.errorCode === ErrorCode.Deleted) {
@@ -128,7 +137,7 @@ export default class GetThumbinfoFetcher {
 
         if (payload instanceof ErrorInfo) {
             if (payload.errorCode !== ErrorCode.Unknown) {
-                this._errorInfo = payload;
+                this._errorInfo = new Some(payload);
             } else {
                 console.warn("Unknown getflv error:", action);
                 // エラーコードは初回の getthumbinfo 時に設定されたもののままにする
@@ -147,20 +156,22 @@ export default class GetThumbinfoFetcher {
         let payload = action.payload;
 
         if (payload instanceof NicopediaInfo) {
-            if (this._videoData === null) {
-                console.warn("this._videoData === null.", this);
+            if (this._videoData.isNone) {
+                console.warn("this._videoData.isNone", this);
                 return false;
             }
 
             switch (payload.type) {
             case NicopediaType.Article:
                 let found = false;
-                for (let tag of this._videoData.tags) {
-                    if (tag.name === payload.name) {
-                        tag.nicopediaRegistered = payload.registered;
-                        found = true;
+                this._videoData.map(videoData => {
+                    for (let tag of videoData.tags) {
+                        if (tag.name === payload.name) {
+                            tag.nicopediaRegistered = new Some(payload.registered);
+                            found = true;
+                        }
                     }
-                }
+                });
                 if (!found) {
                     console.warn("Not found tag: ", payload.name, action);
                 }
@@ -168,7 +179,9 @@ export default class GetThumbinfoFetcher {
                 return found;
 
             case NicopediaType.Video:
-                this._videoData.nicopediaRegistered = payload.registered;
+                this._videoData.map(videoData => {
+                    videoData.nicopediaRegistered = new Some(payload.registered);
+                });
                 return false;
 
             default:

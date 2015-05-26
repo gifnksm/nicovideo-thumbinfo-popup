@@ -1,19 +1,21 @@
 /// <reference path="../../../typings/common.d.ts" />
 "use strict";
 
+import {Option, Some, None} from "option-t";
+
 export default class TagData {
-    isCategory: boolean;
-    isLocked: boolean;
-    nicopediaRegistered: boolean;
+    isCategory: Option<boolean> = new None<boolean>();
+    isLocked: Option<boolean> = new None<boolean>();
+    nicopediaRegistered: Option<boolean> = new None<boolean>();
 
     constructor(public name: string) {}
 
-    static merged(base: TagData, extend: TagData): TagData {
-        let tag = new TagData(base.name);
+    static merged(self: TagData, other: TagData): TagData {
+        let tag = new TagData(self.name);
 
-        tag.isCategory = (base.isCategory === undefined) ? extend.isCategory : base.isCategory;
-        tag.isLocked = (base.isLocked === undefined) ? extend.isLocked : base.isLocked;
-        tag.nicopediaRegistered = (base.nicopediaRegistered === undefined) ? extend.nicopediaRegistered : base.nicopediaRegistered;
+        tag.isCategory = self.isCategory.or(other.isCategory);
+        tag.isLocked = self.isLocked.or(other.isLocked);
+        tag.nicopediaRegistered = self.nicopediaRegistered.or(other.nicopediaRegistered);
 
         return tag;
     }

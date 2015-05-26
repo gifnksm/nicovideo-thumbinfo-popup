@@ -1,8 +1,6 @@
 /// <reference path="../../../typings/common.d.ts" />
 "use strict";
 
-import * as React from "react";
-
 import {DataAttributeName} from "../../components/constants";
 
 import VideoKey from "../models/VideoKey";
@@ -18,6 +16,8 @@ import HeaderList from "./HeaderList";
 import TagList from "./TagList";
 import Description from "./Description";
 import LastResBody from "./LastResBody";
+
+import * as React from "react";
 
 module Base {
     export interface Props {
@@ -77,9 +77,9 @@ class Base extends React.Component<Base.Props, Base.State> {
             },
             React.createElement(Thumbnail, {url: data.thumbnailUrl, deleted: false}), // TODO: Set appropriate value to deleted
             React.createElement(HeaderList, {videoData: data}),
-            React.createElement(Title, {title: data.title, 
+            React.createElement(Title, {title: data.title,
                                         watchUrl: data.watchUrl,
-                                        videoId: data.videoId,
+                                        id: data.key.id,
                                         nicopediaRegistered: data.nicopediaRegistered}),
             React.createElement(CounterList, {videoData: data}),
             React.createElement(TagList, {tags: data.tags}),

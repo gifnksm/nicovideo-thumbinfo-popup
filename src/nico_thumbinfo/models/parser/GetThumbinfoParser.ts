@@ -10,6 +10,8 @@ import VideoKey from "../VideoKey";
 import RawVideoData from "../RawVideoData";
 import ErrorInfo, {ErrorCode} from "../ErrorInfo";
 
+import {Option, Some, None} from "option-t";
+
 module GetThumbinfoParser {
     const Parser = new DOMParser();
 
@@ -80,14 +82,14 @@ module GetThumbinfoParser {
             switch (node.nodeName) {
             case "thumb_type":
                 if (key.type === VideoKey.Type.OptionalThreadId) {
-                    data.thumbType = ThumbType.Community;
+                    data.thumbType = new Some(ThumbType.Community);
                 } else {
                     switch (text) {
                     case "video":
-                        data.thumbType = ThumbType.Video;
+                        data.thumbType = new Some(ThumbType.Video);
                         break;
                     case "mymemory":
-                        data.thumbType = ThumbType.MyMemory;
+                        data.thumbType = new Some(ThumbType.MyMemory);
                         break;
                     default:
                         console.warn("Unknown thumb_type: ", text);
@@ -96,62 +98,62 @@ module GetThumbinfoParser {
                 }
                 break;
 
-            case "video_id": data.videoId = text; break;
+            case "video_id": data.videoId = new Some(text); break;
 
-            case "title": data.title = text; break;
+            case "title": data.title = new Some(text); break;
             case "description":
-                data.description = DescriptionParser.parse(text, true);
+                data.description = new Some(DescriptionParser.parse(text, true));
                 break;
-            case "thumbnail_url": data.thumbnailUrl = text; break;
-            case "first_retrieve": data.postedAt = new Date(text); break;
+            case "thumbnail_url": data.thumbnailUrl = new Some(text); break;
+            case "first_retrieve": data.postedAt = new Some(new Date(text)); break;
             case "length":
-                data.lengthInSeconds = text
+                let len = text
                     .split(":")
                     .reduce((i: number, x: string) => i * 60 + parseInt(x, 10), 0);
+                data.lengthInSeconds = new Some(len);
                 break;
 
-            case "view_counter": data.viewCounter = parseInt(text, 10); break;
-            case "comment_num": data.commentCounter = parseInt(text, 10); break;
-            case "mylist_counter": data.mylistCounter = parseInt(text, 10); break;
-            case "last_res_body": data.lastResBody = text; break;
+            case "view_counter": data.viewCounter = new Some(parseInt(text, 10)); break;
+            case "comment_num": data.commentCounter = new Some(parseInt(text, 10)); break;
+            case "mylist_counter": data.mylistCounter = new Some(parseInt(text, 10)); break;
+            case "last_res_body": data.lastResBody = new Some(text); break;
 
             case "tags":
                 Array.prototype.forEach.call(
                     node.getElementsByTagName("tag"),
                     (elem: Element) => {
                         let tag = new TagData(elem.textContent);
-                        tag.isLocked = elem.hasAttribute("lock");
-                        tag.isCategory = elem.hasAttribute("category");
-                        tag.nicopediaRegistered = undefined;
+                        tag.isLocked = new Some(elem.hasAttribute("lock"));
+                        tag.isCategory = new Some(elem.hasAttribute("category"));
                         data.tags.push(tag);
                     }
                 );
                 break;
 
             case "user_id":
-                user.id = text;
-                data.uploader = user;
+                user.id = new Some(text);
+                data.uploader = new Some(user);
                 break;
             case "user_nickname":
-                user.name = text;
-                data.uploader = user;
+                user.name = new Some(text);
+                data.uploader = new Some(user);
                 break;
             case "user_icon_url":
-                user.iconUrl = text;
-                data.uploader = user;
+                user.iconUrl = new Some(text);
+                data.uploader = new Some(user);
                 break;
 
             case "ch_id":
-                channel.id = text;
-                data.uploader = channel;
+                channel.id = new Some(text);
+                data.uploader = new Some(channel);
                 break;
             case "ch_name":
-                channel.name = text;
-                data.uploader = channel;
+                channel.name = new Some(text);
+                data.uploader = new Some(channel);
                 break;
             case "ch_icon_url":
-                channel.iconUrl = text;
-                data.uploader = channel;
+                channel.iconUrl = new Some(text);
+                data.uploader = new Some(channel);
                 break;
 
             case "movie_type":

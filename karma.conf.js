@@ -18,7 +18,10 @@ module.exports = function(config) {
     // list of files / patterns to load in the browser
     files: bowerFiles({includeDev: true}).concat([
       'target/bundle/test/**/*.js',
-      {pattern: 'etc/resource/**/*', watched: true, included: false, served: true}
+      {pattern: 'etc/resource/**/*', watched: true, included: false, served: true},
+      {pattern: 'target/bundle/test/**/*.js.map', watched: false, included: false, served: true},
+      {pattern: 'src/**/*.ts', watched: false, included: false, served: true },
+      {pattern: 'test/**/*.ts', watched: false, included: false, served: true }
     ]),
 
 

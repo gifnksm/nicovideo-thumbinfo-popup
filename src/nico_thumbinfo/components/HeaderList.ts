@@ -61,6 +61,8 @@ class HeaderList extends React.Component<HeaderList.Props, HeaderList.State> {
                 console.warn("Unknown thumbType: ", thumbType);
                 break;
             }
+
+            return [];
         });
     }
 

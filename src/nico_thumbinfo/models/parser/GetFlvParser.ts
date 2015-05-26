@@ -31,13 +31,13 @@ module GetFlvParser {
 
         if (data.hasOwnProperty("deleted")) {
             switch (data.deleted) {
-            case 1:
+            case "1":
                 return new ErrorInfo(ErrorCode.DeletedByUploader);
-            case 2:
+            case "2":
                 return new ErrorInfo(ErrorCode.DeletedByAdmin);
-            case 3:
+            case "3":
                 return new ErrorInfo(ErrorCode.DeletedByContentHolder);
-            case 8:
+            case "8":
                 return new ErrorInfo(ErrorCode.DeletedAsPrivate);
             default:
                 console.warn("Unknown getflv deleted:", data, input);

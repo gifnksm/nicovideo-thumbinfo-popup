@@ -1,6 +1,8 @@
 /// <reference path="../../../typings/common.d.ts" />
 "use strict";
 
+import NicopediaFetcher from "./NicopediaFetcher";
+
 import ErrorInfo, {ErrorCode} from "../models/ErrorInfo";
 import VideoKey from "../models/VideoKey";
 import RawVideoData from "../models/RawVideoData";
@@ -9,7 +11,7 @@ import NicoThumbinfoActionCreator from "../actions/NicoThumbinfoActionCreator";
 import UrlFetchAction, {Source, SourceType} from "../actions/UrlFetchAction";
 import GetThumbinfoFetchAction from "../actions/GetThumbinfoFetchAction";
 import GetFlvFetchAction from "../actions/GetFlvFetchAction";
-import NicopediaFetchAction, {NicopediaInfo, Type as NicopediaType} from "../actions/NicopediaFetchAction";
+import NicopediaFetchAction from "../actions/NicopediaFetchAction";
 
 import {Option, Some, None} from "option-t";
 import * as querystring from "querystring";
@@ -63,33 +65,13 @@ export default class GetThumbinfoFetcher {
         NicoThumbinfoActionCreator.createGetFlvFetchAction(this._source, reqKey);
     }
 
-    private _fetchNicopediaVideo() {
+    private _fetchNicopedia() {
         if (this._videoData.isNone) {
             console.warn("this._videoData.isNone", this);
             return;
         }
 
-        this._videoData.map(videoData => {
-            videoData.videoId.map(videoId => {
-                NicoThumbinfoActionCreator.createNicopediaFetchAction(
-                    this._source, NicopediaType.Video, videoId);
-            });
-        });
-    }
-
-    private _fetchNicopediaTag() {
-        if (this._videoData.isNone) {
-            console.warn("this._videoData.isNone", this);
-            return;
-        }
-
-        this._videoData.map(videoData => {
-            for (let tag of videoData.tags) {
-                NicoThumbinfoActionCreator.createNicopediaFetchAction(
-                    this._source, NicopediaType.Article, tag.name);
-            };
-        });
-
+        NicopediaFetcher.fetch(this._videoData.unwrap(), this._source);
     }
 
     private _handleGetThumbinfoFetchAction(action: GetThumbinfoFetchAction): boolean {
@@ -98,8 +80,7 @@ export default class GetThumbinfoFetcher {
         if (payload instanceof RawVideoData) {
             this._videoData = new Some(payload);
             this._state = State.Completed;
-            this._fetchNicopediaVideo();
-            this._fetchNicopediaTag();
+            this._fetchNicopedia();
             return true;
         }
 
@@ -153,49 +134,10 @@ export default class GetThumbinfoFetcher {
     }
 
     private _handleNicopediaFetchAction(action: NicopediaFetchAction): boolean {
-        let payload = action.payload;
-
-        if (payload instanceof NicopediaInfo) {
-            if (this._videoData.isNone) {
-                console.warn("this._videoData.isNone", this);
-                return false;
-            }
-
-            switch (payload.type) {
-            case NicopediaType.Article:
-                let found = false;
-                this._videoData.map(videoData => {
-                    for (let tag of videoData.tags) {
-                        if (tag.name === payload.name) {
-                            tag.nicopediaRegistered = new Some(payload.registered);
-                            found = true;
-                        }
-                    }
-                });
-                if (!found) {
-                    console.warn("Not found tag: ", payload.name, action);
-                }
-
-                return found;
-
-            case NicopediaType.Video:
-                this._videoData.map(videoData => {
-                    videoData.nicopediaRegistered = new Some(payload.registered);
-                });
-                return false;
-
-            default:
-                console.warn("Invalid nicopedia type:", payload.type, action);
-                return false;
-            }
-        }
-
-        if (payload instanceof ErrorInfo) {
-            // Ignore errors
+        if (this._videoData.isNone) {
+            console.warn("this._videoData.isNone", this);
             return false;
         }
-
-        console.warn("Invalid nicopedia data:", action);
-        return false;
+        return NicopediaFetcher.handleAction(action, this._videoData.unwrap());
     }
 }

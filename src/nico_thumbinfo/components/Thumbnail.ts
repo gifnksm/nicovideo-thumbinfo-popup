@@ -44,8 +44,13 @@ class Thumbnail extends React.Component<Thumbnail.Props, Thumbnail.State> {
                 attr.style = {width: 0, height: 0};
             }
         } else {
-            attr.src = this.props.url;
+            if (this.props.url === undefined) {
+                attr.src = "";
+            } else {
+                attr.src = this.props.url;
+            }
         }
+
         return RD.img(attr);
     }
 }

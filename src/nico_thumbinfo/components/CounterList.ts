@@ -19,6 +19,20 @@ class CounterList extends React.Component<CounterList.Props, CounterList.State> 
         videoData: React.PropTypes.instanceOf(VideoData).isRequired
     };
 
+    private _renderLength(length: number): string {
+        if (length === undefined) {
+            return "???";
+        }
+        return length2str(length);
+    }
+
+    private _renderCounter(viewCounter: number): string {
+        if (length === undefined) {
+            return "???";
+        }
+        return viewCounter.toLocaleString();
+    }
+
     render() {
         const RD = React.DOM;
         let data = this.props.videoData;
@@ -27,14 +41,14 @@ class CounterList extends React.Component<CounterList.Props, CounterList.State> 
         return RD.dl(
             {className: "counter-list"},
             RD.dt(null, "再生時間:"),
-            RD.dd(null, length2str(data.lengthInSeconds)),
+            RD.dd(null, this._renderLength(data.lengthInSeconds)),
             RD.dt(null, "再生:"),
-            RD.dd(null, data.viewCounter.toLocaleString()),
+            RD.dd(null, this._renderCounter(data.viewCounter)),
             RD.dt(null, "コメント:"),
-            RD.dd(null, data.commentCounter.toLocaleString()),
+            RD.dd(null, this._renderCounter(data.commentCounter)),
             RD.dt(null, "マイリスト:"),
             RD.dd(null, RD.a({href: mylistURL},
-                             data.mylistCounter.toLocaleString()))
+                             this._renderCounter(data.viewCounter)))
         );
     }
 }

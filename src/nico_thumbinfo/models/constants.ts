@@ -9,7 +9,6 @@ export const enum DataSource {
 }
 
 export const enum ThumbType {
-    Unknown,
     Video,
     MyMemory,
     Community,

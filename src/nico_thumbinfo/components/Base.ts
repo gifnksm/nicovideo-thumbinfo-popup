@@ -12,11 +12,12 @@ import VideoDataStore, {VideoDataStoreInterface} from "../stores/VideoDataStore"
 
 import {DataAttributeValue} from "./constants";
 import Thumbnail from "./Thumbnail";
+import Title from "./Title";
 import CounterList from "./CounterList";
 import HeaderList from "./HeaderList";
-import NicopediaIcon, {Type as NicopediaIconType} from "./NicopediaIcon";
 import TagList from "./TagList";
 import Description from "./Description";
+import LastResBody from "./LastResBody";
 
 module Base {
     export interface Props {
@@ -76,18 +77,14 @@ class Base extends React.Component<Base.Props, Base.State> {
             },
             React.createElement(Thumbnail, {url: data.thumbnailUrl, deleted: false}), // TODO: Set appropriate value to deleted
             React.createElement(HeaderList, {videoData: data}),
-            RD.h1({className: "title"},
-                  RD.a({href: data.watchUrl}, data.title),
-                  React.createElement(NicopediaIcon, {
-                      type: NicopediaIconType.Video,
-                      name: data.title,
-                      id: data.videoId,
-                      registered: data.nicopediaRegistered
-                  })),
+            React.createElement(Title, {title: data.title, 
+                                        watchUrl: data.watchUrl,
+                                        videoId: data.videoId,
+                                        nicopediaRegistered: data.nicopediaRegistered}),
             React.createElement(CounterList, {videoData: data}),
             React.createElement(TagList, {tags: data.tags}),
             React.createElement(Description, {description: data.description}),
-            RD.div({className: "res"}, data.lastResBody)
+            React.createElement(LastResBody, {value: data.lastResBody})
         );
     }
 }

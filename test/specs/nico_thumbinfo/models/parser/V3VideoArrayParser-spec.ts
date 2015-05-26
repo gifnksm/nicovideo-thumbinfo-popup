@@ -68,32 +68,32 @@ function checkError(code: ErrorCode, key: VideoKey, input: string, reg: RegExp|s
 
 describe("nico_thumbinfo/models/parser/V3VideoArrayParser", () => {
     it("should fails if input is empty", () => {
-        let key = VideoKey.fromVideoId("sm9");
+        let key = VideoKey.fromVideoId("dummy");
         checkError(ErrorCode.Invalid, key, "", /^XML Parse Error: /);
     });
 
     it("should fails if input is odd but valid XML.", () => {
-        let key = VideoKey.fromVideoId("sm9");
+        let key = VideoKey.fromVideoId("dummy");
         checkError(ErrorCode.Invalid, key, "<unknown_element></unknown_element>",
                    `XML Format Error: Root element name is "unknown_element".`);
     });
 
-    it("should return parse result if valid input is given.", () => {
+    it("should return parse result if valid input (sm9) is given.", () => {
         return checkOk(VideoKey.fromVideoId("sm9"));
     });
-    it("should return parse result if deleted video is given.", () => {
+    it("should return parse result if deleted video (sm22532786) is given.", () => {
         return checkOk(VideoKey.fromVideoId("sm22532786"));
     });
-    it("should return parse result if community only video is given.", () => {
+    it("should return parse result if community only video (1340979099) is given.", () => {
         return checkOk(VideoKey.fromThreadId("1340979099"));
     });
-    it("should return parse result if outdated video is given.", () => {
+    it("should return parse result if outdated video (so19903664) is given.", () => {
         return checkOk(VideoKey.fromVideoId("so19903664"));
     });
-    it("should return parse result if deleted-as-private video is given.", () => {
+    it("should return parse result if deleted-as-private video (sm1) is given.", () => {
         return checkOk(VideoKey.fromVideoId("sm1"));
     });
-    it("should fails if not found video is given.", () => {
+    it("should fails if not found video (sm3) is given.", () => {
         let key = VideoKey.fromVideoId("sm3");
         return getUrl("/base/etc/resource/v3videoarray/sm3")
             .then(input => {
@@ -101,16 +101,16 @@ describe("nico_thumbinfo/models/parser/V3VideoArrayParser", () => {
                            `XML Format Error: There is no "video_info" elements.`);
             });
     });
-    it("should return parse result if deleted-by-content-holder video is given.", () => {
+    it("should return parse result if deleted-by-content-holder video (sm24) is given.", () => {
         return checkOk(VideoKey.fromVideoId("sm24"));
     });
-    it("should return parse result info if thread id video is given.", () => {
+    it("should return parse result info if thread id video (1182590816) is given.", () => {
         return checkOk(VideoKey.fromThreadId("1182590816"));
     })
-    it("should return parse result info if mymemory's thread id video is given.", () => {
+    it("should return parse result info if mymemory's thread id video (1199124049) is given.", () => {
         return checkOk(VideoKey.fromThreadId("1199124049"));
     })
-    it("should return parse result info if community thread id video is given.", () => {
+    it("should return parse result info if community thread id video (1406548974) is) is given.", () => {
         return checkOk(VideoKey.fromThreadId("1406548974"));
     })
 });

@@ -48,24 +48,26 @@ function checkError(code: ErrorCode, key: VideoKey, input: string, reg: RegExp|s
 }
 
 describe("nico_thumbinfo/models/parser/GetThumbinfoParser", () => {
-    let key = VideoKey.fromVideoId("sm9");
 
     it("should fails if input is empty", () => {
+        let key = VideoKey.fromVideoId("dummy");
         checkError(ErrorCode.Invalid, key, "", /^XML Parse Error: /);
     });
 
     it("should fails if input is odd but valid XML.", () => {
+        let key = VideoKey.fromVideoId("dummy");
         checkError(ErrorCode.Invalid, key, "<unknown_element></unknown_element>",
                    `XML Format Error: Root element name is "unknown_element".`);
-    });
+    })
 
-    it("should return parse result if valid input is given.", () => {
+    it("should return parse result if valid input (sm9) is given.", () => {
+        let key = VideoKey.fromVideoId("sm9");
         return getUrl("/base/etc/resource/getthumbinfo/sm9")
             .then(input => GetThumbinfoParser.parse(key, input))
             .then(data => assert.deepEqual(ParseResult["sm9"](DataSource.GetThumbinfo), data));
     });
 
-    it("should return error if deleted video is given.", () => {
+    it("should return error if deleted video (sm22532786) is given.", () => {
         let key = VideoKey.fromVideoId("sm22532786");
         return getUrl("/base/etc/resource/getthumbinfo/sm22532786")
             .then(input => {
@@ -73,7 +75,7 @@ describe("nico_thumbinfo/models/parser/GetThumbinfoParser", () => {
             });
     });
 
-    it("should return error if community only video is given.", () => {
+    it("should return error if community only video (1340979099) is given.", () => {
         let key = VideoKey.fromThreadId("1340979099");
         return getUrl("/base/etc/resource/getthumbinfo/1340979099")
             .then(input => {
@@ -81,7 +83,7 @@ describe("nico_thumbinfo/models/parser/GetThumbinfoParser", () => {
             });
     });
 
-    it("should return error if outdated video is given.", () => {
+    it("should return error if outdated video (so19903664) is given.", () => {
         let key = VideoKey.fromThreadId("so19903664");
         return getUrl("/base/etc/resource/getthumbinfo/so19903664")
             .then(input => {

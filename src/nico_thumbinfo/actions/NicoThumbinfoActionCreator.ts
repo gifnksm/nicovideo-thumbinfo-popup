@@ -18,8 +18,7 @@ import AppDispatcher, {AppDispatcherInterface} from "../../dispatcher/AppDispatc
 import UrlFetcher, {Request, Response} from "../../util/UrlFetcher";
 
 class CachedUrlFetcher<T> {
-    // TODO: Use ES6 Map
-    _cache: {[index: string]: Promise<T|ErrorInfo>} = Object.create(null);
+    _cache = new Map<string, Promise<T|ErrorInfo>>();
     _fetcher: UrlFetcher;
 
     constructor(fetcher: UrlFetcher) {
@@ -30,7 +29,7 @@ class CachedUrlFetcher<T> {
         request: Request, id: string, converter: (resp: Response) => T|ErrorInfo,
         dropCache: boolean = false
     ): Promise<T|ErrorInfo> {
-        let promise = this._cache[id];
+        let promise = this._cache.get(id);
 
         if (promise === undefined || dropCache) {
             promise = this._fetcher
@@ -38,7 +37,7 @@ class CachedUrlFetcher<T> {
                 .then(converter, error => {
                     return new ErrorInfo(ErrorCode.UrlFetch, error);
                 });
-            this._cache[id] = promise;
+            this._cache.set(id, promise);
         }
 
         return promise;

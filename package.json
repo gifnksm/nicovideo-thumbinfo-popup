@@ -31,7 +31,7 @@
   },
   "devDependencies": {
     "bower": "^1.4.1",
-    "browserify": "^9.0.8",
+    "browserify": "^10.2.1",
     "browserify-shim": "^3.8.7",
     "del": "^1.2.0",
     "dtsm": "^0.10.2",
@@ -56,7 +56,7 @@
     "main-bower-files": "^2.8.0",
     "mocha": "^2.2.5",
     "through2": "^0.6.5",
-    "tsify": "git://github.com/fredericlb/tsify.git",
+    "tsify": "^0.11.0",
     "vinyl-source-stream": "^1.1.0",
     "watchify": "^3.2.1"
   },

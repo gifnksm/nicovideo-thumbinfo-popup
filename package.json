@@ -8,7 +8,7 @@
     "test": "gulp test",
     "coveralls": "gulp coveralls",
     "clean": "gulp clean",
-    "postinstall": "bower cache clean && bower install && tsd reinstall -so"
+    "postinstall": "bower install && dtsm install"
   },
   "repository": {
     "type": "git",
@@ -34,6 +34,7 @@
     "browserify": "^9.0.8",
     "browserify-shim": "^3.8.7",
     "del": "^1.2.0",
+    "dtsm": "^0.10.2",
     "espowerify": "^0.10.0",
     "glob": "^5.0.10",
     "gulp": "^3.8.11",
@@ -55,7 +56,6 @@
     "main-bower-files": "^2.8.0",
     "mocha": "^2.2.5",
     "through2": "^0.6.5",
-    "tsd": "^0.6.0",
     "tsify": "git://github.com/fredericlb/tsify.git",
     "vinyl-source-stream": "^1.1.0",
     "watchify": "^3.2.1"

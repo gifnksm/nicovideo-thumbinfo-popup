@@ -8,7 +8,7 @@
     "test": "gulp test",
     "coveralls": "gulp coveralls",
     "clean": "gulp clean",
-    "postinstall": "bower install && dtsm install"
+    "postinstall": "bower install && dtsm --insight false install"
   },
   "repository": {
     "type": "git",

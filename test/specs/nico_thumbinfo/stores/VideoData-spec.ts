@@ -1,4 +1,4 @@
-/// <reference path="../../../../typings/common.d.ts" />
+/// <reference path="../../../../typings/bundle.d.ts" />
 "use strict";
 
 import VideoKey from "../../../../src/nico_thumbinfo/models/VideoKey";

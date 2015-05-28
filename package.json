@@ -62,6 +62,6 @@
   },
   "dependencies": {
     "flux": "^2.0.3",
-    "option-t": "^0.9.1"
+    "option-t": "^0.9.2"
   }
 }

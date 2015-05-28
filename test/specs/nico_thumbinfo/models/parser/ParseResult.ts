@@ -1,4 +1,4 @@
-/// <reference path="../../../../../typings/common.d.ts" />
+/// <reference path="../../../../../typings/bundle.d.ts" />
 "use strict";
 
 import RawVideoData from "../../../../../src/nico_thumbinfo/models/RawVideoData";

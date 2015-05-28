@@ -1,4 +1,4 @@
-/// <reference path="../../../typings/common.d.ts" />
+/// <reference path="../../../typings/bundle.d.ts" />
 "use strict";
 
 import UrlFetcher, {Request} from "../../../src/util/UrlFetcher";

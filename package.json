@@ -41,7 +41,7 @@
     "gulp-buffer": "0.0.2",
     "gulp-concat": "^2.5.2",
     "gulp-coveralls": "^0.1.4",
-    "gulp-extract-sourcemap": "^0.1.3",
+    "gulp-extract-sourcemap": "gifnksm/gulp-extract-sourcemap#patch-1",
     "gulp-rename": "^1.2.2",
     "gulp-sass": "^2.0.1",
     "gulp-sourcemaps": "^1.5.2",

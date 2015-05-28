@@ -49,8 +49,7 @@ function doBundle(pattern, outName, isDebug, isWatch) {
       option.packageCache = {};
     }
 
-    var bundler = browserify(files, option)
-          .plugin("tsify", { target: "ES5", noImplicitAny: true });
+    var bundler = browserify(files, option).plugin("tsify");
 
     if (isDebug) {
       bundler = bundler.transform('espowerify');

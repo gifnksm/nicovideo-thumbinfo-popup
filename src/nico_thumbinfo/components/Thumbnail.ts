@@ -25,9 +25,7 @@ class Thumbnail extends React.Component<Thumbnail.Props, Thumbnail.State> {
     };
 
     private _onError(ev: Event) {
-        if ((<HTMLImageElement>ev.target).width === 1) {
-            this.setState({loadFailed: true});
-        }
+        this.setState({loadFailed: true});
     }
 
     state = <Thumbnail.State> {
@@ -36,16 +34,19 @@ class Thumbnail extends React.Component<Thumbnail.Props, Thumbnail.State> {
 
     render() {
         const RD = React.DOM;
-        let attr: any = {className: "thumbnail"};
+        let attr: any = {className: "thumbnail", onError: this._onError.bind(this) };
 
-        if (this.state.loadFailed) {
-            if (this.props.deleted) {
-                attr.src = "http://res.nicovideo.jp/img/common/video_deleted.jpg";
+        if (this.props.deleted) {
+            if (this.state.loadFailed || this.props.url.isNone) {
+                attr.src = "http://res.nimg.jp/img/common/video_deleted.jpg";
             } else {
-                attr.style = {width: 0, height: 0};
+                attr.src = this.props.url.unwrap();
             }
         } else {
-            attr.src = this.props.url.unwrapOr("");
+            if (this.props.url.isNone) {
+                return null;
+            }
+            attr.src = this.props.url.unwrap();
         }
 
         return RD.img(attr);
@@ -53,3 +54,4 @@ class Thumbnail extends React.Component<Thumbnail.Props, Thumbnail.State> {
 }
 
 export default Thumbnail;
+

@@ -3,6 +3,7 @@
 
 import {DataAttributeName} from "../../components/constants";
 
+import {ThumbType} from "../models/constants";
 import ErrorInfo from "../models/ErrorInfo";
 import VideoKey from "../models/VideoKey";
 
@@ -67,11 +68,24 @@ class Base extends React.Component<Base.Props, Base.State> {
 
     private _renderVideoData(videoData: VideoData): React.ReactNode {
         const RD = React.DOM;
+
+        let deleted = videoData.thumbType.map(type => {
+            switch (type) {
+            case ThumbType.Deleted:
+            case ThumbType.DeletedByAdmin:
+            case ThumbType.DeletedAsPrivate:
+            case ThumbType.DeletedByUploader:
+            case ThumbType.DeletedByContentHolder:
+                return true;
+            }
+            return false;
+        }).unwrapOr(false);
+
         return RD.div(
             {className: "video-data"},
             React.createElement(Thumbnail,
                                 {url: videoData.thumbnailUrl,
-                                 deleted: false}), // TODO: Set appropriate value to deleted
+                                 deleted: deleted}),
             React.createElement(HeaderList, {videoData: videoData}),
             React.createElement(Title, {title: videoData.title,
                                         watchUrl: videoData.watchUrl,
@@ -98,7 +112,12 @@ class Base extends React.Component<Base.Props, Base.State> {
         let progressMessage: React.ReactNode = null;
         let errorMessage: React.ReactNode = null;
 
-        if (!organizer.isCompleted) {
+        let loading = false;
+        if (errors.length === 0 && organizer.videoData.isEmpty) {
+            loading = true;
+        }
+
+        if (loading) {
             progressMessage = this._renderLoadingMessage();
         } else {
             if (organizer.videoData.isEmpty) {

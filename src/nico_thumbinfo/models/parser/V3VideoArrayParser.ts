@@ -210,6 +210,7 @@ module V3VideoArrayParser {
             case "option_flag_mobile_ng_apple":
             case "option_flag_old_message_server":
             case "option_flag_ng_nicobox":
+            case "option_flag_vast_enabled":
             case "main_category_key":
                 break;
 

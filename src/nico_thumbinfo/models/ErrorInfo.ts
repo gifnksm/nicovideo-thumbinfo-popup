@@ -15,6 +15,7 @@ export const enum ErrorCode {
     Community,
     CommunitySubThread,
     NotFound,
+    NotLoggedIn,
     Unknown
 }
 

@@ -50,9 +50,10 @@ module GetFlvParser {
         }
 
         if (data.hasOwnProperty("closed")) {
-            console.warn("Not logged in");
+            return new ErrorInfo(ErrorCode.NotLoggedIn);
         }
 
+        console.warn("unkown getflv error", data);
         return new ErrorInfo(ErrorCode.Unknown);
     }
 }

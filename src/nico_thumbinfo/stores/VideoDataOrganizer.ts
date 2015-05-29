@@ -42,10 +42,6 @@ export default class VideoDataOrganizer {
 
     get key() { return this._key; }
     get videoData() { return this._videoData; }
-    get isCompleted() {
-        return this._getThumbinfoFetcher.isCompleted ||
-            this._v3VideoArrayFetcher.isCompleted;
-    }
 
     getErrors() {
         let errors: ErrorInfo[] = [];

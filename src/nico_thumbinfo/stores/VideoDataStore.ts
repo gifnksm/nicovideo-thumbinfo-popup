@@ -23,7 +23,6 @@ export interface VideoDataStoreInterface {
 
 export interface VideoDataOrganizerInterface {
     videoData: VideoData;
-    isCompleted: boolean;
     getErrors(): ErrorInfo[];
 }
 

@@ -27,7 +27,9 @@ export default class GetThumbinfoFetcher {
 
     get errorInfo() { return this._errorInfo; }
     get videoData() { return this._videoData; }
-    get isCompleted() { return this._errorInfo.isSome || this._videoData.isSome }
+    get isCompleted() { return this._videoData.isSome }
+    get isErrored() { return this._errorInfo.isSome }
+    get isStopped() { return this.isCompleted || this.isErrored }
 
     constructor(key: VideoKey) {
         this._key = key;

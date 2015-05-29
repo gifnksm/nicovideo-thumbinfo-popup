@@ -59,5 +59,9 @@ export default class VideoDataOrganizer {
         this._v3VideoArrayFetcher.videoData.map(videoData => {
             this._videoData.pushRawVideoData(videoData);
         });
+
+        this._videoData.videoId.map(videoId => {
+            this._getThumbinfoFetcher.setVideoId(videoId);
+        });
     }
 }

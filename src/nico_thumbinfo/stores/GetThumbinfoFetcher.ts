@@ -17,6 +17,12 @@ import NicopediaFetchAction from "../actions/NicopediaFetchAction";
 import {Option, Some, None} from "option-t";
 import * as querystring from "querystring";
 
+const enum FetchType {
+    FirstTime,
+    RetryOptionalThreadId,
+    RetryVideoId
+}
+
 export default class GetThumbinfoFetcher {
     private _key: VideoKey;
     private _source: Source;
@@ -24,6 +30,9 @@ export default class GetThumbinfoFetcher {
     private _errorInfo: Option<ErrorInfo> = new None<ErrorInfo>();
     private _savedErrorInfo: Option<ErrorInfo> = new None<ErrorInfo>();
     private _videoData: Option<RawVideoData> = new None<RawVideoData>();
+    private _videoId: Option<string> = new None<string>();
+    private _fetchType: FetchType;
+    private _retryVideoIdTriggered: boolean;
 
     get errorInfo() { return this._errorInfo; }
     get videoData() { return this._videoData; }
@@ -35,7 +44,7 @@ export default class GetThumbinfoFetcher {
         this._key = key;
         this._source = new Source(SourceType.GetThumbinfo, this._key);
 
-        this._fetchGetThumbinfo(this._key);
+        this._fetchGetThumbinfo(this._key, FetchType.FirstTime);
     }
 
     handleAction(action: NicoThumbinfoAction): boolean {
@@ -60,7 +69,16 @@ export default class GetThumbinfoFetcher {
         return false;
     }
 
-    private _fetchGetThumbinfo(reqKey: VideoKey) {
+    setVideoId(videoId: string) {
+        if (this._videoId.isSome) {
+            return;
+        }
+        this._videoId = new Some(videoId);
+        this._triggerFetchRetry();
+    }
+
+    private _fetchGetThumbinfo(reqKey: VideoKey, fetchType: FetchType) {
+        this._fetchType = fetchType;
         NicoThumbinfoActionCreator.createGetThumbinfoFetchAction(this._source, reqKey);
     }
 
@@ -81,12 +99,28 @@ export default class GetThumbinfoFetcher {
         let payload = action.payload;
 
         if (payload instanceof RawVideoData) {
+            if (this._fetchType === FetchType.RetryVideoId ||
+                this._fetchType === FetchType.RetryOptionalThreadId) {
+                // 再実行の場合、異なるIDで動画を取得しているため、
+                // 誤った情報になっている可能性がある項目については上書きする
+                // 具体的には、スレッドごとに紐づく情報 (コメント関連)
+                payload.commentCounter = new None<number>();
+                payload.lastResBody = new None<string>();
+            }
             this._videoData = new Some(payload);
             this._fetchNicopedia();
             return true;
         }
 
         if (payload instanceof ErrorInfo) {
+            if (this._fetchType === FetchType.RetryVideoId) {
+                // 2度目の取得だった場合、これ以上繰り返しても失敗するため、
+                // エラー情報を保存しておいたものに戻して終了する
+                this._errorInfo = this._savedErrorInfo;
+                this._savedErrorInfo = new None<ErrorInfo>();
+                return true;
+            }
+
             if (payload.errorCode === ErrorCode.CommunitySubThread ||
                 payload.errorCode === ErrorCode.Deleted) {
                 // コミュニティ動画の場合、getflv の optional_thread_id により、
@@ -97,6 +131,7 @@ export default class GetThumbinfoFetcher {
                 this._fetchGetFlv(this._key);
             } else {
                 this._errorInfo = new Some(payload);
+                this._triggerFetchRetry();
             }
 
             return true;
@@ -104,6 +139,7 @@ export default class GetThumbinfoFetcher {
 
         console.warn("Unknown result: ", payload);
         this._errorInfo = new Some(new ErrorInfo(ErrorCode.Unknown));
+        this._triggerFetchRetry();
         return true;
     }
 
@@ -111,7 +147,7 @@ export default class GetThumbinfoFetcher {
         let payload = action.payload;
 
         if (payload instanceof VideoKey) {
-            this._fetchGetThumbinfo(payload);
+            this._fetchGetThumbinfo(payload, FetchType.RetryOptionalThreadId);
             return true;
         }
 
@@ -124,6 +160,7 @@ export default class GetThumbinfoFetcher {
                 this._errorInfo = this._savedErrorInfo;
                 this._savedErrorInfo = new None<ErrorInfo>();
             }
+            this._triggerFetchRetry();
             return true;
         }
 
@@ -131,6 +168,7 @@ export default class GetThumbinfoFetcher {
         // エラーコードは初回の getthumbinfo 時に設定されたものを設定する
         this._errorInfo = this._savedErrorInfo;
         this._savedErrorInfo = new None<ErrorInfo>();
+        this._triggerFetchRetry();
         return true;
     }
 
@@ -141,4 +179,23 @@ export default class GetThumbinfoFetcher {
         }
         return NicopediaFetcher.handleAction(action, this._videoData.unwrap());
     }
+
+    private _triggerFetchRetry() {
+        // スレッドIDで取得が失敗した動画について、videoID で再取得に挑戦してみる
+        // 非ログイン状態だと getflv が失敗するため、コミュニティ動画の場合にうまくいくケースがある
+        if (this._retryVideoIdTriggered ||
+            !this.isErrored ||
+            this._videoId.isNone ||
+            this._key.type === VideoKey.Type.VideoId) {
+            return;
+        }
+
+        console.log("trigger", this);
+
+        this._retryVideoIdTriggered = true;
+        this._savedErrorInfo = this._errorInfo;
+        this._errorInfo = new None<ErrorInfo>();
+        let key = VideoKey.fromVideoId(this._videoId.unwrap());
+        this._fetchGetThumbinfo(key, FetchType.RetryVideoId);
+   }
 }

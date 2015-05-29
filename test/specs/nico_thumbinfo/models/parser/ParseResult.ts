@@ -22,6 +22,20 @@ function tag(name: string, isCategory?: boolean, isLocked?: boolean): TagData {
     return tag;
 }
 
+function convertStyle(input: {[index: string]: string}): any {
+    let span = document.createElement("span");
+    for (let name of Object.keys(input)) {
+        (<any>span.style)[name] = input[name];
+    }
+    let styles: {[index: string]: string} = {};
+    for (let name of <any>span.style) {
+        let jsName = name.replace(/\-+([^\-])/g,
+                                  (_: string, m: string) => m.toUpperCase());
+        styles[jsName] = span.style[name];
+    }
+    return styles;
+}
+
 const ParseResult: {[index: string]: (source: DataSource, key?: VideoKey) => RawVideoData} = {
     "sm9": (source: DataSource) => {
         let data: RawVideoData;
@@ -210,7 +224,7 @@ const ParseResult: {[index: string]: (source: DataSource, key?: VideoKey) => Raw
         data.description = new Some([
             new DElement("br"),
             new DElement("br"),
-            new DElement("span", {style: "background:#FFCCCC; color:#FF0000;"}, [
+            new DElement("span", {style: convertStyle({"background":"#FFCCCC", "color": "#FF0000"})}, [
                 new DElement("span", {id: "deleted_message_default"}, [
                     new DText("この動画は削除されました。")
                 ]),
@@ -242,7 +256,7 @@ const ParseResult: {[index: string]: (source: DataSource, key?: VideoKey) => Raw
             new DText("ガツンてやってやりゃいいんだよガツンとさ！"),
             new DElement("br"),
             new DElement("br"),
-            new DElement("span", {style: "background:#FFCCCC; color:#FF0000;"}, [
+            new DElement("span", {style: convertStyle({"background":"#FFCCCC", "color": "#FF0000"})}, [
                 new DElement("span", {id: "deleted_message_default"}, [
                     new DText("この動画は株式会社フジテレビジョンの権利を侵害していたため、または申し立てがあったため削除されました。")
                 ]),

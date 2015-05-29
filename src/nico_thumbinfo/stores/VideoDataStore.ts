@@ -7,6 +7,7 @@ import VideoDataOrganizer from "./VideoDataOrganizer";
 
 import NicoThumbinfoAction from "../actions/NicoThumbinfoAction";
 
+import ErrorInfo from "../models/ErrorInfo";
 import VideoKey from "../models/VideoKey";
 
 import AppDispatcher, {AppDispatcherInterface} from "../../dispatcher/AppDispatcher";
@@ -17,7 +18,13 @@ const CHANGE_EVENT = "change";
 export interface VideoDataStoreInterface {
     addChangeListener(callback: (key: VideoKey) => void): void;
     removeChangeListener(callback: (key: VideoKey) => void): void;
-    getVideoDataByKey(key: VideoKey): VideoData;
+    getVideoDataOrganizerByKey(key: VideoKey): VideoDataOrganizerInterface;
+}
+
+export interface VideoDataOrganizerInterface {
+    videoData: VideoData;
+    isCompleted: boolean;
+    getErrors(): ErrorInfo[];
 }
 
 class VideoDataStore implements VideoDataStoreInterface {
@@ -42,7 +49,7 @@ class VideoDataStore implements VideoDataStoreInterface {
         this._emitter.removeListener(CHANGE_EVENT, callback);
     }
 
-    getVideoDataByKey(videoKey: VideoKey): VideoData {
+    getVideoDataOrganizerByKey(videoKey: VideoKey): VideoDataOrganizerInterface {
         let key = videoKey.valueOf();
 
         let organizer = this._organizerMap.get(key);
@@ -51,7 +58,7 @@ class VideoDataStore implements VideoDataStoreInterface {
             this._organizerMap.set(key, organizer);
         }
 
-        return organizer.videoData;
+        return organizer;
     }
 
     private _dispatchListener(payload: Payload) {

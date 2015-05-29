@@ -16,7 +16,7 @@ export interface DescriptionNode {
 export class DescriptionElement implements DescriptionNode {
     constructor(
         public name: string,
-        public attributes: {[index: string]: string} = {},
+        public attributes: {[index: string]: string|{[index: string]: string}} = {},
         public children: DescriptionNode[] = []) {}
 
     render() {

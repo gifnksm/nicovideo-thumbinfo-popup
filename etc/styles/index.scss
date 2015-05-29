@@ -35,127 +35,129 @@ div[data-nicovideo-thumbinfo-popup-content-type="nicovideo-thumbinfo"].content {
         font-weight: bold;
     }
 
-    > img.thumbnail {
-        float: left;
-        width: 130px;
-        height: 100px;
-        margin: 0 5px 5px 0;
-        padding: 0;
-        border: none;
-    }
+    > div.video-data {
+        > img.thumbnail {
+            float: left;
+            width: 130px;
+            height: 100px;
+            margin: 0 5px 5px 0;
+            padding: 0;
+            border: none;
+        }
 
-    > ul.header {
-        display: block;
-        margin: 0;
-        padding: 0;
+        > ul.header {
+            display: block;
+            margin: 0;
+            padding: 0;
 
-        > li {
-            display: inline;
-            margin: 0 3px 0 0;
+            > li {
+                display: inline;
+                margin: 0 3px 0 0;
 
-            &.uploader-name {
-                &::before {
-                    content: "[up: ";
+                &.uploader-name {
+                    &::before {
+                        content: "[up: ";
+                    }
+                    &::after {
+                        content: "]";
+                    }
+
+                    > a {
+                        font-weight: bold;
+                        @extend %link-in-header;
+                    }
                 }
-                &::after {
-                    content: "]";
-                }
 
+                &.hatebu-icon > a > img {
+                    vertical-align: middle;
+                }
+            }
+        }
+
+        > h1 {
+            display: block;
+            margin: 0;
+            padding: 0;
+            font-size: 14px;
+            line-height: 22px;
+            font-weight: bold;
+            a {
+                @extend %link-in-description;
+            }
+        }
+
+        > dl.counter-list {
+            display: block;
+            margin: 0;
+            padding: 0;
+
+            > dt {
+                display: inline;
+                margin: 0;
+                padding: 0;
+                border: none;
+            }
+            > dd {
+                display: inline;
+                margin: 0 3px 0 0;
+                padding: 0;
+                border: none;
+                font-weight: bold;
                 > a {
-                    font-weight: bold;
                     @extend %link-in-header;
                 }
             }
+        }
 
-            &.hatebu-icon > a > img {
-                vertical-align: middle;
+        > dl.tag-list {
+            display: block;
+            border: 1px solid silver;
+            border-width: 1px 0;
+            margin: 3px 0 3px 0;
+            padding: 3px;
+            word-spacing: 3px;
+            line-height: 1.7;
+            background-color: #eee;
+
+            > dt {
+                display: inline;
+                margin: 0;
+                padding: 0;
+                font-weight: bold;
+            }
+            > dd {
+                display: inline;
+                margin: 0 3px 0 0;
+                padding: 0;
+                white-space: nowrap;
+
+                > a {
+                    @extend %link-in-header;
+                }
             }
         }
-    }
 
-    > h1 {
-        display: block;
-        margin: 0;
-        padding: 0;
-        font-size: 14px;
-        line-height: 22px;
-        font-weight: bold;
-        a {
-            @extend %link-in-description;
-        }
-    }
-
-    > dl.counter-list {
-        display: block;
-        margin: 0;
-        padding: 0;
-
-        > dt {
-            display: inline;
-            margin: 0;
-            padding: 0;
-            border: none;
-        }
-        > dd {
-            display: inline;
-            margin: 0 3px 0 0;
-            padding: 0;
-            border: none;
-            font-weight: bold;
-            > a {
-                @extend %link-in-header;
+        > div.description {
+            clear: left;
+            display: block;
+            padding: 0 5px;
+            line-height: 1.7;
+            max-height: 150px;
+            overflow-y: auto;
+            a {
+                font-weight: bold;
+                @extend %link-in-description;
             }
         }
-    }
 
-    > dl.tag-list {
-        display: block;
-        border: 1px solid silver;
-        border-width: 1px 0;
-        margin: 3px 0 3px 0;
-        padding: 3px;
-        word-spacing: 3px;
-        line-height: 1.7;
-        background-color: #eee;
-
-        > dt {
-            display: inline;
-            margin: 0;
-            padding: 0;
+        > div.last-res-body {
+            display: block;
+            margin: 2px 4px 0;
+            padding: 2px 4px;
+            border: 2px solid #999;
             font-weight: bold;
+            line-height: 1.25;
+            word-spacing: 1em;
         }
-        > dd {
-            display: inline;
-            margin: 0 3px 0 0;
-            padding: 0;
-            white-space: nowrap;
-
-            > a {
-                @extend %link-in-header;
-            }
-        }
-    }
-
-    > div.description {
-        clear: left;
-        display: block;
-        padding: 0 5px;
-        line-height: 1.7;
-        max-height: 150px;
-        overflow-y: auto;
-        a {
-            font-weight: bold;
-            @extend %link-in-description;
-        }
-    }
-
-    > div.last-res-body {
-        display: block;
-        margin: 2px 4px 0;
-        padding: 2px 4px;
-        border: 2px solid #999;
-        font-weight: bold;
-        line-height: 1.25;
-        word-spacing: 1em;
     }
 }

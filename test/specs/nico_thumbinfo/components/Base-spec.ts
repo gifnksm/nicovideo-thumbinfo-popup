@@ -4,6 +4,7 @@
 import NicoThumbinfo from "../../../../src/nico_thumbinfo/components/Base";
 
 import GetThumbinfoParser from "../../../../src/nico_thumbinfo/models/parser/GetThumbinfoParser";
+import ErrorInfo from "../../../../src/nico_thumbinfo/models/ErrorInfo";
 import VideoKey from "../../../../src/nico_thumbinfo/models/VideoKey";
 import RawVideoData from "../../../../src/nico_thumbinfo/models/RawVideoData";
 
@@ -46,9 +47,13 @@ class VideoDataStoreDummy implements VideoDataStoreInterface {
         assert(callback === this.callback);
         this.callback = null;
     }
-    getVideoDataByKey(key: VideoKey) {
+    getVideoDataOrganizerByKey(key: VideoKey) {
         assert(this.key.valueOf() === key.valueOf())
-        return this.data;
+        return {
+            videoData: this.data,
+            isCompleted: true,
+            getErrors(): ErrorInfo[] { return []; }
+        };
     }
 }
 

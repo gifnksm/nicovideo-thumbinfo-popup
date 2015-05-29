@@ -3,10 +3,13 @@
 
 import {DataAttributeName} from "../../components/constants";
 
+import ErrorInfo from "../models/ErrorInfo";
 import VideoKey from "../models/VideoKey";
 
 import VideoData from "../stores/VideoData";
-import VideoDataStore, {VideoDataStoreInterface} from "../stores/VideoDataStore";
+import VideoDataStore,
+    {VideoDataStoreInterface, VideoDataOrganizerInterface}
+    from "../stores/VideoDataStore";
 
 import {DataAttributeValue} from "./constants";
 import Thumbnail from "./Thumbnail";
@@ -25,7 +28,7 @@ module Base {
         store?: VideoDataStoreInterface
     }
     export interface State {
-        videoData?: VideoData
+        organizer?: VideoDataOrganizerInterface
     }
 }
 
@@ -36,23 +39,18 @@ class Base extends React.Component<Base.Props, Base.State> {
     };
     static propTypes = <React.ValidationMap<Base.Props>> {
         videoKey: React.PropTypes.instanceOf(VideoKey).isRequired,
-        store: React.PropTypes.shape({
-            addChangeListener: React.PropTypes.func.isRequired,
-            removeChangeListener: React.PropTypes.func.isRequired,
-            getVideoDataByKey: React.PropTypes.func.isRequired
-        })
+        store: React.PropTypes.object.isRequired
     };
 
     state = <Base.State> {
-        videoData: this.props.store.getVideoDataByKey(this.props.videoKey)
+        organizer: this.props.store.getVideoDataOrganizerByKey(this.props.videoKey)
     };
 
     private _onChange(key: VideoKey) {
         if (key.valueOf() !== this.props.videoKey.valueOf()) {
             return;
         }
-
-        this.setState({videoData: this.props.store.getVideoDataByKey(this.props.videoKey)});
+        this.setState({organizer: this.props.store.getVideoDataOrganizerByKey(this.props.videoKey)});
     }
 
     componentDidMount() {
@@ -62,12 +60,52 @@ class Base extends React.Component<Base.Props, Base.State> {
         this.props.store.removeChangeListener(this._onChange.bind(this));
     }
 
+    private _renderLoadingMessage(): React.ReactNode {
+        const RD = React.DOM;
+        return RD.div(null, "loading...");
+    }
+
+    private _renderVideoData(videoData: VideoData): React.ReactNode {
+        const RD = React.DOM;
+        return RD.div(
+            {className: "video-data"},
+            React.createElement(Thumbnail,
+                                {url: videoData.thumbnailUrl,
+                                 deleted: false}), // TODO: Set appropriate value to deleted
+            React.createElement(HeaderList, {videoData: videoData}),
+            React.createElement(Title, {title: videoData.title,
+                                        watchUrl: videoData.watchUrl,
+                                        id: videoData.key.id,
+                                        nicopediaRegistered: videoData.nicopediaRegistered}),
+            React.createElement(CounterList, {videoData: videoData}),
+            React.createElement(TagList, {tags: videoData.tags}),
+            React.createElement(Description, {description: videoData.description}),
+            React.createElement(LastResBody, {value: videoData.lastResBody}));
+    }
+
+    private _renderErrorMessage(errors: ErrorInfo[]): React.ReactNode {
+        const RD = React.DOM;
+        return RD.div(null, "error",
+                      errors.map(e => `${e.errorCode}: ${e.errorDetail}`));
+    }
+
     render() {
         const RD = React.DOM;
-        let data = this.state.videoData;
+        let organizer = this.state.organizer;
+        let errors = organizer.getErrors();
 
-        if (data.isEmpty) {
-            return RD.div(null);
+        let videoData: React.ReactNode = null;
+        let progressMessage: React.ReactNode = null;
+        let errorMessage: React.ReactNode = null;
+
+        if (!organizer.isCompleted) {
+            progressMessage = this._renderLoadingMessage();
+        } else {
+            if (organizer.videoData.isEmpty) {
+                errorMessage = this._renderErrorMessage(errors);
+            } else {
+                videoData = this._renderVideoData(organizer.videoData);
+            }
         }
 
         return RD.div(
@@ -75,16 +113,9 @@ class Base extends React.Component<Base.Props, Base.State> {
                 [DataAttributeName.PopupContent]: DataAttributeValue.PopupContent,
                 className: "content"
             },
-            React.createElement(Thumbnail, {url: data.thumbnailUrl, deleted: false}), // TODO: Set appropriate value to deleted
-            React.createElement(HeaderList, {videoData: data}),
-            React.createElement(Title, {title: data.title,
-                                        watchUrl: data.watchUrl,
-                                        id: data.key.id,
-                                        nicopediaRegistered: data.nicopediaRegistered}),
-            React.createElement(CounterList, {videoData: data}),
-            React.createElement(TagList, {tags: data.tags}),
-            React.createElement(Description, {description: data.description}),
-            React.createElement(LastResBody, {value: data.lastResBody})
+            videoData,
+            progressMessage,
+            errorMessage
         );
     }
 }

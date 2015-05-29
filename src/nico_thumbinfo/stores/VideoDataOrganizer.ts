@@ -1,14 +1,13 @@
 /// <reference path="../../../typings/bundle.d.ts" />
 "use strict";
 
-
 import VideoData from "./VideoData";
 import GetThumbinfoFetcher from "./GetThumbinfoFetcher";
 import V3VideoArrayFetcher from "./V3VideoArrayFetcher";
 
 import NicoThumbinfoAction from "../actions/NicoThumbinfoAction";
-import UrlFetchAction, {SourceType} from "../actions/UrlFetchAction";
 
+import ErrorInfo from "../models/ErrorInfo";
 import VideoKey from "../models/VideoKey";
 
 export default class VideoDataOrganizer {
@@ -25,34 +24,35 @@ export default class VideoDataOrganizer {
     }
 
     handleAction(action: NicoThumbinfoAction): boolean {
-        if (action instanceof UrlFetchAction) {
-            switch (action.source.sourceType) {
-            case SourceType.GetThumbinfo:
-                if (this._getThumbinfoFetcher.handleAction(action)) {
-                    this._updateVideoData();
-                    return true;
-                }
-                return false;
+        let updated = false;
 
-            case SourceType.V3VideoArray:
-                if (this._v3VideoArrayFetcher.handleAction(action)) {
-                    this._updateVideoData();
-                    return true;
-                }
-                return false;
-            }
+        if (this._getThumbinfoFetcher.handleAction(action)) {
+            updated = true;
+        }
+        if (this._v3VideoArrayFetcher.handleAction(action)) {
+            updated = true;
         }
 
-        return false;
+        if (updated) {
+            this._updateVideoData();
+        }
+
+        return updated;
     }
 
     get key() { return this._key; }
     get videoData() { return this._videoData; }
+    get isCompleted() {
+        return this._getThumbinfoFetcher.isCompleted ||
+            this._v3VideoArrayFetcher.isCompleted;
+    }
 
-    // TODO: implements
-    // get state() { return this._state.state; }
-    // get errorCode() { return this._errorCode; }
-    // get errorDetail() { return this._errorDetail; }
+    getErrors() {
+        let errors: ErrorInfo[] = [];
+        this._getThumbinfoFetcher.errorInfo.map(e => errors.push(e));
+        this._v3VideoArrayFetcher.errorInfo.map(e => errors.push(e));
+        return errors;
+    }
 
     private _updateVideoData() {
         this._videoData.clear();

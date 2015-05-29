@@ -7,6 +7,9 @@ import VideoKey from "./nico_thumbinfo/models/VideoKey";
 
 function render(key: VideoKey, parent: Element) {
     let div = document.createElement("div");
+    div.style.margin = "5px";
+    div.style.padding = "5px";
+    div.style.border = "1px solid black";
     React.render(React.createElement(NicoThumbinfo, { videoKey: key }), div);
     parent.appendChild(div);
 }

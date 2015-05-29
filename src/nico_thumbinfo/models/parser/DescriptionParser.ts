@@ -76,7 +76,17 @@ module DescriptionParser {
                 // TODO: Use ES6 for-of
                 // for (let attr of node.attributes) {
                 for (let attr of Array.prototype.slice.call(node.attributes)) {
-                    attrs[attr.name] = attr.value;
+                    if (attr.name === "style") {
+                        let obj: any = {};
+                        for (let name of node.style) {
+                            let jsName = name.replace(/\-+([^\-])/g,
+                                                      (_: string, m: string) => m.toUpperCase());
+                            obj[jsName] = node.style[name];
+                        }
+                        attrs[attr.name] = obj;
+                    } else {
+                        attrs[attr.name] = attr.value;
+                    }
                 }
                 let children = _nodeList2Description(node.childNodes);
 

@@ -37,7 +37,9 @@ div[data-nicovideo-thumbinfo-popup-content-type="nicovideo-thumbinfo"].content {
         & {
             width: 600px;
         }
+    }
 
+    > div.video-data, > div.loading-message, > div.error-message {
         > img.thumbnail {
             float: left;
             width: 130px;

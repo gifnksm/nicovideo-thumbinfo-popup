@@ -23,6 +23,9 @@ export interface VideoDataStoreInterface {
 
 export interface VideoDataOrganizerInterface {
     videoData: VideoData;
+    numStopped: number;
+    numCompleted: number;
+    numErrored: number;
     getErrors(): ErrorInfo[];
 }
 
@@ -74,9 +77,11 @@ class VideoDataStore implements VideoDataStoreInterface {
             return;
         }
 
-        if (organizer.handleAction(action)) {
-            this._emitChange(key);
-        }
+        setTimeout(() => {
+            if (organizer.handleAction(action)) {
+                this._emitChange(key);
+            }
+        }, 1000);
     }
 }
 

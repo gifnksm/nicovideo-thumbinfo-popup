@@ -100,7 +100,7 @@ const ParseResult: {[index: string]: (source: DataSource, key?: VideoKey) => Raw
         data.viewCounter = new Some(11400);
         data.commentCounter = new Some(491);
         data.mylistCounter = new Some(370);
-        data.tags.push(tag("アイドルマスター", true));
+        data.tags.push(tag("アイドルマスター", true, true));
         data.tags.push(tag("アイマス紙芝居", false));
         data.tags.push(tag("空母そそそそ", false));
         data.tags.push(tag("アイドルマスター_シンデレラガールズ", false));
@@ -146,7 +146,7 @@ const ParseResult: {[index: string]: (source: DataSource, key?: VideoKey) => Raw
         data.viewCounter = new Some(78564);
         data.commentCounter = new Some(12339);
         data.mylistCounter = new Some(1571);
-        data.tags.push(tag("ゲーム", true));
+        data.tags.push(tag("ゲーム", true, true));
         data.tags.push(tag("フジ、あほ", false));
         data.tags.push(tag("キヨ、丁寧解説", false));
         data.tags.push(tag("イケニエノヨル", false));
@@ -201,7 +201,7 @@ const ParseResult: {[index: string]: (source: DataSource, key?: VideoKey) => Raw
         data.viewCounter = new Some(76341);
         data.commentCounter = new Some(0);
         data.mylistCounter = new Some(285);
-        data.tags.push(tag("アニメ", true));
+        data.tags.push(tag("アニメ", true, true));
         data.tags.push(tag("ラブライブ！", false));
         data.tags.push(tag("新田恵海", false));
         data.tags.push(tag("南條愛乃", false));
@@ -327,7 +327,7 @@ const ParseResult: {[index: string]: (source: DataSource, key?: VideoKey) => Raw
         data.viewCounter = new Some(8747261);
         data.commentCounter = new Some(4406924);
         data.mylistCounter = new Some(139935);
-        data.tags.push(tag("音楽", true));
+        data.tags.push(tag("音楽", true, true));
         data.tags.push(tag("アレンジ", false));
         data.tags.push(tag("組曲『ニコニコ動画』", false));
         data.tags.push(tag("空気の読めるWMP", false));
@@ -398,7 +398,7 @@ const ParseResult: {[index: string]: (source: DataSource, key?: VideoKey) => Raw
         data.viewCounter = new Some(3848);
         data.commentCounter = new Some(0);
         data.mylistCounter = new Some(28);
-        data.tags.push(tag("ゲーム", true));
+        data.tags.push(tag("ゲーム", true, true));
         data.tags.push(tag("実況プレイ動画", false));
         data.tags.push(tag("ドリームクラブGogo.", false));
         data.tags.push(tag("オンナスキーP", false));

@@ -51,6 +51,9 @@ class VideoDataStoreDummy implements VideoDataStoreInterface {
         assert(this.key.valueOf() === key.valueOf())
         return {
             videoData: this.data,
+            numStopped: 1,
+            numCompleted: 1,
+            numErrored: 0,
             getErrors(): ErrorInfo[] { return []; }
         };
     }

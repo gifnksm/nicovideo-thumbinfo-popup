@@ -68,7 +68,4 @@ export default class VideoData {
     get watchUrl(): string {
         return `http://www.nicovideo.jp/watch/${this._key.id}`;
     }
-    get isEmpty(): boolean {
-        return this._rawData.length == 0;
-    }
 }

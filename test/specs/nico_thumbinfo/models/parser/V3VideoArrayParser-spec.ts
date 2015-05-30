@@ -52,17 +52,17 @@ function checkOk(key: VideoKey) {
 }
 
 function checkError(code: ErrorCode, key: VideoKey, input: string, reg: RegExp|string) {
-    let data = V3VideoArrayParser.parse(key, input);
-    if (data instanceof ErrorInfo) {
-        assert(data.errorCode === code);
+    let error = V3VideoArrayParser.parse(key, input);
+    if (error instanceof ErrorInfo) {
+        assert(error.code === code);
         if (reg instanceof RegExp) {
-            assert(reg.test(data.errorDetail));
+            assert(reg.test(error.detail));
         } else {
-            assert(data.errorDetail === reg);
+            assert(error.detail === reg);
         }
     } else {
-        console.error("data is not instance of ErrorInfo: ", data);
-        throw new Error("data is not instance of ErrorInfo");
+        console.error("error is not instance of ErrorInfo: ", error);
+        throw new Error("error is not instance of ErrorInfo");
     }
 }
 
@@ -97,8 +97,7 @@ describe("nico_thumbinfo/models/parser/V3VideoArrayParser", () => {
         let key = VideoKey.fromVideoId("sm3");
         return getUrl("/base/etc/resource/v3videoarray/sm3")
             .then(input => {
-                checkError(ErrorCode.NotFound, key, input,
-                           `XML Format Error: There is no "video_info" elements.`);
+                checkError(ErrorCode.NotFound, key, input, undefined);
             });
     });
     it("should return parse result if deleted-by-content-holder video (sm24) is given.", () => {

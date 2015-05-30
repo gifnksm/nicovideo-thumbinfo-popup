@@ -39,16 +39,14 @@ export default class RawVideoData {
         this._dataSource = source;
     }
 
-    static createWatchPage(key: VideoKey): RawVideoData {
-        return new RawVideoData(key, DataSource.WatchPage);
-    }
-
     static createV3VideoArray(key: VideoKey): RawVideoData {
         return new RawVideoData(key, DataSource.V3VideoArray);
     }
-
     static createGetThumbinfo(key: VideoKey): RawVideoData {
         return new RawVideoData(key, DataSource.GetThumbinfo);
+    }
+    static createInitialDummy(key: VideoKey): RawVideoData {
+        return new RawVideoData(key, DataSource.InitialDummy);
     }
 
     get key() { return this._key; }

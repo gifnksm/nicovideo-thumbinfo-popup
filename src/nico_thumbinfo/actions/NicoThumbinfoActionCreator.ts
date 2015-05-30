@@ -143,9 +143,9 @@ class NicoThumbinfoActionCreator {
         }
 
         if (result instanceof ErrorInfo) {
-            if (result.errorCode === ErrorCode.Community &&
+            if (result.code === ErrorCode.Community &&
                 requestKey.type === VideoKey.Type.ThreadId) {
-                return new ErrorInfo(ErrorCode.CommunitySubThread, result.errorDetail);
+                return new ErrorInfo(ErrorCode.CommunitySubThread, result.detail);
             }
             return result;
         }

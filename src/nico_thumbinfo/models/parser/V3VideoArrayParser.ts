@@ -61,8 +61,7 @@ module V3VideoArrayParser {
 
             let videoInfos = docElem.getElementsByTagName("video_info");
             if (videoInfos.length === 0) {
-                return new ErrorInfo(ErrorCode.NotFound,
-                                     `XML Format Error: There is no "video_info" elements.`)
+                return new ErrorInfo(ErrorCode.NotFound);
             }
             if (videoInfos.length > 1) {
                 return new ErrorInfo(ErrorCode.Invalid,
@@ -347,6 +346,9 @@ module V3VideoArrayParser {
             .mapOr(false, main_category => main_category === name);
 
         tag.isCategory = new Some(isCategory);
+        if (isCategory) {
+            tag.isLocked = new Some(true); // カテゴリタグは必ずロックされている
+        }
 
         return tag;
     }

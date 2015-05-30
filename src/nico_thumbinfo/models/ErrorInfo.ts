@@ -20,14 +20,14 @@ export const enum ErrorCode {
 }
 
 export default class ErrorInfo {
-    private _errorCode: ErrorCode;
-    private _errorDetail: string;
+    private _code: ErrorCode;
+    private _detail: string;
 
-    constructor(errorCode: ErrorCode, errorDetail?: string) {
-        this._errorCode = errorCode;
-        this._errorDetail = errorDetail;
+    constructor(code: ErrorCode, detail?: string) {
+        this._code = code;
+        this._detail = detail;
     }
 
-    get errorCode() { return this._errorCode; }
-    get errorDetail() { return this._errorDetail; }
+    get code() { return this._code; }
+    get detail() { return this._detail; }
 }

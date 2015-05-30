@@ -13,22 +13,17 @@ import {Option, Some, None} from "option-t";
 describe("nico_thumbinfo/stores/VideoData", () => {
     let key = VideoKey.fromVideoId("sm9");
 
+    let initialDummy = RawVideoData.createInitialDummy(key);
+    initialDummy.description = new Some([new DText("getthumbinfo description")]);
+    initialDummy.title = new Some("getthumbinfo title");
+    initialDummy.lastResBody = new Some("getthumbinfo lastResBody");
+
     let getThumbinfo = RawVideoData.createGetThumbinfo(key);
-    getThumbinfo.description = new Some([new DText("getthumbinfo description")]);
-    getThumbinfo.title = new Some("getthumbinfo title");
-    getThumbinfo.lastResBody = new Some("getthumbinfo lastResBody");
+    getThumbinfo.description = new Some([new DText("videoarray description")]);
+    getThumbinfo.title = new Some("videoarray title");
 
-    let videoArray = RawVideoData.createV3VideoArray(key);
-    videoArray.description = new Some([new DText("videoarray description")]);
-    videoArray.title = new Some("videoarray title");
-
-    let watchPage = RawVideoData.createWatchPage(key);
-    watchPage.description = new Some([new DText("watchpage description")]);
-
-    it("should empty when no raw data is pushed.", () => {
-        let data = new VideoData(key);
-        assert(data.isEmpty);
-    });
+    let v3VideoArray = RawVideoData.createV3VideoArray(key);
+    v3VideoArray.description = new Some([new DText("watchpage description")]);
 
     it("should returns pushed data.", () => {
         function check(raw: RawVideoData, value: DText[]) {
@@ -36,35 +31,35 @@ describe("nico_thumbinfo/stores/VideoData", () => {
             data.pushRawVideoData(raw);
             assert.deepEqual(data.description.unwrap(), value);
         }
+        check(initialDummy, <DText[]>initialDummy.description.unwrap());
         check(getThumbinfo, <DText[]>getThumbinfo.description.unwrap());
-        check(videoArray, <DText[]>videoArray.description.unwrap());
-        check(watchPage, <DText[]>watchPage.description.unwrap());
+        check(v3VideoArray, <DText[]>v3VideoArray.description.unwrap());
     });
 
     it("should overwrite the property with higher priority rawVideoData's value.", () => {
         let data = new VideoData(key);
+        data.pushRawVideoData(initialDummy);
         data.pushRawVideoData(getThumbinfo);
-        data.pushRawVideoData(videoArray);
 
-        assert.deepEqual(data.description, videoArray.description);
-        data.pushRawVideoData(watchPage);
-        assert.deepEqual(data.description, watchPage.description);
+        assert.deepEqual(data.description, getThumbinfo.description);
+        data.pushRawVideoData(v3VideoArray);
+        assert.deepEqual(data.description, v3VideoArray.description);
 
         data = new VideoData(key);
-        data.pushRawVideoData(getThumbinfo);
-        data.pushRawVideoData(watchPage);
-        assert.deepEqual(data.description, watchPage.description);
+        data.pushRawVideoData(initialDummy);
+        data.pushRawVideoData(v3VideoArray);
+        assert.deepEqual(data.description, v3VideoArray.description);
     });
 
     it("should not overwrite the property when higher priority rawVideoData's value is None.", () => {
         let data = new VideoData(key);
+        data.pushRawVideoData(initialDummy);
         data.pushRawVideoData(getThumbinfo);
-        data.pushRawVideoData(videoArray);
-        data.pushRawVideoData(watchPage);
+        data.pushRawVideoData(v3VideoArray);
 
-        assert.deepEqual(data.description, watchPage.description);
-        assert.deepEqual(data.title, videoArray.title);
-        assert.deepEqual(data.lastResBody, getThumbinfo.lastResBody);
+        assert.deepEqual(data.description, v3VideoArray.description);
+        assert.deepEqual(data.title, getThumbinfo.title);
+        assert.deepEqual(data.lastResBody, initialDummy.lastResBody);
     })
 });
 

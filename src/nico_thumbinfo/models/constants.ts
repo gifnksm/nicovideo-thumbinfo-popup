@@ -2,10 +2,11 @@
 "use strict";
 
 export const enum DataSource {
+    // 優先度の高い順に並べること (RawVideoData のマージ時に使われる)
     Merge,
-    WatchPage,
     V3VideoArray,
-    GetThumbinfo
+    GetThumbinfo,
+    InitialDummy // Key のみから生成されたダミー情報
 }
 
 export const enum ThumbType {

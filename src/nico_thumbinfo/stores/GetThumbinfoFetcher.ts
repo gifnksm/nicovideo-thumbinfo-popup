@@ -161,8 +161,8 @@ export default class GetThumbinfoFetcher {
 
             this._errorStack.set(payload);
 
-            if (payload.errorCode === ErrorCode.CommunitySubThread ||
-                payload.errorCode === ErrorCode.Deleted) {
+            if (payload.code === ErrorCode.CommunitySubThread ||
+                payload.code === ErrorCode.Deleted) {
                 // コミュニティ動画の場合、getflv の optional_thread_id により、
                 // 元動画の情報を取得できる可能性がある
                 // 削除済み動画の場合、getflv の deleted/error により、
@@ -188,7 +188,7 @@ export default class GetThumbinfoFetcher {
         }
 
         if (payload instanceof ErrorInfo) {
-            if (payload.errorCode !== ErrorCode.Unknown) {
+            if (payload.code !== ErrorCode.Unknown) {
                 this._errorStack.set(payload);
             } else {
                 console.warn("Unknown getflv error:", action);

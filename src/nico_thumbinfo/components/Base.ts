@@ -4,7 +4,7 @@
 import {DataAttributeName} from "../../components/constants";
 
 import {ThumbType} from "../models/constants";
-import ErrorInfo from "../models/ErrorInfo";
+import ErrorInfo, {ErrorCode} from "../models/ErrorInfo";
 import VideoKey from "../models/VideoKey";
 
 import VideoData from "../stores/VideoData";
@@ -21,6 +21,7 @@ import TagList from "./TagList";
 import Description from "./Description";
 import LastResBody from "./LastResBody";
 
+import {Option, Some, None} from "option-t";
 import * as React from "react";
 
 module Base {
@@ -61,14 +62,7 @@ class Base extends React.Component<Base.Props, Base.State> {
         this.props.store.removeChangeListener(this._onChange.bind(this));
     }
 
-    private _renderLoadingMessage(): React.ReactNode {
-        const RD = React.DOM;
-        return RD.div(null, "loading...");
-    }
-
-    private _renderVideoData(videoData: VideoData): React.ReactNode {
-        const RD = React.DOM;
-
+    private _renderThumbnail(videoData: VideoData): React.ReactNode {
         let deleted = videoData.thumbType.map(type => {
             switch (type) {
             case ThumbType.Deleted:
@@ -81,11 +75,27 @@ class Base extends React.Component<Base.Props, Base.State> {
             return false;
         }).unwrapOr(false);
 
+        return React.createElement(Thumbnail,
+                                   {url: videoData.thumbnailUrl,
+                                    deleted: deleted})
+    }
+
+    private _renderLoadingMessage(videoData: VideoData): React.ReactNode {
+        const RD = React.DOM;
+        return RD.div({className: "loading-message"},
+                      this._renderThumbnail(videoData),
+                      RD.h1({className: "title"},
+                            "取得中: \"",
+                            RD.a({href: videoData.watchUrl}, videoData.key.id),
+                            "\"..."));
+    }
+
+    private _renderVideoData(videoData: VideoData): React.ReactNode {
+        const RD = React.DOM;
+
         return RD.div(
             {className: "video-data"},
-            React.createElement(Thumbnail,
-                                {url: videoData.thumbnailUrl,
-                                 deleted: deleted}),
+            this._renderThumbnail(videoData),
             React.createElement(HeaderList, {videoData: videoData}),
             React.createElement(Title, {title: videoData.title,
                                         watchUrl: videoData.watchUrl,
@@ -97,33 +107,98 @@ class Base extends React.Component<Base.Props, Base.State> {
             React.createElement(LastResBody, {value: videoData.lastResBody}));
     }
 
-    private _renderErrorMessage(errors: ErrorInfo[]): React.ReactNode {
+    private _renderErrorMessage(videoData: VideoData, errors: ErrorInfo[]): React.ReactNode {
         const RD = React.DOM;
-        return RD.div(null, "error",
-                      errors.map(e => `${e.errorCode}: ${e.errorDetail}`));
+        return RD.div({className: "error-message"},
+                      this._renderThumbnail(videoData),
+                      RD.h1({className: "title"},
+                            "取得失敗: \"",
+                            RD.a({href: videoData.watchUrl}, videoData.key.id),
+                            "\""),
+                      this._renderErrorSummary(errors));
+    }
+
+    private _errorCode2Summary(code: ErrorCode): string {
+        switch (code) {
+        case ErrorCode.UrlFetch:
+            return "APIの呼び出しに失敗";
+        case ErrorCode.HttpStatus:
+            return "APIのレスポンスコードが異常";
+        case ErrorCode.ServerMaintenance:
+            return "メンテナンスまたはサーバダウン";
+        case ErrorCode.Invalid:
+            return "APIのレスポンス内容が異常";
+        case ErrorCode.Deleted:
+            return "削除済み";
+        case ErrorCode.DeletedByUploader:
+            return "投稿者削除";
+        case ErrorCode.DeletedByAdmin:
+            return "利用規約違反削除";
+        case ErrorCode.DeletedByContentHolder:
+            return "権利者削除";
+        case ErrorCode.DeletedAsPrivate:
+            return "非表示";
+        case ErrorCode.AccessLocked:
+            return "APIアクセス過多";
+        case ErrorCode.Community:
+            return "コミュニティー動画"
+        case ErrorCode.CommunitySubThread:
+            return "コミュニティー動画(サブスレッド)"
+        case ErrorCode.NotFound:
+            return "動画が見つかりません";
+        case ErrorCode.NotLoggedIn:
+            return "ログインしていません";
+        case ErrorCode.Unknown:
+            return "未知のエラー";
+        default:
+            return "バグ";
+        }
+    }
+
+    private _renderErrorSummary(errors: ErrorInfo[]): React.ReactNode {
+        const RD = React.DOM;
+        let map = new Map<ErrorCode, ErrorInfo[]>();
+        for (let e of errors) {
+            let es = map.get(e.code);
+            if (es === undefined) {
+                es = [];
+                map.set(e.code, es);
+            }
+            es.push(e);
+        }
+
+        let list: string[] = [];
+        map.forEach((es, code) => {
+            let msg = this._errorCode2Summary(code);
+            let detail: string[] = [];
+            for (let e of es) {
+                if (e.detail !== undefined) {
+                    detail.push(e.detail);
+                }
+            }
+            if (detail.length !== 0) {
+                msg = `${msg} (${detail.join(", ")})`;
+            }
+            list.push(msg)
+        })
+
+        return RD.ul({className: "error-summary"},
+                     list.map(msg => RD.li(null, msg)));
     }
 
     render() {
         const RD = React.DOM;
         let organizer = this.state.organizer;
-        let errors = organizer.getErrors();
+        let content: React.ReactNode = null;
 
-        let videoData: React.ReactNode = null;
-        let progressMessage: React.ReactNode = null;
-        let errorMessage: React.ReactNode = null;
-
-        let loading = false;
-        if (errors.length === 0 && organizer.videoData.isEmpty) {
-            loading = true;
-        }
-
-        if (loading) {
-            progressMessage = this._renderLoadingMessage();
+        if (organizer.numStopped === 0) {
+            content = this._renderLoadingMessage(organizer.videoData);
         } else {
-            if (organizer.videoData.isEmpty) {
-                errorMessage = this._renderErrorMessage(errors);
+            if (organizer.numCompleted === 0) {
+                content = this._renderErrorMessage(organizer.videoData,
+                                                   organizer.getErrors());
             } else {
-                videoData = this._renderVideoData(organizer.videoData);
+                content = this._renderVideoData(organizer.videoData);
             }
         }
 
@@ -132,9 +207,7 @@ class Base extends React.Component<Base.Props, Base.State> {
                 [DataAttributeName.PopupContent]: DataAttributeValue.PopupContent,
                 className: "content"
             },
-            videoData,
-            progressMessage,
-            errorMessage
+            content
         );
     }
 }

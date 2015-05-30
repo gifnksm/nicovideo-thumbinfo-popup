@@ -43,7 +43,7 @@ class Thumbnail extends React.Component<Thumbnail.Props, Thumbnail.State> {
                 attr.src = this.props.url.unwrap();
             }
         } else {
-            if (this.props.url.isNone) {
+            if (this.props.url.isNone || this.state.loadFailed) {
                 return null;
             }
             attr.src = this.props.url.unwrap();

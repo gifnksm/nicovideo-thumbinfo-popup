@@ -7,6 +7,7 @@ import VideoKey from "./nico_thumbinfo/models/VideoKey";
 
 function render(key: VideoKey, parent: Element) {
     let div = document.createElement("div");
+    div.style.display = "inline-block";
     div.style.margin = "5px";
     div.style.padding = "5px";
     div.style.border = "1px solid black";
@@ -15,7 +16,6 @@ function render(key: VideoKey, parent: Element) {
 }
 
 GM_addStyle(GM_getResourceText("style"));
-
 render(VideoKey.fromUrl("http://www.nicovideo.jp/watch/sm1").unwrap(), document.body);
 render(VideoKey.fromUrl("http://www.nicovideo.jp/watch/sm2").unwrap(), document.body);
 render(VideoKey.fromUrl("http://www.nicovideo.jp/watch/sm3").unwrap(), document.body);
@@ -25,4 +25,3 @@ render(VideoKey.fromUrl("http://www.nicovideo.jp/watch/sm24").unwrap(), document
 render(VideoKey.fromUrl("http://www.nicovideo.jp/watch/1340979099").unwrap(), document.body);
 render(VideoKey.fromUrl("http://www.nicovideo.jp/watch/sm24109050").unwrap(), document.body);
 render(VideoKey.fromUrl("http://www.nicovideo.jp/watch/1406548974").unwrap(), document.body);
-

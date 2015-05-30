@@ -82,4 +82,10 @@ export default class RawVideoData {
             });
         }).or(other.uploader);
     }
+
+    shallowClone(): RawVideoData {
+        let data = new RawVideoData(this._key, this._dataSource);
+        data.merge(this);
+        return data;
+    }
 }

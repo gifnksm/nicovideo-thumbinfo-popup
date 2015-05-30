@@ -49,8 +49,7 @@ export default class V3VideoArrayFetcher {
             return this._handleNicopediaFetchAction(action);
         }
 
-        console.warn("Fetch response does not handled: ", action);
-        return false;
+        throw new Error("BUG: unreachable");
     }
 
     private _fetchV3VideoArray(reqKey: VideoKey) {
@@ -80,9 +79,7 @@ export default class V3VideoArrayFetcher {
             return true;
         }
 
-        console.warn("Unknown result: ", payload);
-        this._errorInfo = new Some(new ErrorInfo(ErrorCode.Unknown));
-        return true;
+        throw new Error("BUG: unreachable");
     }
 
     private _handleNicopediaFetchAction(action: NicopediaFetchAction): boolean {

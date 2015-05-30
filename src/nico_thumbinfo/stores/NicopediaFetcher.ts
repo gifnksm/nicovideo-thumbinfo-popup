@@ -50,8 +50,7 @@ module NicopediaFetcher {
             return false;
         }
 
-        console.warn("Invalid nicopedia data:", action);
-        return false;
+        throw new Error("BUG: unreachable");
     }
 
     function _fetchVideo(videoData: RawVideoData, source: Source) {

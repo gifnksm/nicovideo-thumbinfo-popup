@@ -7,10 +7,8 @@
 div[data-nicovideo-thumbinfo-popup-content-type="nicovideo-thumbinfo"].content {
     & {
         all: unset;
-    }
-
-    & {
         display: block;
+        min-width: 28em;
         border-radius: 5px;
         font-size: 11px;
     }
@@ -36,6 +34,10 @@ div[data-nicovideo-thumbinfo-popup-content-type="nicovideo-thumbinfo"].content {
     }
 
     > div.video-data {
+        & {
+            width: 600px;
+        }
+
         > img.thumbnail {
             float: left;
             width: 130px;

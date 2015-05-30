@@ -79,7 +79,7 @@ class HeaderList extends React.Component<HeaderList.Props, HeaderList.State> {
 
         let name = optUploader
             .andThen(uploader => uploader.name)
-            .unwrapOr("投稿者不明");
+            .unwrapOr("不明な投稿者");
 
         let text = optUploader.andThen<React.ReactNode>(uploader => {
             return uploader.url.map(url => RD.a({href: url}, name));

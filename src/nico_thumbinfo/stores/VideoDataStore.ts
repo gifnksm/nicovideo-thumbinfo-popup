@@ -77,11 +77,9 @@ class VideoDataStore implements VideoDataStoreInterface {
             return;
         }
 
-        setTimeout(() => {
-            if (organizer.handleAction(action)) {
-                this._emitChange(key);
-            }
-        }, 1000);
+        if (organizer.handleAction(action)) {
+            this._emitChange(key);
+        }
     }
 }
 

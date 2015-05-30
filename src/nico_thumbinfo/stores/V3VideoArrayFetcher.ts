@@ -6,12 +6,14 @@ import NicopediaFetcher from "./NicopediaFetcher";
 import ErrorInfo, {ErrorCode} from "../models/ErrorInfo";
 import VideoKey from "../models/VideoKey";
 import RawVideoData from "../models/RawVideoData";
+import {User} from "../models/Uploader";
 
 import NicoThumbinfoActionCreator from "../actions/NicoThumbinfoActionCreator";
 import NicoThumbinfoAction from "../actions/NicoThumbinfoAction";
 import UrlFetchAction, {Source, SourceType} from "../actions/UrlFetchAction";
 import V3VideoArrayFetchAction from "../actions/V3VideoArrayFetchAction";
 import NicopediaFetchAction from "../actions/NicopediaFetchAction";
+import UserNameFetchAction from "../actions/UserNameFetchAction";
 
 import {Option, Some, None} from "option-t";
 
@@ -49,6 +51,10 @@ export default class V3VideoArrayFetcher {
             return this._handleNicopediaFetchAction(action);
         }
 
+        if (action instanceof UserNameFetchAction) {
+            return this._handleUserNameFetchAction(action);
+        }
+
         throw new Error("BUG: unreachable");
     }
 
@@ -65,12 +71,28 @@ export default class V3VideoArrayFetcher {
         NicopediaFetcher.fetch(this._videoData.unwrap(), this._source);
     }
 
+    private _fetchUserName() {
+        if (this._videoData.isNone) {
+            console.warn("this._videoData.isNone", this);
+            return;
+        }
+
+        this._videoData.unwrap().uploader.map(uploader => {
+            if (uploader instanceof User) {
+                uploader.id.map(id => {
+                    NicoThumbinfoActionCreator.createUserNameFetchAction(this._source, id);
+                });
+            }
+        });
+    }
+
     private _handleV3VideoArrayFetchAction(action: V3VideoArrayFetchAction): boolean {
         let payload = action.payload;
 
         if (payload instanceof RawVideoData) {
             this._videoData = new Some(payload);
             this._fetchNicopedia();
+            this._fetchUserName();
             return true;
         }
 
@@ -88,5 +110,26 @@ export default class V3VideoArrayFetcher {
             return false;
         }
         return NicopediaFetcher.handleAction(action, this._videoData.unwrap());
+    }
+
+    private _handleUserNameFetchAction(action: UserNameFetchAction): boolean {
+        if (this._videoData.isNone) {
+            console.warn("this._videoData.isNone", this);
+            return false;
+        }
+
+        let payload = action.payload;
+        if (typeof payload === "string") {
+            this._videoData.unwrap().uploader.map(uploader => {
+                uploader.name = new Some(payload);
+            });
+            return true;
+        }
+        if (payload instanceof ErrorInfo) {
+            // Ignore errors
+            return false;
+        }
+
+        throw new Error("BUG: unreachable");
     }
 }

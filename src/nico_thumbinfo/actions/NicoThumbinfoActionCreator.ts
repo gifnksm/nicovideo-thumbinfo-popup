@@ -6,6 +6,7 @@ import GetThumbinfoFetchAction from "./GetThumbinfoFetchAction";
 import GetFlvFetchAction from "./GetFlvFetchAction";
 import V3VideoArrayFetchAction from "./V3VideoArrayFetchAction";
 import NicopediaFetchAction, {NicopediaInfo, Type as NicopediaType} from "./NicopediaFetchAction";
+import UserNameFetchAction from "./UserNameFetchAction";
 
 import ErrorInfo, {ErrorCode} from "../models/ErrorInfo";
 import VideoKey from "../models/VideoKey";
@@ -13,6 +14,7 @@ import RawVideoData from "../models/RawVideoData";
 import GetThumbinfoParser from "../models/parser/GetThumbinfoParser";
 import GetFlvParser from "../models/parser/GetFlvParser";
 import V3VideoArrayParser from "../models/parser/V3VideoArrayParser";
+import UserNameParser from "../models/parser/UserNameParser";
 
 import AppDispatcher, {AppDispatcherInterface} from "../../dispatcher/AppDispatcher";
 import UrlFetcher, {Request, Response} from "../../util/UrlFetcher";
@@ -50,6 +52,7 @@ class NicoThumbinfoActionCreator {
     private _getFlvFetcher: CachedUrlFetcher<VideoKey|ErrorInfo>;
     private _nicopediaFetcher: CachedUrlFetcher<NicopediaInfo|ErrorInfo>;
     private _v3VideoArrayFetcher: CachedUrlFetcher<RawVideoData|ErrorInfo>;
+    private _userNameFetcher: CachedUrlFetcher<string|ErrorInfo>;
 
     constructor(dispatcher: AppDispatcherInterface, fetcher: UrlFetcher) {
         this._dispatcher = dispatcher;
@@ -57,6 +60,7 @@ class NicoThumbinfoActionCreator {
         this._getFlvFetcher = new CachedUrlFetcher(fetcher);
         this._nicopediaFetcher = new CachedUrlFetcher(fetcher);
         this._v3VideoArrayFetcher = new CachedUrlFetcher(fetcher);
+        this._userNameFetcher = new CachedUrlFetcher(fetcher);
     }
 
     createGetThumbinfoFetchAction(source: Source, reqKey: VideoKey) {
@@ -128,6 +132,20 @@ class NicoThumbinfoActionCreator {
         });
     }
 
+    createUserNameFetchAction(source: Source, id: string) {
+        let url = `http://seiga.nicovideo.jp/api/user/info?id=${id}`;
+        let req = Request.get(url);
+
+        this._userNameFetcher.fetch(
+            req,
+            id,
+            this._handleUserNameResponse
+        ).then(payload => {
+            this._dispatcher.handleStoreEvent(
+                new UserNameFetchAction(source, payload));
+        });
+    }
+
     _handleGetThumbinfoResponse(requestKey: VideoKey, response: Response): RawVideoData|ErrorInfo {
         if (response.status !== 200) {
             return new ErrorInfo(ErrorCode.HttpStatus, response.statusText);
@@ -183,6 +201,15 @@ class NicoThumbinfoActionCreator {
         return V3VideoArrayParser.parse(requestKey, response.responseText);
     }
 
+    _handleUserNameResponse(response: Response): string|ErrorInfo {
+        if (response.status !== 200) {
+            return new ErrorInfo(ErrorCode.HttpStatus, response.statusText);
+        }
+        if (response.responseText === "") {
+            return new ErrorInfo(ErrorCode.ServerMaintenance);
+        }
+        return UserNameParser.parse(response.responseText);
+    }
 }
 
 const Creator = new NicoThumbinfoActionCreator(AppDispatcher, UrlFetcher.getInstance());

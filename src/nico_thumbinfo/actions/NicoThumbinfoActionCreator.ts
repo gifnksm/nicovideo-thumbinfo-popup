@@ -69,7 +69,7 @@ class NicoThumbinfoActionCreator {
             resp => this._handleGetThumbinfoResponse(reqKey, resp)
         ).then(payload => {
             this._dispatcher.handleStoreEvent(
-                new GetThumbinfoFetchAction(source, req, payload));
+                new GetThumbinfoFetchAction(source, payload));
         });
     }
 
@@ -83,7 +83,7 @@ class NicoThumbinfoActionCreator {
             this._handleGetFlvResponse
         ).then(payload => {
             this._dispatcher.handleStoreEvent(
-                new GetFlvFetchAction(source, req, payload));
+                new GetFlvFetchAction(source, payload));
         });
     }
 
@@ -110,7 +110,7 @@ class NicoThumbinfoActionCreator {
             resp => this._handleNicopediaResponse(type, name, resp)
         ).then(payload => {
             this._dispatcher.handleStoreEvent(
-                new NicopediaFetchAction(source, req, payload));
+                new NicopediaFetchAction(source, payload));
         })
     }
 
@@ -124,7 +124,7 @@ class NicoThumbinfoActionCreator {
             resp => this._handleV3VideoArrayResponse(reqKey, resp)
         ).then(payload => {
             this._dispatcher.handleStoreEvent(
-                new V3VideoArrayFetchAction(source, req, payload));
+                new V3VideoArrayFetchAction(source, payload));
         });
     }
 
@@ -138,20 +138,14 @@ class NicoThumbinfoActionCreator {
 
         let result = GetThumbinfoParser.parse(requestKey, response.responseText);
 
-        if (result instanceof RawVideoData) {
-            return result;
-        }
-
         if (result instanceof ErrorInfo) {
             if (result.code === ErrorCode.Community &&
                 requestKey.type === VideoKey.Type.ThreadId) {
                 return new ErrorInfo(ErrorCode.CommunitySubThread, result.detail);
             }
-            return result;
         }
 
-        console.warn("Unknown result: ", result);
-        return new ErrorInfo(ErrorCode.Invalid, "" + result);
+        return result;
     }
 
     _handleGetFlvResponse(response: Response): VideoKey|ErrorInfo {
@@ -161,19 +155,7 @@ class NicoThumbinfoActionCreator {
         if (response.responseText === "") {
             return new ErrorInfo(ErrorCode.ServerMaintenance);
         }
-
-        let result = GetFlvParser.parse(response.responseText);
-
-        if (result instanceof VideoKey) {
-            return result;
-        }
-
-        if (result instanceof ErrorInfo) {
-            return result;
-        }
-
-        console.warn("Unknown result: ", result);
-        return new ErrorInfo(ErrorCode.Invalid, "" + result);
+        return GetFlvParser.parse(response.responseText);
     }
 
     _handleNicopediaResponse(type: NicopediaType, name: string, response: Response): NicopediaInfo|ErrorInfo {
@@ -198,18 +180,9 @@ class NicoThumbinfoActionCreator {
         if (response.responseText === "") {
             return new ErrorInfo(ErrorCode.ServerMaintenance);
         }
-
-        let result = V3VideoArrayParser.parse(requestKey, response.responseText);
-        if (result instanceof RawVideoData) {
-            return result;
-        }
-
-        if (result instanceof ErrorInfo) {
-            return result;
-        }
-        console.warn("Unknown result: ", result);
-        return new ErrorInfo(ErrorCode.Invalid, "" + result);
+        return V3VideoArrayParser.parse(requestKey, response.responseText);
     }
+
 }
 
 const Creator = new NicoThumbinfoActionCreator(AppDispatcher, UrlFetcher.getInstance());

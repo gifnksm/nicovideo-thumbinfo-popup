@@ -5,8 +5,6 @@ import UrlFetchAction, {Source} from "./UrlFetchAction";
 
 import ErrorInfo, {ErrorCode} from "../models/ErrorInfo";
 
-import {Request} from "../../util/UrlFetcher";
-
 export const enum Type {
     Article, Video
 }
@@ -30,8 +28,8 @@ export class NicopediaInfo {
 export default class NicopediaFetchAction extends UrlFetchAction {
     private _payload: NicopediaInfo|ErrorInfo;
 
-    constructor(source: Source, request: Request, payload: NicopediaInfo|ErrorInfo) {
-        super(source, request);
+    constructor(source: Source, payload: NicopediaInfo|ErrorInfo) {
+        super(source);
         this._payload = payload;
     }
 

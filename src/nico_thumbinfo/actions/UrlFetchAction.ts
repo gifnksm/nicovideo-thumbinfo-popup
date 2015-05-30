@@ -25,15 +25,12 @@ export class Source {
 }
 
 export default class UrlFetchAction extends NicoThumbinfoAction {
-    private _request: Request;
     private _source: Source;
 
-    constructor(source: Source, request: Request) {
+    constructor(source: Source) {
         super(source.key);
-        this._request = request;
         this._source = source;
     }
 
-    get request() { return this._request; }
     get source() { return this._source; }
 }

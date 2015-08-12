@@ -15,7 +15,7 @@ var template = require("gulp-template");
 var uglify = require("gulp-uglify");
 var gutil = require("gulp-util");
 var lcovSourcemap = require("lcov-sourcemap");
-var karma = require("karma").server;
+var karma = require("karma");
 var path = require("path");
 var through = require("through2");
 var watchify = require("watchify");
@@ -168,13 +168,14 @@ gulp.task("watch:test:bundle", doBundle("test/**/*-spec.ts", "test/spec.js", tru
 gulp.task("build", ["build:normal", "build:min", "build:scss"]);
 
 gulp.task("test", ["test:bundle"], function(done) {
-  karma.start({
+  var server = new karma.Server({
     configFile: __dirname + "/karma.conf.js",
     singleRun: true,
     autoWatch: false
   }, function(exitStatus) {
     done(exitStatus ? "There are failing unit tests" : undefined);
   });
+  server.start();
 });
 
 gulp.task("watch:build", ["watch:build:bundle:normal"], function() {
@@ -200,11 +201,12 @@ gulp.task("watch:build", ["watch:build:bundle:normal"], function() {
 });
 
 gulp.task("watch:test", ["watch:test:bundle"], function() {
-  karma.start({
+  var server = new karma.Server({
     configFile: __dirname + "/karma.conf.js",
     singleRun: false,
     autoWatch: true
   });
+  server.start();
 });
 
 gulp.task("watch", ["watch:build", "watch:test"]);

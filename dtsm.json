@@ -2,7 +2,7 @@
   "repos": [
     {
       "url": "https://github.com/borisyankov/DefinitelyTyped.git",
-      "ref": "tsc-1.5.0-alpha"
+      "ref": "master"
     }
   ],
   "path": "typings",
@@ -17,28 +17,28 @@
   },
   "dependencies": {
     "mocha/mocha.d.ts": {
-      "ref": "4408b656fab59a4e7f871da2f492311eedc9bdcd"
+      "ref": "2d4c4679bc2b509f27435a4f9da5e2de11258571"
     },
     "power-assert/power-assert.d.ts": {
-      "ref": "4408b656fab59a4e7f871da2f492311eedc9bdcd"
+      "ref": "2d4c4679bc2b509f27435a4f9da5e2de11258571"
     },
     "react/react.d.ts": {
-      "ref": "4408b656fab59a4e7f871da2f492311eedc9bdcd"
+      "ref": "2d4c4679bc2b509f27435a4f9da5e2de11258571"
     },
     "es6-promise/es6-promise.d.ts": {
-      "ref": "4408b656fab59a4e7f871da2f492311eedc9bdcd"
+      "ref": "2d4c4679bc2b509f27435a4f9da5e2de11258571"
     },
     "node/node.d.ts": {
-      "ref": "00e7f3fede5f2df55b56c72f40a144824f0f0bfa"
+      "ref": "2d4c4679bc2b509f27435a4f9da5e2de11258571"
     },
     "flux/flux.d.ts": {
-      "ref": "4408b656fab59a4e7f871da2f492311eedc9bdcd"
+      "ref": "2d4c4679bc2b509f27435a4f9da5e2de11258571"
     },
     "greasemonkey/greasemonkey.d.ts": {
-      "ref": "4408b656fab59a4e7f871da2f492311eedc9bdcd"
+      "ref": "2d4c4679bc2b509f27435a4f9da5e2de11258571"
     },
     "es6-collections/es6-collections.d.ts": {
-      "ref": "4408b656fab59a4e7f871da2f492311eedc9bdcd"
+      "ref": "338f9db37074d197764e95a487ddb865c5f2d73c"
     }
   }
 }

@@ -7,7 +7,7 @@ import NicopediaIcon, {Type as NicopediaIconType} from "./NicopediaIcon";
 import * as React from "react";
 import {Option, Some, None} from "option-t";
 
-module Tag {
+namespace Tag {
     export interface Props {
         tag: TagData;
     }

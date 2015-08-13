@@ -12,7 +12,7 @@ import ErrorInfo, {ErrorCode} from "../ErrorInfo";
 
 import {Option, Some, None} from "option-t";
 
-module GetThumbinfoParser {
+namespace GetThumbinfoParser {
     const Parser = new DOMParser();
 
     export function parse(key: VideoKey, input: string): RawVideoData|ErrorInfo {

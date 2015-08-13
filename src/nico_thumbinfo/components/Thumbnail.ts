@@ -4,7 +4,7 @@
 import * as React from "react";
 import {Option, Some, None} from "option-t";
 
-module Thumbnail {
+namespace Thumbnail {
     export interface Props {
         url: Option<string>;
         deleted: boolean;

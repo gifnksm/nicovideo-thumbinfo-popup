@@ -24,7 +24,7 @@ import LastResBody from "./LastResBody";
 import {Option, Some, None} from "option-t";
 import * as React from "react";
 
-module Base {
+namespace Base {
     export interface Props {
         videoKey: VideoKey
         store?: VideoDataStoreInterface

@@ -6,7 +6,7 @@ import ErrorInfo, {ErrorCode} from "../ErrorInfo";
 
 import * as querystring from "querystring";
 
-module GetFlvParser {
+namespace GetFlvParser {
     export function parse(input: string): VideoKey|ErrorInfo {
         let data = querystring.parse(input);
         if (data.hasOwnProperty("error")) {

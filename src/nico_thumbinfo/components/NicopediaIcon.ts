@@ -9,7 +9,7 @@ export const enum Type {
     Tag, Video
 }
 
-module NicopediaIcon {
+namespace NicopediaIcon {
     export interface Props {
         type: Type,
         id: string,

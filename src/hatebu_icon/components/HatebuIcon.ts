@@ -7,7 +7,7 @@ export const enum Size {
     Normal, Small, Large
 }
 
-module HatebuIcon {
+namespace HatebuIcon {
     export interface Props {
         url: string;
         size?: Size;

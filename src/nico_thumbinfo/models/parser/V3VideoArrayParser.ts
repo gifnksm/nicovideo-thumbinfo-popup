@@ -23,7 +23,7 @@ class ParserState {
     get key() { return this._key; }
 }
 
-module V3VideoArrayParser {
+namespace V3VideoArrayParser {
     const Parser = new DOMParser();
 
     export function parse(key: VideoKey, input: string): RawVideoData|ErrorInfo {

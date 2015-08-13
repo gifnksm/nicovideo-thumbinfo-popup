@@ -53,7 +53,7 @@ class Key {
     }
 }
 
-module Key {
+namespace Key {
     export const enum Type {
         VideoId, ThreadId, OptionalThreadId
     }
@@ -65,7 +65,7 @@ module Key {
      *
      * 参考: http://dic.nicovideo.jp/a/id
      */
-    export module Prefix {
+    export namespace Prefix {
         const User = "sm|nm";
         const OldUser = "am|fz|ut";
         const Official = "ax|ca|cd|cw|fx|ig|na|om|sd|sk|yk|yo|za|zb|zc|zd|ze|so|nl";
@@ -74,14 +74,14 @@ module Key {
         export const AutoLink = [User, Official].join("|");
     }
 
-    module RegExpStr {
+    namespace RegExpStr {
         const NicovideoDomain = "(?:ext|www|tw|es|de|de|nine)\\.nicovideo\\.jp";
         const ShorUrlDomain = "nico\\.(?:ms|sc)";
-        module VideoId {
+        namespace VideoId {
             export const Strict = `(?:${Prefix.AutoLink})\\d+`;
             export const Loose = `[a-z]{2}\\d+`;
         }
-        module ThreadId {
+        namespace ThreadId {
             export const Strict = `\\d{10,}`;
             export const Loose = `\\d+`;
         }

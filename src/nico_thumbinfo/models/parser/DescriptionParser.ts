@@ -6,7 +6,7 @@ import {DescriptionNode as DNode,
         DescriptionElement as DElement,
         DescriptionText as DText} from "../DescriptionNode";
 
-module DescriptionParser {
+namespace DescriptionParser {
     const Parser = new DOMParser();
 
     /**
@@ -137,7 +137,7 @@ module DescriptionParser {
         return output;
     }
 
-    module Prefix {
+    namespace Prefix {
         const Video = VideoKey.Prefix.AutoLink; /// ニコニコ動画
         const VideoFull = VideoKey.Prefix.AutoLink /// ニコニコ動画 (watch/<id>)
             .split("|")
@@ -193,7 +193,7 @@ module DescriptionParser {
         })();
     }
 
-    module RegExpStr {
+    namespace RegExpStr {
         const Protocol = "(?:h?t?t?ps?|ftp)";
         const Domain = "[-_.!~*\'()a-zA-Z0-9;?:@&=+$,%#]";
         const Path = "[-_.!~*\'()a-zA-Z0-9;?:@&=+$,%#]";

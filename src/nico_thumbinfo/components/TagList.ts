@@ -6,7 +6,7 @@ import Tag from "./Tag"
 
 import * as React from "react";
 
-module TagList {
+namespace TagList {
     export interface Props {
         tags: TagData[];
     }

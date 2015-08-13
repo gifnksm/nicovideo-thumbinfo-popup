@@ -9,7 +9,7 @@ import HatebuIcon, {Size as HatebuIconSize} from "../../hatebu_icon/components/H
 import * as React from "react";
 import {Option, Some, None} from "option-t";
 
-module HeaderList {
+namespace HeaderList {
     export interface Props {
         videoData: VideoData;
     }

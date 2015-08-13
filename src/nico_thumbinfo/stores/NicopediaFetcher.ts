@@ -10,7 +10,7 @@ import NicopediaFetchAction, {NicopediaInfo, Type as NicopediaType} from "../act
 
 import {Option, Some, None} from "option-t";
 
-module NicopediaFetcher {
+namespace NicopediaFetcher {
     export function fetch(videoData: RawVideoData, source: Source) {
         _fetchVideo(videoData, source);
         _fetchTags(videoData, source);

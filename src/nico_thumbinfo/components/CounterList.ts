@@ -6,7 +6,7 @@ import VideoData from "../stores/VideoData";
 import * as React from "react";
 import {Option, Some, None} from "option-t";
 
-module CounterList {
+namespace CounterList {
     export interface Props {
         videoData: VideoData;
     }

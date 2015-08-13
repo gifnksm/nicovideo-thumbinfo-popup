@@ -6,7 +6,7 @@ import {DescriptionNode as DNode} from "../models/DescriptionNode";
 import * as React from "react";
 import {Option, Some, None} from "option-t";
 
-module Description {
+namespace Description {
     export interface Props {
         description: Option<DNode[]>;
     }

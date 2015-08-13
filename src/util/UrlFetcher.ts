@@ -72,7 +72,7 @@ interface UrlFetcher {
     fetch(request: Request): Promise<Response>;
 }
 
-module UrlFetcher {
+namespace UrlFetcher {
     var instance: Option<UrlFetcher> = new None<UrlFetcher>();
 
     export function getInstance(): UrlFetcher {

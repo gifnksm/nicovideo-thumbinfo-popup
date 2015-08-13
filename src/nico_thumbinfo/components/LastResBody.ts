@@ -6,7 +6,7 @@ import NicopediaIcon, {Type as NicopediaIconType} from "./NicopediaIcon";
 import * as React from "react";
 import {Option, Some, None} from "option-t";
 
-module LastResBody {
+namespace LastResBody {
     export interface Props {
         value: Option<string>;
     }

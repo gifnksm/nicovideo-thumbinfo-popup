@@ -5,7 +5,7 @@ import ErrorInfo, {ErrorCode} from "../ErrorInfo";
 
 import {Option, Some, None} from "option-t";
 
-module UserNameParser {
+namespace UserNameParser {
     const Parser = new DOMParser();
 
     export function parse(input: string): string|ErrorInfo {

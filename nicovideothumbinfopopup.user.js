@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           nicovideo Thumbinfo popup
 // @description    Get information about nicovideo movies before going to watch page.
-// @version        1.0.4
+// @version        2.0.0
 // @updateURL      https://raw.githubusercontent.com/gifnksm/nicovideo-thumbinfo-popup/master/nicovideothumbinfopopup.user.js
 // @namespace      http://d.hatena.ne.jp/gifnksm/
 // @include        *
@@ -9,11 +9,8 @@
 // @exclude        http://ext.nicovideo.jp/thumb_mylist/*
 // @exclude        http://ext.nicovideo.jp/thumb_community/*
 // @exclude        http://ichiba.nicovideo.jp/parts/*
-// @resource       style    https://raw.githubusercontent.com/gifnksm/nicovideo-thumbinfo-popup/master/style.css
-// @grant          GM_getResourceText
-// @grant          GM_addStyle
-// @grant          GM_xmlhttpRequest
-// @grant          GM_log
+// @grant          GM.xmlHttpRequest
+// @grant          GM.log
 // ==/UserScript==
 
 
@@ -415,14 +412,18 @@ var ClassNames = new function() {
   }
 
   // __hoge__ -> CSSNames[hoge] の置換
-  var cssString =  GM_getResourceText('style').replace(
+  var cssString =  getStyleText().replace(
       /__(\w+)__/g,
     function(_, name) {
       registName(name);
       return selectors[name];
     });
 
-  GM_addStyle(cssString);
+  let head = document.getElementsByTagName('head')[0];
+  let style = document.createElement('style');
+  style.setAttribute('type', 'text/css');
+  style.textContent = cssString;
+  head.appendChild(style);
 
   this.prefix = prefix;
   this.get = function(name) {
@@ -967,7 +968,7 @@ var InfoGetter = function() {
 
       log('access');
       this.loadState = LOAD_STATE.LOADING;
-      GM_xmlhttpRequest(
+      GM.xmlHttpRequest(
         { method: 'GET',
           url: this.url,
           headers: { 'User-Agent': 'Mozilla/5.0 Greasemonkey; nicovideo Thumbinfo popup' },
@@ -2242,10 +2243,13 @@ function log() {
     try {
       console.log.apply(console, arguments);
     } catch(e) {
-      GM_log('Error on console.log:\n' + Array.slice(arguments).join(',\n'));
+      GM.log('Error on console.log\n' + Array.map(
+               arguments,
+               function(obj) { return obj.toString(); }
+             ).join('\n'));
     }
   else
-    Array.forEach(arguments, GM_log);
+    Array.forEach(arguments, GM.log);
 }
 function group() {
   if(!DEBUG)
@@ -2254,7 +2258,10 @@ function group() {
     try {
       console.group.apply(console, arguments);
     } catch(e) {
-      GM_log('Error on console.group:\n' + Array.slice(arguments).join(',\n'));
+      GM.log('Error on console.group\n' + Array.map(
+               arguments,
+               function(obj) { return obj.toString(); }
+             ).join('\n'));
     }
 }
 function groupEnd() {
@@ -2264,7 +2271,10 @@ function groupEnd() {
     try {
       console.groupEnd();
     } catch(e) {
-      GM_log('Error on console.groupEnd:\n' + Array.slice(arguments).join(',\n'));
+      GM.log('Error on console.groupEnd\n' + Array.map(
+               arguments,
+               function(obj) { return obj.toString(); }
+             ).join('\n'));
     }
 }
 function getPosition(elem) {
@@ -2386,3 +2396,225 @@ function getPosition(elem) {
     pos.right = pos.left + pos.width;
   }
 }
+
+function getStyleText() {
+  return `
+__base__ {
+  -moz-border-radius: 5px;
+  position: fixed;
+  overflow: auto;
+  border: 1px solid gray;
+  background-color: #eee;
+  color: black;
+  text-align: left;
+  font-size: 11px;
+  padding: 8px 8px 8px;
+  margin: 0;
+  font-family: none;
+  z-index: 100000;
+  opacity: 0.8;
+  min-width: 28em;
+}
+__base__:hover, __base__.__mouseover__ {
+  opacity: 1;
+  background-color: white;
+}
+__base__ * {
+  font-family: none;
+  margin: 0;
+  padding: 0;
+  border: none;
+  text-indent: 0;
+  text-align: inherit;
+  background: none;
+  background-color: transparent;
+  color: black;
+  width: auto;
+  height: auto;
+  max-width: none;
+  max-height: none;
+  min-width: 0;
+  min-height: 0;
+  line-height: 1.5;
+  float: none;
+  clear: none;
+  -moz-box-sizing: content-box;
+  position: static;
+  visibility: visible;
+}
+__base__.__expanded__ {
+  width: 600px;
+}
+
+__base__ strong {
+  font-weight: bold;
+  font-size: inherit;
+}
+__base__ a         {
+  text-decoration: underline;
+  font-size: inherit;
+}
+__base__ a:link    { color: blue; }
+__base__ a:visited { color: #135; }
+__base__ a:hover,
+__base__ a:active {
+  color: red;
+  text-decoration: none;
+}
+
+
+__base__ > p.__buttons_container__ {
+  position: absolute;
+  top: 0;
+  right: 0;
+  margin: 0;
+  padding: 0;
+  color: white;
+}
+__base__ > p.__buttons_container__ > span {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  font-size: 15px;
+  font-weight: bold;
+  line-height: 16px;
+  margin: 0;
+  padding: 0;
+  text-align: center;
+  border: 1px solid gray;
+  border-width: 0 0 1px 1px;
+  background-color: inherit;
+  color: black;
+  cursor: pointer;
+}
+__base__ > p.__buttons_container__ > span:first-child {
+  -moz-border-radius-bottomleft: 5px;
+}
+__base__ > p.__buttons_container__ > span:last-child {
+  -moz-border-radius-topright: 2px;
+}
+__base__:hover span.__close_button__ {
+  background-color: #ffaaaa;
+}
+__base__ span.__close_button__:hover {
+  background-color: red;
+  color: white;
+}
+__base__ span.__help_button__:hover {
+  background-color: blue;
+  color: white;
+}
+__base__.__fixed__ {
+  border: 2px solid black;
+  margin: -1px;
+  background-color: white;
+  color: black;
+  text-align: left;
+}
+__base__.__fixed__ > p.__buttons_container__ > span {
+  border: 2px solid black;
+  border-width: 0 0 2px 2px;
+}
+__base__ img.__thumbnail__ {
+  float: left;
+  width: 130px;
+  height: 100px;
+  margin: 0 5px 5px 0;
+}
+__base__ h1 {
+  font-size: 14px;
+  line-height: 22px;
+  font-weight: bold;
+}
+__base__ a.__uploader__ {
+  font-weight: bold;
+}
+__base__ a.__mylist__ strong {
+  color: inherit;
+}
+__base__ img.__hatena__ {
+  vertical-align: middle;
+}
+
+
+__base__ p.__tags__ {
+  border: 1px solid silver;
+  border-width: 1px 0;
+  margin: 3px 0 3px 0;
+  padding: 3px;
+  word-spacing: 3px;
+  line-height: 1.7;
+  background-color: #eee;
+/*   text-align: justify; */
+}
+__base__ p.__tags__ > strong {
+  display: inline-block;
+}
+__base__ p.__tags__ span.__domain__ > span.__tag__ {
+  display: inline-block;
+}
+__base__ p.__tags__ span.__domain__ > strong {
+  margin-left: 2em;
+  letter-spacing: 0;
+  display: inline-block;
+}
+__base__ p.__tags__ a {
+  white-space: nowrap;
+}
+__base__ p.__tags__ a:link,
+__base__ a.__uploader__:link,
+__base__ a.__mylist__:link {
+  color: #222222;
+}
+__base__ p.__tags__ a:visited,
+__base__ a.__uploader__:visited,
+__base__ a.__mylist__:visited {
+  color: #444444;
+}
+__base__ p.__tags__ a:hover,
+__base__ > p.__tags__ a:active,
+__base__ a.__uploader__:hover,
+__base__ a.__uploader__:active,
+__base__ a.__mylist__:hover,
+__base__ a.__mylist__:active {
+  color: #666666;
+}
+
+__base__ img.__dic_icon__ {
+  vertical-align: middle;
+  margin: 0 2px 1px;
+}
+__base__ p.__description__ {
+  clear: left;
+  padding: 0 5px;
+  line-height: 1.7;
+  max-height: 150px;
+  overflow-y: auto;
+}
+__base__ p.__description__ a {
+  font-weight: bolder;
+}
+__base__ p.__deleted_message__ {
+  color: red;
+  background-color: #fcc;
+}
+
+
+__base__ p.__res__ {
+  margin: 2px 4px 0;
+  padding: 2px 4px;
+  border: 2px solid #999;
+  font-weight: bold;
+  line-height: 1.25;
+  word-spacing: 1em;
+}
+
+@-moz-document url-prefix(http://www.nicovideo.jp/watch) {
+  __base__ {
+    opacity: 1;
+    -moz-border-radius: 0px;
+  }
+}
+`;
+}
+
